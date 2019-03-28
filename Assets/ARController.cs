@@ -8,7 +8,7 @@ public class ARController : MonoBehaviour {
     
 	void Start() 
     {
-        ARCamera.SetActive(false);	
+        // ARCamera.SetActive(false);	
 	}
 
     public void ToggleARCamera()

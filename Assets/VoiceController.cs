@@ -1,17 +1,31 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 
 public class VoiceController : MonoBehaviour
 {
-    private const int CLIP_SIZE = 3;
+    public NetworkManager networkManager;
+    public AudioMixerGroup mixerGroupMic, mixerGroupMaster;
+    public bool playMicrophoneInRealTime = false;
+
+    private const int CLIP_SIZE = 4;
     private const int SAMPLING_RATE = 16000;
     private AudioSource audioSource;
-  
+
     void Start()
     {
         audioSource = GetComponent<AudioSource>();
+        if (playMicrophoneInRealTime)
+        {
+            audioSource.outputAudioMixerGroup = mixerGroupMaster;
+        }
+        else
+        {
+            audioSource.outputAudioMixerGroup = mixerGroupMic;
+        }
+
     }
 
     public void ToggleMicrophone()
@@ -57,7 +71,10 @@ public class VoiceController : MonoBehaviour
             // Save the clip after waiting
             if (audioSource.clip != null)
             {
-                SaveMicFile(audioSource.clip);
+                string filePath = SaveMicFile(audioSource.clip);
+
+                // Speech-to-text here
+                networkManager.RequestSpeechToText(filePath);
             }
         }
     }
@@ -75,7 +92,7 @@ public class VoiceController : MonoBehaviour
         audioSource.clip = null;
     }
 
-    private void SaveMicFile(AudioClip clip)
+    private string SaveMicFile(AudioClip clip)
     {
         // Get current date time as file name
         string timestamp = DateTime.Now.ToString();
@@ -83,6 +100,8 @@ public class VoiceController : MonoBehaviour
         string micFilename = "MicAudio-" + timestamp;
 
         // Save the clip
-        SavWav.Save(micFilename, clip);
+        string newFilePath = SavWav.Save(micFilename, clip);
+
+        return newFilePath;
     }
 }
