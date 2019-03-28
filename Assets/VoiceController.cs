@@ -5,8 +5,10 @@ using UnityEngine;
 
 public class VoiceController : MonoBehaviour
 {
+    private const int CLIP_SIZE = 3;
+    private const int SAMPLING_RATE = 16000;
     private AudioSource audioSource;
-
+  
     void Start()
     {
         audioSource = GetComponent<AudioSource>();
@@ -34,17 +36,15 @@ public class VoiceController : MonoBehaviour
 
     private void StartMicrophone(string micName)
     {
-        int clipSizeSec = 3;
-        StartCoroutine(CheckMic(micName, clipSizeSec));
+        StartCoroutine(CheckMic(micName, CLIP_SIZE));
     }
 
     private IEnumerator CheckMic(string micName, int clipSizeSec)
     {
-        int samplingRate = 44100;
         int latency = 0;
 
         // Start the microphone
-        audioSource.clip = Microphone.Start(micName, true, clipSizeSec, samplingRate);
+        audioSource.clip = Microphone.Start(micName, true, clipSizeSec, SAMPLING_RATE);
         audioSource.loop = true;
 
         // For real-time playback, set latency to 0.
