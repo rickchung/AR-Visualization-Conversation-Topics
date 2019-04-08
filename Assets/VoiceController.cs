@@ -6,12 +6,12 @@ using UnityEngine.Audio;
 
 public class VoiceController : MonoBehaviour
 {
-    public NetworkManager networkManager;
+    public SttNetworkManager networkManager;
     public AudioMixerGroup mixerGroupMic, mixerGroupMaster;
-    public bool playMicrophoneInRealTime = false;
+    public bool playMicrophoneInRealTime;
 
-    private const int CLIP_SIZE = 4;
-    private const int SAMPLING_RATE = 16000;
+    public int CLIP_SIZE;
+    public int SAMPLING_RATE;
     private AudioSource audioSource;
 
     void Start()
