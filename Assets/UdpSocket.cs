@@ -14,15 +14,17 @@ public class UdpSocket : MonoBehaviour
     private const int UDP_PORT = 7777;
 
     public Text localIpDisplay;
-    public InputField partnerIpInput;
+    public InputField partnerIPAddress;
+    public Text testMsgText;
 
-    private string _localIpAddress;
+    private string _localIpAddress, _serverIpAddress;
 
     NetworkClient clientToPartner;
 
-    public static class MyMsgType
+    private static class MyMsgType
     {
         public static short MSG_TEST = MsgType.Highest + 1;
+        public static short MSG_CLIENT_CONNECTED = MsgType.Highest + 2;
     }
 
     void Start()
@@ -35,22 +37,54 @@ public class UdpSocket : MonoBehaviour
                 _localIpAddress = ip.ToString();
             }
         }
-        localIpDisplay.text = _localIpAddress;
+
+        localIpDisplay.text = "HOST: " + _localIpAddress;
 
         SetupServer();
     }
 
+    // ==================== Server Side ==================== 
+
     // Create a server and listen on a port
-    public void SetupServer()
+    private void SetupServer()
     {
-        Debug.Log("[Server] Setting up a local server listening at " + UDP_PORT);
+        Debug.Log("[SERVER] Setting up a local server listening at " + UDP_PORT);
         NetworkServer.Listen(UDP_PORT);
+        NetworkServer.RegisterHandler(MyMsgType.MSG_CLIENT_CONNECTED, OnConnectedClientReport);
     }
 
-    // Create a client and connect to the server port
-    public void SetupClient(string partnerIP)
+    // After the partner connects to this device, you have to
+    // build make your client connect back.
+    private void OnConnectedClientReport(NetworkMessage netMsg)
     {
-        Debug.Log("[Client] Trying to connect to the partner at " + partnerIP);
+        if (_serverIpAddress == null)
+        {
+            _serverIpAddress = netMsg.conn.address;
+            Debug.Log("[SERVER] Received client report at " + _serverIpAddress);
+            NetworkServer.dontListen = true;
+            partnerIPAddress.interactable = false;
+            partnerIPAddress.text = _serverIpAddress;
+            SetupClient(_serverIpAddress);
+        }
+    }
+
+    // Used to test whether the clients can receive a message.
+    public void TestServerToClient()
+    {
+        var testMsg = new StringMessage();
+        StringMessage stringMessage = new StringMessage
+        {
+            value = "[SERVER] Hello I'm Server at " + _localIpAddress
+        };
+        NetworkServer.SendToAll(MyMsgType.MSG_TEST, stringMessage);
+    }
+
+    // ==================== Client Side ==================== 
+
+    // Create a client and connect to the server port
+    private void SetupClient(string partnerIP)
+    {
+        Debug.Log("[CLIENT] Trying to connect to the partner at " + partnerIP);
         clientToPartner = new NetworkClient();
         clientToPartner.RegisterHandler(MsgType.Connect, OnConnected);
         clientToPartner.RegisterHandler(MyMsgType.MSG_TEST, OnTestMsgArrived);
@@ -58,27 +92,31 @@ public class UdpSocket : MonoBehaviour
     }
 
     // Client OnConnected callback
-    public void OnConnected(NetworkMessage netMsg)
+    private void OnConnected(NetworkMessage netMsg)
     {
-        Debug.Log("[Client] Connected to the server at " + clientToPartner.serverIp);
+        _serverIpAddress = clientToPartner.serverIp;
+        // Disable the IP input field
+        partnerIPAddress.interactable = false;
+
+        Debug.Log("[CLIENT] Connected to the server at " + _serverIpAddress);
+
+        // Tell the server you received the message.
+        StringMessage stringMessage = new StringMessage
+        {
+            value = "[CLIENT] Client report"
+        };
+
+        clientToPartner.Send(MyMsgType.MSG_CLIENT_CONNECTED, stringMessage);
     }
 
-    public void OnTestMsgArrived(NetworkMessage netMsg)
+    // Used to test the connection from server to clients
+    private void OnTestMsgArrived(NetworkMessage netMsg)
     {
         if (netMsg != null)
         {
             var msg = netMsg.ReadMessage<StringMessage>();
-            Debug.Log("[Client] Test message arrived: " + msg.value);
+            Debug.Log("[CLIENT] Test message arrived: " + msg.value);
+            testMsgText.text = msg.value;
         }
-    }
-
-    public void TestServerToClient()
-    {
-        var testMsg = new StringMessage();
-        StringMessage stringMessage = new StringMessage
-        {
-            value = "Hello I'm server. This is a test message"
-        };
-        NetworkServer.SendToAll(MyMsgType.MSG_TEST, stringMessage);
     }
 }
