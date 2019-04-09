@@ -11,6 +11,7 @@ public class SttNetworkManager : MonoBehaviour
     private const int TIMEOUT = 5;
 
     public SpeechToTextController sttController;
+    public PartnerSocket partnerSocket;
 
     public void RequestSpeechToText(string audio_path)
     {
@@ -105,6 +106,7 @@ public class SttNetworkManager : MonoBehaviour
         {
             sttController.SaveTranscript(stt.transcript);
             sttController.UpdateVis();
+            partnerSocket.BroadcastNewTranscript(stt.transcript);
         }
     }
 }

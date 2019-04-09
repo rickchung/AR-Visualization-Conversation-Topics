@@ -5,26 +5,31 @@ using System;
 using UnityEngine.UI;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using UnityEngine.Networking;
 using UnityEngine.Networking.NetworkSystem;
 
-public class UdpSocket : MonoBehaviour
+public class PartnerSocket : MonoBehaviour
 {
     private const int UDP_PORT = 7777;
 
     public Text localIpDisplay;
     public InputField partnerIPAddress;
     public Text testMsgText;
+    public PinnedConceptController pinnedConceptController;
+    public SpeechToTextController speechToTextController;
 
     private string _localIpAddress, _serverIpAddress;
 
-    NetworkClient clientToPartner;
+    private NetworkClient clientToPartner;
 
     private static class MyMsgType
     {
         public static short MSG_TEST = MsgType.Highest + 1;
         public static short MSG_CLIENT_CONNECTED = MsgType.Highest + 2;
+        public static short MSG_NEW_KEYWORDS = MsgType.Highest + 3;
+        public static short MSG_PINNED_KEYWORDS = MsgType.Highest + 4;
+        public static short MSG_TRANS = MsgType.Highest + 5;
+
     }
 
     void Start()
@@ -77,6 +82,28 @@ public class UdpSocket : MonoBehaviour
             value = "[SERVER] Hello I'm Server at " + _localIpAddress
         };
         NetworkServer.SendToAll(MyMsgType.MSG_TEST, stringMessage);
+
+        StringMessage testNewConcepts = new StringMessage
+        {
+            value = "C1,C2"
+        };
+        NetworkServer.SendToAll(MyMsgType.MSG_NEW_KEYWORDS, testNewConcepts);
+    }
+
+    public void BroadcasetNewKeywords(string[] keywords)
+    {
+        NetworkServer.SendToAll(MyMsgType.MSG_NEW_KEYWORDS, new StringMessage
+        {
+            value = String.Join(",", keywords)
+        });
+    }
+
+    public void BroadcastNewTranscript(string[] transcripts)
+    {
+        NetworkServer.SendToAll(MyMsgType.MSG_TRANS, new StringMessage
+        {
+            value = String.Join("|", transcripts)
+        });
     }
 
     // ==================== Client Side ==================== 
@@ -88,6 +115,9 @@ public class UdpSocket : MonoBehaviour
         clientToPartner = new NetworkClient();
         clientToPartner.RegisterHandler(MsgType.Connect, OnConnected);
         clientToPartner.RegisterHandler(MyMsgType.MSG_TEST, OnTestMsgArrived);
+        clientToPartner.RegisterHandler(MyMsgType.MSG_NEW_KEYWORDS, OnReceivedNewKeywords);
+        clientToPartner.RegisterHandler(MyMsgType.MSG_PINNED_KEYWORDS, OnReceivedPinnedKeywords);
+        clientToPartner.RegisterHandler(MyMsgType.MSG_TRANS, OnReceiveTranscript);
         clientToPartner.Connect(partnerIP, UDP_PORT);
     }
 
@@ -101,12 +131,10 @@ public class UdpSocket : MonoBehaviour
         Debug.Log("[CLIENT] Connected to the server at " + _serverIpAddress);
 
         // Tell the server you received the message.
-        StringMessage stringMessage = new StringMessage
+        clientToPartner.Send(MyMsgType.MSG_CLIENT_CONNECTED, new StringMessage
         {
             value = "[CLIENT] Client report"
-        };
-
-        clientToPartner.Send(MyMsgType.MSG_CLIENT_CONNECTED, stringMessage);
+        });
     }
 
     // Used to test the connection from server to clients
@@ -118,5 +146,27 @@ public class UdpSocket : MonoBehaviour
             Debug.Log("[CLIENT] Test message arrived: " + msg.value);
             testMsgText.text = msg.value;
         }
+    }
+
+    private void OnReceiveTranscript(NetworkMessage netMsg)
+    {
+        string transcripts = netMsg.ReadMessage<StringMessage>().value;
+        speechToTextController.SaveTranscript(transcripts.Split('|'));
+        speechToTextController.UpdateVis();
+    }
+
+    private void OnReceivedNewKeywords(NetworkMessage netMsg)
+    {
+        // Add to the panel
+        var newKeywordsMsg = netMsg.ReadMessage<StringMessage>();
+        foreach (String kw in newKeywordsMsg.value.Split(','))
+        {
+            pinnedConceptController.AddNewConcept(new ConceptData(kw));
+        }
+    }
+
+    private void OnReceivedPinnedKeywords(NetworkMessage netMsg)
+    {
+
     }
 }

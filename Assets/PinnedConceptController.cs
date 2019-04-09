@@ -14,12 +14,18 @@ public class PinnedConceptController : MonoBehaviour, IEnhancedScrollerDelegate 
     {
         _pinnedConcepts = new List<ConceptData>();
 
-        _pinnedConcepts.Add(new ConceptData("For Loop"));
-        _pinnedConcepts.Add(new ConceptData("While Loop"));
-        _pinnedConcepts.Add(new ConceptData("Array"));
-        _pinnedConcepts.Add(new ConceptData("Nested Loop"));
+        //_pinnedConcepts.Add(new ConceptData("For Loop"));
+        //_pinnedConcepts.Add(new ConceptData("While Loop"));
+        //_pinnedConcepts.Add(new ConceptData("Array"));
+        //_pinnedConcepts.Add(new ConceptData("Nested Loop"));
 
         pinnedConceptScroller.Delegate = this;
+        pinnedConceptScroller.ReloadData();
+    }
+
+    public void AddNewConcept(ConceptData concept)
+    {
+        _pinnedConcepts.Add(concept);
         pinnedConceptScroller.ReloadData();
     }
 

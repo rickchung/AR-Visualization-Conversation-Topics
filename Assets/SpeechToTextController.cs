@@ -41,11 +41,14 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
     {
         foreach (string ts in text)
         {
-            SaveToFile(ts + "\n");
-            _sttHistory.Add(ts);
-            foreach (string t in ts.Split(' '))
+            if (ts.Length > 0)
             {
-                _sttTokens.Add(t);
+                SaveToFile(ts + "\n");
+                _sttHistory.Add(ts);
+                foreach (string t in ts.Split(' '))
+                {
+                    _sttTokens.Add(t);
+                }
             }
         }
         historyScroller.ReloadData();
@@ -106,25 +109,7 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
     public void UpdateTxtOutput()
     {
         string output = "";
-
         output = _sttHistory[_sttHistory.Count - 1];
-
-        //int tail = _sttTokens.Count;
-        //if (tail < TXT_OUTPUT_LIMIT)
-        //{
-        //    foreach (string s in _sttTokens)
-        //    {
-        //        output += s + " ";
-        //    }
-        //}
-        //else
-        //{
-        //    for (int i = tail - TXT_OUTPUT_LIMIT; i < tail; i++)
-        //    {
-        //        output += _sttTokens[i] + " ";
-        //    }
-        //}
-
         textOutput.text = output;
     }
 
