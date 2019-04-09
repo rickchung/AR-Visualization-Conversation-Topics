@@ -29,9 +29,25 @@ def upload_file(request):
                 # Call Google cloud transcription service
                 results = transcribe_file(tmp_filename)
 
+                # Find relevant keywords (w2v)
+                keywords = []
+                
+                # Find relevant topics/subtopics
+                topics = []
+                subtopics = [[]]
+                
+                # Find relevant examples
+                examples = [[]]
+                
+
             return JsonResponse({
                 'msg': 'valid', 
-                'transcript': results})
+                'transcript': results,
+                'keywords': keywords,
+                'topics': topics,
+                'subtopics': subtopics,
+                'examples': examples,
+            })
 
         else:
             return JsonResponse({
