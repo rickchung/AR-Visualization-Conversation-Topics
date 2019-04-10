@@ -10,13 +10,13 @@ class MyUDPHandler(socketserver.BaseRequestHandler):
 
         # If it is the first time seeing this connection, save it and
         # do nothing.
-        if address not in client_list:
+        if address not in this.client_list:
             print("New connection: " + str(address))
-            client_list[address] = socket        
+            this.client_list[address] = socket        
 
         # Otherwise, broadcast the data too all the saved connections 
         else:
-            for c_addr, c_socket in client_list.items():
+            for c_addr, c_socket in this.client_list.items():
                 # if c_addr != address
                 #     c_socket.sendto(data, c_addr)
                 c_socket.sendto(data, c_addr)
