@@ -453,6 +453,11 @@ Prefab:
       propertyPath: m_SizeDelta.x
       value: -50.8
       objectReference: {fileID: 0}
+    - target: {fileID: 114744032405250800, guid: 6ae3a25093538495fb17f7331d11417c,
+        type: 2}
+      propertyPath: m_FontData.m_BestFit
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6ae3a25093538495fb17f7331d11417c, type: 2}
   m_IsPrefabAsset: 0
@@ -816,7 +821,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.00003398454, y: 0.000005539515}
+  m_AnchoredPosition: {x: 0.00003407156, y: 0.000005539515}
   m_SizeDelta: {x: 284.7, y: 78.9}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &467917072
@@ -1672,6 +1677,7 @@ MonoBehaviour:
   testMsgText: {fileID: 1850253378}
   pinnedConceptController: {fileID: 747354413}
   speechToTextController: {fileID: 747354411}
+  useLocalServer: 1
 --- !u!4 &1014079041
 Transform:
   m_ObjectHideFlags: 0
@@ -3372,10 +3378,10 @@ RectTransform:
   m_Father: {fileID: 1732101021}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -374.7, y: -304.5}
-  m_SizeDelta: {x: 330.6, y: 61.2}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 165.29999, y: 100.5}
+  m_SizeDelta: {x: 330.6, y: 61.200012}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &2110509975
 GameObject:

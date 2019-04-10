@@ -10,13 +10,15 @@ using UnityEngine.Networking.NetworkSystem;
 
 public class PartnerSocket : MonoBehaviour
 {
-    private const int UDP_PORT = 7777;
+    private const string HOST_SERVER = "10.218.106.151:8082";
+    private const int UDP_PORT = 7777;  // For local server
 
     public Text localIpDisplay;
     public InputField partnerIPAddress;
     public Text testMsgText;
     public PinnedConceptController pinnedConceptController;
     public SpeechToTextController speechToTextController;
+    public bool useLocalServer;
 
     private string _localIpAddress, _serverIpAddress;
 
@@ -45,7 +47,8 @@ public class PartnerSocket : MonoBehaviour
 
         localIpDisplay.text = "HOST: " + _localIpAddress;
 
-        SetupServer();
+        if (useLocalServer)
+            SetupServer();
     }
 
     // ==================== Server Side ==================== 
@@ -81,29 +84,39 @@ public class PartnerSocket : MonoBehaviour
         {
             value = "[SERVER] Hello I'm Server at " + _localIpAddress
         };
-        NetworkServer.SendToAll(MyMsgType.MSG_TEST, stringMessage);
+        BroadcastToConnected(MyMsgType.MSG_TEST, stringMessage);
 
         StringMessage testNewConcepts = new StringMessage
         {
             value = "C1,C2"
         };
-        NetworkServer.SendToAll(MyMsgType.MSG_NEW_KEYWORDS, testNewConcepts);
+        BroadcastToConnected(MyMsgType.MSG_NEW_KEYWORDS, testNewConcepts);
     }
 
     public void BroadcasetNewKeywords(string[] keywords)
     {
-        NetworkServer.SendToAll(MyMsgType.MSG_NEW_KEYWORDS, new StringMessage
+        BroadcastToConnected(MyMsgType.MSG_NEW_KEYWORDS, new StringMessage
         {
-            value = String.Join(",", keywords)
+            value = string.Join(",", keywords)
         });
     }
 
     public void BroadcastNewTranscript(string[] transcripts)
     {
-        NetworkServer.SendToAll(MyMsgType.MSG_TRANS, new StringMessage
+        string[] pTranscripts = new string[transcripts.Length];
+        for (int i = 0; i < pTranscripts.Length; i++)
         {
-            value = String.Join("|", transcripts)
+            pTranscripts[i] = "P: " + transcripts[i];
+        }
+        BroadcastToConnected(MyMsgType.MSG_TRANS, new StringMessage
+        {
+            value = string.Join("|", pTranscripts)
         });
+    }
+
+    private void BroadcastToConnected(short msgType, MessageBase msg)
+    {
+        NetworkServer.SendToAll(msgType, msg);
     }
 
     // ==================== Client Side ==================== 
@@ -129,6 +142,7 @@ public class PartnerSocket : MonoBehaviour
         partnerIPAddress.interactable = false;
 
         Debug.Log("[CLIENT] Connected to the server at " + _serverIpAddress);
+        testMsgText.text = "Connected to " + _serverIpAddress;
 
         // Tell the server you received the message.
         clientToPartner.Send(MyMsgType.MSG_CLIENT_CONNECTED, new StringMessage

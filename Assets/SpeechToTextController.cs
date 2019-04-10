@@ -52,6 +52,8 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
             }
         }
         historyScroller.ReloadData();
+        if (historyScroller.gameObject.activeSelf)
+            historyScroller.JumpToDataIndex(_sttHistory.Count - 1);
     }
 
     private void SaveToFile(string transcript)
@@ -109,7 +111,10 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
     public void UpdateTxtOutput()
     {
         string output = "";
-        output = _sttHistory[_sttHistory.Count - 1];
+        if (_sttHistory.Count > 0)
+        {
+            output = _sttHistory[_sttHistory.Count - 1];
+        }
         textOutput.text = output;
     }
 
