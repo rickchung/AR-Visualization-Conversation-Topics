@@ -10,17 +10,26 @@ using UnityEngine.Networking.NetworkSystem;
 
 public class PartnerSocket : MonoBehaviour
 {
-    private const string HOST_SERVER = "10.218.106.151:8082";
-    private const int UDP_PORT = 7777;  // For local server
+    // For Internet server
+    private const string HOST_SERVER = "10.218.106.151";
+    private const int HOST_SERVER_PORT = 8082;
+    // For local server
+    private const int UDP_PORT = 7777;
 
     public Text localIpDisplay;
     public InputField partnerIPAddress;
-    public Text testMsgText;
+    public GameObject serverMsgPanel;
     public PinnedConceptController pinnedConceptController;
     public SpeechToTextController speechToTextController;
+
+    private Button hostConnBtn;
+    private Text serverMsgText;
+
     public bool useLocalServer;
 
     private string _localIpAddress, _serverIpAddress;
+
+    private bool _broadcastByHost;
 
     private NetworkClient clientToPartner;
 
@@ -31,11 +40,13 @@ public class PartnerSocket : MonoBehaviour
         public static short MSG_NEW_KEYWORDS = MsgType.Highest + 3;
         public static short MSG_PINNED_KEYWORDS = MsgType.Highest + 4;
         public static short MSG_TRANS = MsgType.Highest + 5;
-
     }
 
     void Start()
     {
+        serverMsgText = serverMsgPanel.GetComponentInChildren<Text>();
+        hostConnBtn = serverMsgPanel.GetComponent<Button>();
+
         var host = Dns.GetHostEntry(Dns.GetHostName());
         foreach (var ip in host.AddressList)
         {
@@ -45,24 +56,61 @@ public class PartnerSocket : MonoBehaviour
             }
         }
 
-        localIpDisplay.text = "HOST: " + _localIpAddress;
+        localIpDisplay.text = "LAN: " + _localIpAddress;
 
         if (useLocalServer)
-            SetupServer();
+            SetupLocalServer();
+    }
+
+    public void SetupRemoteServer()
+    {
+        Debug.Log("Trying to connect to the HOST server...");
+        clientToPartner = new NetworkClient();
+        clientToPartner.RegisterHandler(MsgType.Connect, OnConnected);
+        clientToPartner.RegisterHandler(MyMsgType.MSG_TEST, OnTestMsgArrived);
+        clientToPartner.RegisterHandler(MyMsgType.MSG_NEW_KEYWORDS, OnReceivedNewKeywords);
+        clientToPartner.RegisterHandler(MyMsgType.MSG_PINNED_KEYWORDS, OnReceivedPinnedKeywords);
+        clientToPartner.RegisterHandler(MyMsgType.MSG_TRANS, OnReceiveTranscript);
+        clientToPartner.Connect(HOST_SERVER, HOST_SERVER_PORT);
+
+        _broadcastByHost = true;
+
+        serverMsgText.text = "Trying to find the host...";
+        hostConnBtn.interactable = false;
+    }
+
+    // ==================== Middleware ==================== 
+
+    private void BroadcastToConnected(short msgType, MessageBase msg)
+    {
+        if (!_broadcastByHost)
+        {
+            NetworkServer.SendToAll(msgType, msg);
+        }
+        else
+        {
+            clientToPartner.Send(msgType, msg);
+        }
     }
 
     // ==================== Server Side ==================== 
 
     // Create a server and listen on a port
-    private void SetupServer()
+    private void SetupLocalServer()
     {
         Debug.Log("[SERVER] Setting up a local server listening at " + UDP_PORT);
         NetworkServer.Listen(UDP_PORT);
         NetworkServer.RegisterHandler(MyMsgType.MSG_CLIENT_CONNECTED, OnConnectedClientReport);
+
+        _broadcastByHost = false;
     }
 
-    // After the partner connects to this device, you have to
-    // build make your client connect back.
+    /// <summary>
+    /// After the partner connects to this device, 
+    /// you have to make your client connect back to the local server
+    /// (this is only for LAN server setup).
+    /// </summary>
+    /// <param name="netMsg">Net message.</param>
     private void OnConnectedClientReport(NetworkMessage netMsg)
     {
         if (_serverIpAddress == null)
@@ -79,13 +127,6 @@ public class PartnerSocket : MonoBehaviour
     // Used to test whether the clients can receive a message.
     public void TestServerToClient()
     {
-        var testMsg = new StringMessage();
-        StringMessage stringMessage = new StringMessage
-        {
-            value = "[SERVER] Hello I'm Server at " + _localIpAddress
-        };
-        BroadcastToConnected(MyMsgType.MSG_TEST, stringMessage);
-
         StringMessage testNewConcepts = new StringMessage
         {
             value = "C1,C2"
@@ -114,11 +155,6 @@ public class PartnerSocket : MonoBehaviour
         });
     }
 
-    private void BroadcastToConnected(short msgType, MessageBase msg)
-    {
-        NetworkServer.SendToAll(msgType, msg);
-    }
-
     // ==================== Client Side ==================== 
 
     // Create a client and connect to the server port
@@ -142,12 +178,13 @@ public class PartnerSocket : MonoBehaviour
         partnerIPAddress.interactable = false;
 
         Debug.Log("[CLIENT] Connected to the server at " + _serverIpAddress);
-        testMsgText.text = "Connected to " + _serverIpAddress;
+        serverMsgText.text = "Connected to " + _serverIpAddress;
+        serverMsgText.text = "Connected to " + _serverIpAddress;
 
         // Tell the server you received the message.
         clientToPartner.Send(MyMsgType.MSG_CLIENT_CONNECTED, new StringMessage
         {
-            value = "[CLIENT] Client report"
+            value = "[CLIENT] Client report from " + _localIpAddress
         });
     }
 
@@ -158,10 +195,14 @@ public class PartnerSocket : MonoBehaviour
         {
             var msg = netMsg.ReadMessage<StringMessage>();
             Debug.Log("[CLIENT] Test message arrived: " + msg.value);
-            testMsgText.text = msg.value;
+            serverMsgText.text = msg.value;
         }
     }
 
+    /// <summary>
+    /// When receiving new broacasted transcripts from the server
+    /// </summary>
+    /// <param name="netMsg">Net message.</param>
     private void OnReceiveTranscript(NetworkMessage netMsg)
     {
         string transcripts = netMsg.ReadMessage<StringMessage>().value;

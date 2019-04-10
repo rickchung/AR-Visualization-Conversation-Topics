@@ -137,7 +137,7 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
     /// <param name="dataIndex">Data index.</param>
     public float GetCellViewSize(EnhancedScroller scroller, int dataIndex)
     {
-        return 50f;
+        return 60f;
     }
 
     /// <summary>
