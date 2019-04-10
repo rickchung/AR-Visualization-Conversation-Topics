@@ -105,7 +105,7 @@ public class SttNetworkManager : MonoBehaviour
         if (sttController != null)
         {
             sttController.SaveTranscript(stt.transcript);
-            sttController.UpdateVis();
+            // sttController.UpdateVis();  // Puts the new message on top and xr
             partnerSocket.BroadcastNewTranscript(stt.transcript);
         }
     }

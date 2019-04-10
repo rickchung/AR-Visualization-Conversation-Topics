@@ -106,7 +106,7 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
     }
 
     /// <summary>
-    /// Update the transcription on the screen
+    /// Show the latest transcript on the screen
     /// </summary>
     public void UpdateTxtOutput()
     {
