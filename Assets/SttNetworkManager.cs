@@ -16,6 +16,7 @@ public class SttNetworkManager : MonoBehaviour
 
     public SpeechToTextController sttController;
     public PartnerSocket partnerSocket;
+    public bool debugEchoUserStt;
 
     /// <summary>
     /// A wrapper function which requests the speech file to text.
@@ -122,6 +123,12 @@ public class SttNetworkManager : MonoBehaviour
         if (sttController != null)
         {
             sttController.SaveTranscript(stt.transcript);
+
+            if (debugEchoUserStt)
+            {
+                sttController.UpdateVis();
+            }
+
             // Broadcast the new transcript extracted from the user's speech
             partnerSocket.BroadcastNewTranscript(stt.transcript);
         }

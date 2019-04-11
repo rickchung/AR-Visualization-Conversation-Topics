@@ -16,10 +16,10 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
     public GameObject xrImageContainer;
     public EnhancedScroller historyScroller;
     public TransCellView transCellViewPrefab;
+    public bool render3DTranscripts;
 
-    private const int TXT_OUTPUT_LIMIT = 7;
+    private const int XR_TRANSCRIPTS_OUTPUT_LIMIT = 20;
 
-    private List<string> _sttTokens;
     private List<string> _sttHistory;
 
     private string _sttHistoryFilePath;
@@ -30,7 +30,6 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
         _sttHistoryFilename = System.Guid.NewGuid().ToString() + ".trans.txt";
         _sttHistoryFilePath = Path.Combine(Application.persistentDataPath, _sttHistoryFilename);
 
-        _sttTokens = new List<string>();
         _sttHistory = new List<string>();
 
         historyScroller.Delegate = this;
@@ -51,10 +50,6 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
                 var timestamp = System.DateTime.Now.ToString("MM/dd/HH:mm:ss");
                 SaveToFile(timestamp + "," + ts + "\n");
                 _sttHistory.Add(ts);
-                foreach (string t in ts.Split(' '))
-                {
-                    _sttTokens.Add(t);
-                }
             }
         }
         historyScroller.ReloadData();
@@ -76,7 +71,7 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
         {
             UpdateTxtOutput();
         }
-        if (xrImageContainer != null)
+        if (render3DTranscripts && xrImageContainer != null)
         {
             UpdateXrVis();
         }
@@ -85,7 +80,7 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
     /// <summary>
     /// Update the visualization in XR
     /// </summary>
-    public void UpdateXrVis()
+    private void UpdateXrVis()
     {
         // Clear the container
         foreach (Transform child in xrImageContainer.transform)
@@ -93,28 +88,35 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
             Destroy(child.gameObject);
         }
 
-        for (int i = _sttTokens.Count - 1, cnt = 0; i >= 0 && cnt <= TXT_OUTPUT_LIMIT; i--, cnt++)
+        // Only visualize a limited number of transcripts
+        int numToVisualize = XR_TRANSCRIPTS_OUTPUT_LIMIT;
+        int indexStart = _sttHistory.Count - numToVisualize;
+        if (indexStart < 0)
+            indexStart = 0;
+        float localPosZStart = 1.0f;
+        float localPosZPad = -0.25f;
+        for (int i = indexStart; i < _sttHistory.Count; i++)
         {
             var xrTxt = Instantiate(Resources.Load<GameObject>("XrTxtModel"));
-            var textMesh = xrTxt.GetComponentInChildren<TextMesh>();
-            textMesh.text = _sttTokens[i];
+            var textMesh = xrTxt.transform.Find("Text");
+            var textBg = xrTxt.transform.Find("TextBg");
 
-            // Random position
+            textMesh.GetComponent<TextMesh>().text = _sttHistory[i];
+
+            // Adjust the position/scale of the background
+            textBg.localScale = new Vector3(0.25f, 10.0f, 0.07f);
+            // Adjust the position/scale of the whole text object
+            float zPosition = localPosZStart + i * localPosZPad;
             xrTxt.transform.parent = xrImageContainer.transform;
-            xrTxt.transform.localEulerAngles = new Vector3(90f, 0, 0);
-            xrTxt.transform.localScale = new Vector3(5f, 1f, 0.1f);
-
-            int span = 5;
-            float posX = Random.Range(-span, span);
-            float posY = Random.Range(-span, span);
-            xrTxt.transform.localPosition = new Vector3(posX, 2.0f, posY);
+            xrTxt.transform.localPosition = new Vector3(0, 0, zPosition);
+            xrTxt.transform.localEulerAngles = new Vector3(90, 0, 0);
         }
     }
 
     /// <summary>
     /// Show the latest transcript on the screen
     /// </summary>
-    public void UpdateTxtOutput()
+    private void UpdateTxtOutput()
     {
         string output = "";
         if (_sttHistory.Count > 0)
