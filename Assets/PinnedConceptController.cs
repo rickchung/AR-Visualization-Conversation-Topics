@@ -3,6 +3,12 @@ using System.Collections.Generic;
 using EnhancedUI.EnhancedScroller;
 using UnityEngine;
 
+/// <summary>
+/// Pinned concept controller handles the keywords selected (pinned) by the
+/// partner. When a partner select a keyword on his/her screen thatis generated
+/// from their transcripts, the keyword will show up in the user's pinned keyword
+/// panel on the top of the screen.
+/// </summary>
 public class PinnedConceptController : MonoBehaviour, IEnhancedScrollerDelegate {
 
     private List<ConceptData> _pinnedConcepts;

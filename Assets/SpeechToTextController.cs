@@ -5,6 +5,11 @@ using UnityEngine.UI;
 using EnhancedUI.EnhancedScroller;
 using System.IO;
 
+/// <summary>
+/// Speech to text controller handles the transcription rendering on the screen,
+/// for both 2D and AR GUI. The scrollers of transcripts are handled by 
+/// EnhancedScroller attached to this object.
+/// </summary>
 public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
 {
     public Text textOutput;
@@ -150,6 +155,10 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
     public EnhancedScrollerCellView GetCellView(EnhancedScroller scroller, int dataIndex, int cellIndex)
     {
         TransCellView cellView = scroller.GetCellView(transCellViewPrefab) as TransCellView;
+        if (_sttHistory[dataIndex].Contains("P:"))
+        {
+            cellView.GetComponent<Image>().color = new Color(0xff, 0xff, 0xff, 180);
+        }
         cellView.SetData(_sttHistory[dataIndex]);
         return cellView;
     }

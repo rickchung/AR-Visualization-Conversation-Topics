@@ -8,6 +8,14 @@ using System.Net.Sockets;
 using UnityEngine.Networking;
 using UnityEngine.Networking.NetworkSystem;
 
+/// <summary>
+/// Partner socket is responsible for the communication between the local
+/// device and the partner's device. This class provides two ways to build
+/// up the connection: LAN servers and Remote server. The LAN servers require
+/// both devices are in the same network space (e.g., under the same router)
+/// or having static IP addresses. The Remote server uses the server
+/// in ASU and it requires the ASU network environment.
+/// </summary>
 public class PartnerSocket : MonoBehaviour
 {
     // For Internet server

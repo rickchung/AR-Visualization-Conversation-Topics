@@ -4,6 +4,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
 
+
+/// <summary>
+/// Voice controller. This class controls the microphone and audio files on the
+/// device.
+/// </summary>
 public class VoiceController : MonoBehaviour
 {
     public SttNetworkManager networkManager;

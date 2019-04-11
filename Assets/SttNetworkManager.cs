@@ -4,6 +4,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 
+/// <summary>
+/// Stt network manager gets an audio fild and sends it to the server. This 
+/// class handles all the network connection works.
+/// </summary>
 public class SttNetworkManager : MonoBehaviour
 {
 
@@ -31,14 +35,14 @@ public class SttNetworkManager : MonoBehaviour
         }
     }
 
-   
+
     private IEnumerator PostRequest(WWWForm formData)
     {
         // Append location message into the address
         string dest = string.Format(HOST_ADDR);
         Debug.Log("[INFO] Sending Request to " + dest);
 
-       // Obtain CSRF token first
+        // Obtain CSRF token first
         UnityWebRequest csrfRequest = UnityWebRequest.Get(dest);
         csrfRequest.timeout = TIMEOUT;
         yield return csrfRequest.SendWebRequest();
