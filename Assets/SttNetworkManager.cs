@@ -17,6 +17,10 @@ public class SttNetworkManager : MonoBehaviour
     public SpeechToTextController sttController;
     public PartnerSocket partnerSocket;
 
+    /// <summary>
+    /// A wrapper function which requests the speech file to text.
+    /// </summary>
+    /// <param name="audio_path">Audio path.</param>
     public void RequestSpeechToText(string audio_path)
     {
         byte[] data = File.ReadAllBytes(audio_path);
@@ -36,6 +40,11 @@ public class SttNetworkManager : MonoBehaviour
     }
 
 
+    /// <summary>
+    /// Posts the speech-to-text request.
+    /// </summary>
+    /// <returns>The request.</returns>
+    /// <param name="formData">Form data.</param>
     private IEnumerator PostRequest(WWWForm formData)
     {
         // Append location message into the address
@@ -100,16 +109,20 @@ public class SttNetworkManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Processes the speech to text result. This method will be invoked when the
+    /// speech-to-text result is returned from the server.
+    /// </summary>
+    /// <param name="result">Result.</param>
     private void ProcessSpeechToTextResult(string result)
     {
         SpToTextResult stt = SpToTextResult.CreateFromJson(result);
         Debug.Log("STT Raw Result: " + result);
-        // Debug.Log("STT transcript: " + concatStt);
 
         if (sttController != null)
         {
             sttController.SaveTranscript(stt.transcript);
-            // sttController.UpdateVis();  // Puts the new message on top and xr
+            // Broadcast the new transcript extracted from the user's speech
             partnerSocket.BroadcastNewTranscript(stt.transcript);
         }
     }

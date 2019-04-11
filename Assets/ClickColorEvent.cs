@@ -4,11 +4,14 @@ using UnityEngine.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class ClickColorEvent : MonoBehaviour, IPointerClickHandler
+public class ClickColorEvent : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler
 {
 
     public Image image;
     public Color clickedColor;
+    public bool useClick;
+    public bool usePointerUpDown;
+
     private Color originalColor;
     private bool isClicked;
 
@@ -20,15 +23,30 @@ public class ClickColorEvent : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (isClicked)
+        if (useClick)
         {
-            isClicked = false;
-            image.color = originalColor;
+            if (isClicked)
+            {
+                isClicked = false;
+                image.color = originalColor;
+            }
+            else
+            {
+                isClicked = true;
+                image.color = clickedColor;
+            }
         }
-        else
-        {
-            isClicked = true;
+    }
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        if (usePointerUpDown)
             image.color = clickedColor;
-        }
+    }
+
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        if (usePointerUpDown)
+            image.color = originalColor;
     }
 }

@@ -33,6 +33,9 @@ public class VoiceController : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// Toggles the microphone. This method is used in button callback events.
+    /// </summary>
     public void ToggleMicrophone()
     {
         string micName = null;

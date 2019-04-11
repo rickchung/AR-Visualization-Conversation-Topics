@@ -70,6 +70,10 @@ public class PartnerSocket : MonoBehaviour
             SetupLocalServer();
     }
 
+    /// <summary>
+    /// Setups the remote server. This method should not be used when the
+    /// LAN servers are used.
+    /// </summary>
     public void SetupRemoteServer()
     {
         Debug.Log("Trying to connect to the HOST server...");
@@ -89,6 +93,13 @@ public class PartnerSocket : MonoBehaviour
 
     // ==================== Middleware ==================== 
 
+    /// <summary>
+    /// The helper function that broadcasts the message through the server.
+    /// This method will use the server according to the current connection
+    /// type (LAN or Remote server).
+    /// </summary>
+    /// <param name="msgType">Message type.</param>
+    /// <param name="msg">Message.</param>
     private void BroadcastToConnected(short msgType, MessageBase msg)
     {
         if (!_broadcastByHost)
@@ -103,7 +114,10 @@ public class PartnerSocket : MonoBehaviour
 
     // ==================== Server Side ==================== 
 
-    // Create a server and listen on a port
+    /// <summary>
+    /// Setups the local server in LAN environment. This method should not 
+    /// be used when the Remote server is used.
+    /// </summary>
     private void SetupLocalServer()
     {
         Debug.Log("[SERVER] Setting up a local server listening at " + UDP_PORT);
@@ -132,7 +146,10 @@ public class PartnerSocket : MonoBehaviour
         }
     }
 
-    // Used to test whether the clients can receive a message.
+    /// <summary>
+    /// Used to test whether the clients can receive a message. Only used for
+    /// development purpose.
+    /// </summary>
     public void TestServerToClient()
     {
         StringMessage testNewConcepts = new StringMessage
@@ -150,6 +167,12 @@ public class PartnerSocket : MonoBehaviour
         });
     }
 
+    /// <summary>
+    /// Broadcasts the new transcript to the partners. The transcript sent
+    /// to the partners will have prefix "P:" showing this is a message from
+    /// a partner.
+    /// </summary>
+    /// <param name="transcripts">Transcripts.</param>
     public void BroadcastNewTranscript(string[] transcripts)
     {
         string[] pTranscripts = new string[transcripts.Length];
@@ -165,7 +188,10 @@ public class PartnerSocket : MonoBehaviour
 
     // ==================== Client Side ==================== 
 
-    // Create a client and connect to the server port
+    /// <summary>
+    /// Create a client handler and connect to the server at partnerIP.
+    /// </summary>
+    /// <param name="partnerIP">Partner ip.</param>
     private void SetupClient(string partnerIP)
     {
         Debug.Log("[CLIENT] Trying to connect to the partner at " + partnerIP);
@@ -178,7 +204,11 @@ public class PartnerSocket : MonoBehaviour
         clientToPartner.Connect(partnerIP, UDP_PORT);
     }
 
-    // Client OnConnected callback
+    /// <summary>
+    /// The callback function that will be invoked when the client connects to 
+    /// the server successfully.
+    /// </summary>
+    /// <param name="netMsg">Net message.</param>
     private void OnConnected(NetworkMessage netMsg)
     {
         _serverIpAddress = clientToPartner.serverIp;
@@ -196,7 +226,11 @@ public class PartnerSocket : MonoBehaviour
         });
     }
 
-    // Used to test the connection from server to clients
+    /// <summary>
+    /// Used to test the connection from server to clients. For development
+    /// purpose only.
+    /// </summary>
+    /// <param name="netMsg">Net message.</param>
     private void OnTestMsgArrived(NetworkMessage netMsg)
     {
         if (netMsg != null)
@@ -208,7 +242,8 @@ public class PartnerSocket : MonoBehaviour
     }
 
     /// <summary>
-    /// When receiving new broacasted transcripts from the server
+    /// The callback that will be invoked when the client receives new 
+    /// broacasted transcripts from the server
     /// </summary>
     /// <param name="netMsg">Net message.</param>
     private void OnReceiveTranscript(NetworkMessage netMsg)

@@ -48,7 +48,8 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
         {
             if (ts.Length > 0)
             {
-                SaveToFile(ts + "\n");
+                var timestamp = System.DateTime.Now.ToString("MM/dd/HH:mm:ss");
+                SaveToFile(timestamp + "," + ts + "\n");
                 _sttHistory.Add(ts);
                 foreach (string t in ts.Split(' '))
                 {
@@ -142,7 +143,7 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
     /// <param name="dataIndex">Data index.</param>
     public float GetCellViewSize(EnhancedScroller scroller, int dataIndex)
     {
-        return 60f;
+        return 50f;
     }
 
     /// <summary>
