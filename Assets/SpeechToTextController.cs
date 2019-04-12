@@ -158,10 +158,10 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
     public EnhancedScrollerCellView GetCellView(EnhancedScroller scroller, int dataIndex, int cellIndex)
     {
         TransCellView cellView = scroller.GetCellView(transCellViewPrefab) as TransCellView;
-        if (_sttHistory[dataIndex].Contains("P:"))
-        {
-            cellView.GetComponent<Image>().color = new Color(0xff, 0xff, 0xff, 180);
-        }
+        //if (_sttHistory[dataIndex].Contains("P:"))
+        //{
+        //    cellView.GetComponent<Image>().color = new Color(0xff, 0xff, 0xff, 180);
+        //}
         cellView.SetData(_sttHistory[dataIndex]);
         return cellView;
     }

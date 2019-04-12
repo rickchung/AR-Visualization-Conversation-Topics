@@ -19,6 +19,8 @@ public class VoiceController : MonoBehaviour
     public int SAMPLING_RATE;
     private AudioSource audioSource;
 
+    private string micName;
+
     void Start()
     {
         audioSource = GetComponent<AudioSource>();
@@ -31,6 +33,8 @@ public class VoiceController : MonoBehaviour
             audioSource.outputAudioMixerGroup = mixerGroupMic;
         }
 
+        if (Microphone.devices.Length > 0)
+            micName = Microphone.devices[0];
     }
 
     /// <summary>
@@ -38,35 +42,34 @@ public class VoiceController : MonoBehaviour
     /// </summary>
     public void ToggleMicrophone()
     {
-        string micName = null;
-        if (Microphone.devices.Length > 0)
-        {
-            micName = Microphone.devices[0];
-        }
-
         if (!Microphone.IsRecording(micName))
         {
             Debug.Log("[LOG] Start recording at " + micName);
-            StartMicrophone(micName);
+            StartMicrophone();
         }
         else
         {
             Debug.Log("[LOG] Stop recording at " + micName);
-            StopMicrophone(micName);
+            StopMicrophone();
         }
     }
 
-    private void StartMicrophone(string micName)
+    private void StartMicWholeClip()
     {
-        StartCoroutine(CheckMic(micName, CLIP_SIZE));
+
     }
 
-    private IEnumerator CheckMic(string micName, int clipSizeSec)
+    private void StartMicrophone()
+    {
+        StartCoroutine(CheckMic());
+    }
+
+    private IEnumerator CheckMic()
     {
         int latency = 0;
 
         // Start the microphone
-        audioSource.clip = Microphone.Start(micName, true, clipSizeSec, SAMPLING_RATE);
+        audioSource.clip = Microphone.Start(micName, true, CLIP_SIZE, SAMPLING_RATE);
         audioSource.loop = true;
 
         // For real-time playback, set latency to 0.
@@ -75,7 +78,7 @@ public class VoiceController : MonoBehaviour
 
         while (Microphone.IsRecording(micName))
         {
-            yield return new WaitForSeconds(clipSizeSec);
+            yield return new WaitForSeconds(CLIP_SIZE);
             // Save the clip after waiting
             if (audioSource.clip != null)
             {
@@ -87,7 +90,7 @@ public class VoiceController : MonoBehaviour
         }
     }
 
-    private void StopMicrophone(string micName)
+    private void StopMicrophone()
     {
         // Stop the audio source is it's playing
         if (audioSource.isPlaying)
