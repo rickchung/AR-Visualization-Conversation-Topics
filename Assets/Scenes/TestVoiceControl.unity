@@ -773,7 +773,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.000018628592, y: 0.0000043373325}
+  m_AnchoredPosition: {x: -0.000022451346, y: 0.0000043373325}
   m_SizeDelta: {x: 284.7, y: 78.9}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &467917072
@@ -1239,8 +1239,9 @@ MonoBehaviour:
     type: 2}
   mixerGroupMaster: {fileID: 24300002, guid: aae2b410aae9748a1b88b63001775599, type: 2}
   playMicrophoneInRealTime: 0
-  CLIP_SIZE: 6
+  CLIP_SIZE: 5
   SAMPLING_RATE: 16000
+  WHOLE_CLIP_SIZE: 60
 --- !u!114 &747354410
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1520,7 +1521,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.000006775809, y: 0.000009262141}
+  m_AnchoredPosition: {x: -0.000011949208, y: 0.000018882372}
   m_SizeDelta: {x: 210.6, y: 58.353}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &922886150
