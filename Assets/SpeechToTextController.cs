@@ -104,7 +104,7 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
             textMesh.GetComponent<TextMesh>().text = _sttHistory[i];
 
             // Adjust the position/scale of the background
-            textBg.localScale = new Vector3(0.25f, 10.0f, 0.07f);
+            textBg.localScale = new Vector3(0.35f, 10.0f, 0.07f);
             // Adjust the position/scale of the whole text object
             float zPosition = localPosZStart + i * localPosZPad;
             xrTxt.transform.parent = xrImageContainer.transform;
