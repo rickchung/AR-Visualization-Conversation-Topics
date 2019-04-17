@@ -18,7 +18,7 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
     public TransCellView transCellViewPrefab;
     public bool render3DTranscripts;
 
-    private const int XR_TRANSCRIPTS_OUTPUT_LIMIT = 60;  // Chars
+    private const int XR_TRANSCRIPTS_OUTPUT_LIMIT = 30;  // Chars
     private int mWordCount;
 
     private List<string> _sttHistory;
@@ -88,7 +88,7 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
         for (int i = _sttHistory.Count - 1; i >= 0; i--)
         {
             mWordCount += _sttHistory[i].Length;
-            textContent = _sttHistory[i] + "\n" + textContent;
+            textContent = _sttHistory[i] + "  " + textContent;
 
             if (mWordCount > XR_TRANSCRIPTS_OUTPUT_LIMIT)
                 break;
