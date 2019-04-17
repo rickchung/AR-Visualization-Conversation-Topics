@@ -12,6 +12,9 @@ class JavaContentModel:
     default_sub_regex = r'[{}\d\\<>/\[\]\'.,;()|%\-:="*?]'
     default_topic_list = 'raw_topic.txt'
 
+    default_dict_path = 'java-content.dict'
+    default_model_path = 'w2c-java-filter.model'
+
     m_stopwords = None
     m_dictionary = None
     m_w2v = None
@@ -29,6 +32,8 @@ class JavaContentModel:
         self.default_w2v_source = str(Path(wd, self.default_w2v_source))
         self.default_stopwords = str(Path(wd, self.default_stopwords))
         self.default_topic_list = str(Path(wd, self.default_topic_list))
+        self.default_dict_path = str(Path(wd, self.default_dict_path))
+        self.default_model_path = str(Path(wd, self.default_model_path))
 
     def query_topics_from_raw(self, terms, out_topn=5, term_topn=5):
         rt = []
@@ -69,14 +74,21 @@ class JavaContentModel:
         # Build a w2v model
 
         dictionary = corpora.Dictionary(texts)
-        dictionary.save('./java-content.dict')
-        print(dictionary)
+        dictionary.save(self.default_dict_path)
 
         w2v_model = models.Word2Vec(texts, size=100, window=5, min_count=1, workers=4)
-        w2v_model.save("w2c-java-filter.model")
+        w2v_model.save(self.default_model_path)
+
+        print("Default model training completed.");
+        print(dictionary)
 
         self.m_dictionary = dictionary
         self.m_w2v = w2v_model
+
+    def load_default_w2v(self):
+        self.m_dictionary = corpora.Dictionary.load(self.default_dict_path)
+        self.m_w2v = models.Word2Vec.load(self.default_model_path)
+        print("Default models were found and loaded.")
 
     def doc_to_tokens(self, doc, stopwords=None):
         if not stopwords and not self.m_stopwords:
@@ -98,11 +110,12 @@ class JavaContentModel:
 
 def get_java_w2v(wd=None):
     javaw2v = JavaContentModel(wd=wd)
-    javaw2v.train_default_w2v()
+    if not Path(javaw2v.default_model_path).is_file():
+        javaw2v.train_default_w2v()
+    else:
+        javaw2v.load_default_w2v()
+
     return javaw2v
-
-
-javaw2v = get_java_w2v(wd='main_app/lib')
 
 if __name__ == '__main__':
     javaw2v = get_java_w2v()

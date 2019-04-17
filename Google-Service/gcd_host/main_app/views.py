@@ -8,7 +8,7 @@ from tempfile import NamedTemporaryFile
 from .forms import UploadFileForm
 from .lib.short_trans import transcribe_file
 
-from .lib.w2v import javaw2v
+from .lib.w2v import get_java_w2v
 
 # Create your views here.
 def index(request):
