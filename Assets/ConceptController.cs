@@ -14,10 +14,11 @@ public class ConceptController : MonoBehaviour, IEnhancedScrollerDelegate
     public EnhancedScroller myConceptScroller;
     public ConceptCellView conceptCellViewPrefab;
 
+    public bool Enable2DScroller;
+
     void Start()
     {
         _myConcepts = new List<ConceptData>();
-
         //_myConcepts.Add(new ConceptData("Loop"));
         //_myConcepts.Add(new ConceptData("Variable"));
         //_myConcepts.Add(new ConceptData("Condition"));
@@ -25,8 +26,16 @@ public class ConceptController : MonoBehaviour, IEnhancedScrollerDelegate
         //_myConcepts.Add(new ConceptData("Array"));
         //_myConcepts.Add(new ConceptData("File I/O"));
 
-        myConceptScroller.Delegate = this;
-        myConceptScroller.ReloadData();
+        if (Enable2DScroller)
+        {
+            myConceptScroller.gameObject.SetActive(true);
+            myConceptScroller.Delegate = this;
+            myConceptScroller.ReloadData();
+        }
+        else
+        {
+            myConceptScroller.gameObject.SetActive(false);
+        }
     }
 
     public int GetNumberOfCells(EnhancedScroller scroller)

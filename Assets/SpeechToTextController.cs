@@ -18,7 +18,8 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
     public TransCellView transCellViewPrefab;
     public bool render3DTranscripts;
 
-    private const int XR_TRANSCRIPTS_OUTPUT_LIMIT = 10;
+    private const int XR_TRANSCRIPTS_OUTPUT_LIMIT = 60;  // Chars
+    private int mWordCount;
 
     private List<string> _sttHistory;
 
@@ -53,8 +54,8 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
             }
         }
         historyScroller.ReloadData();
-        if (historyScroller.gameObject.activeSelf)
-            historyScroller.JumpToDataIndex(_sttHistory.Count - 1);
+        //if (historyScroller.gameObject.activeSelf)
+            //historyScroller.JumpToDataIndex(_sttHistory.Count - 1);
     }
 
     private void SaveToFile(string transcript)
@@ -82,14 +83,15 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
     /// </summary>
     private void UpdateXrVis()
     {
-        int numToVisualize = XR_TRANSCRIPTS_OUTPUT_LIMIT;
-        int indexStart = _sttHistory.Count - numToVisualize;
-        if (indexStart < 0) indexStart = 0;
-
+        mWordCount = 0;
         string textContent = "";
-        for (int i = indexStart; i < _sttHistory.Count; i++)
+        for (int i = _sttHistory.Count - 1; i >= 0; i--)
         {
-            textContent += _sttHistory[i] + "\n";
+            mWordCount += _sttHistory[i].Length;
+            textContent = _sttHistory[i] + "\n" + textContent;
+
+            if (mWordCount > XR_TRANSCRIPTS_OUTPUT_LIMIT)
+                break;
         }
         xrTextContainer.SetText(textContent);
     }
@@ -155,14 +157,17 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
         historyScroller.gameObject.SetActive(!historyScroller.gameObject.activeSelf);
     }
 
+    private string[] _testScripts = {
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. ",
+        "Nulla efficitur nisi at sem porta finibus. Vestibulum ",
+        "lacinia ultrices purus, eu maximus mauris maximus in. ",
+        "In enim sapien, dignissim non maximus in, convallis at eros."
+    };
+    private int testScriptCount = 0;
     public void _TestAddTextToSttHistory()
     {
-        SaveTranscript(new string[] {
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. ",
-            "Nulla efficitur nisi at sem porta finibus. Vestibulum ",
-            "lacinia ultrices purus, eu maximus mauris maximus in. " +
-            "In enim sapien, dignissim non maximus in, convallis at eros."
-        });
+        SaveTranscript(new string[] { _testScripts[testScriptCount++] });
+        testScriptCount %= _testScripts.Length;
         UpdateVis();
     }
 }
