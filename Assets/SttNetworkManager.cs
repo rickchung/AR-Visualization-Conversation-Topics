@@ -122,12 +122,19 @@ public class SttNetworkManager : MonoBehaviour
 
         if (sttController != null)
         {
-            sttController.SaveTranscript(stt.transcript);
+            sttController.SaveTransResponse(stt);
 
             if (debugEchoUserStt) sttController.UpdateVis();
 
             // Broadcast the new transcript extracted from the user's speech
             partnerSocket.BroadcastNewTranscript(stt.transcript);
         }
+    }
+
+
+
+    public void _TestStt()
+    {
+        RequestSpeechToText("Assets/Data/speech-test-data.wav");
     }
 }

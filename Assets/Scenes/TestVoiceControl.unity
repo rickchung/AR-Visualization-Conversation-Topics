@@ -722,7 +722,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.00002076236, y: -0.0000029957544}
+  m_AnchoredPosition: {x: -0.000010617883, y: -0.0000029957544}
   m_SizeDelta: {x: 284.7, y: 78.9}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &453988295
@@ -738,7 +738,7 @@ GameObject:
   - component: {fileID: 453988298}
   - component: {fileID: 453988297}
   m_Layer: 0
-  m_Name: XrKeywordContainer
+  m_Name: XrTopicContainer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1398,6 +1398,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   textOutput: {fileID: 110939457}
   xrTextContainer: {fileID: 2037261151}
+  xrTopicContainer: {fileID: 453988297}
   historyScroller: {fileID: 1660361130}
   transCellViewPrefab: {fileID: 114090520430874464, guid: 6ae3a25093538495fb17f7331d11417c,
     type: 2}
@@ -3300,8 +3301,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 747354411}
-        m_MethodName: _TestAddTextToSttHistory
+      - m_Target: {fileID: 747354410}
+        m_MethodName: _TestStt
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

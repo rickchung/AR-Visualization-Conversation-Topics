@@ -523,7 +523,7 @@
 			"file": "Google-Service/gcd_host/main_app/views.py",
 			"settings":
 			{
-				"buffer_size": 1792,
+				"buffer_size": 1837,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -532,17 +532,16 @@
 			"file": "Google-Service/gcd_host/main_app/lib/w2v.py",
 			"settings":
 			{
-				"buffer_size": 2058,
+				"buffer_size": 3549,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "Google-Service/gcd_host/main_app/lib/stopwords.txt",
+			"file": "Google-Service/gcd_host/main_app/lib/short_trans.py",
 			"settings":
 			{
-				"buffer_size": 490,
-				"encoding": "UTF-8",
+				"buffer_size": 1292,
 				"line_ending": "Unix"
 			}
 		}
@@ -1122,8 +1121,11 @@
 	],
 	"file_history":
 	[
-		"/Users/rickchung/Projects/ERDE-XR-Project/Mobile-AR-Ebola/.gitignore",
+		"/Users/rickchung/Projects/Conv-XR-DataVis/Google-Service/gcd_host/main_app/lib/topics.txt",
+		"/Users/rickchung/Projects/Conv-XR-DataVis/Google-Service/gcd_host/main_app/lib/raw_topic.txt",
 		"/Users/rickchung/Projects/Conv-XR-DataVis/Google-Service/gcd_host/main_app/lib/java-content-selected.txt",
+		"/Users/rickchung/Projects/Conv-XR-DataVis/Google-Service/gcd_host/main_app/lib/stopwords.txt",
+		"/Users/rickchung/Projects/ERDE-XR-Project/Mobile-AR-Ebola/.gitignore",
 		"/Users/rickchung/Projects/Conv-XR-DataVis/Assets/Data/java-concepts.txt",
 		"/Users/rickchung/Projects/Conv-XR-DataVis/Assets/Data/java-toc.txt",
 		"/Users/rickchung/Projects/Conv-XR-DataVis/Assets/Data/java-topic-concepts.txt",
@@ -1246,10 +1248,7 @@
 		"/Users/rickchung/Projects/B_Lak19_Proc/data/easychair/tmp.csv",
 		"/Users/rickchung/Projects/B_Lak19_Proc/data/easychair/tmp.txt",
 		"/Users/rickchung/Projects/B_Lak19_Proc/uncompressed.pdf",
-		"/Users/rickchung/Projects/B_Lak19_Proc/data/easychair/easychair_table.csv",
-		"/Users/rickchung/Projects/B_Lak19_Proc/out/page_numbers.csv",
-		"/Users/rickchung/Projects/B_Lak19_Proc/lak_scripts/acm_proceedings/src/4_make_proceedings.sh",
-		"/Users/rickchung/Projects/B_Lak19_Proc/out/ftoc.pdf"
+		"/Users/rickchung/Projects/B_Lak19_Proc/data/easychair/easychair_table.csv"
 	],
 	"find":
 	{
@@ -1267,6 +1266,21 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"doc_to_tokens",
+			"outtopn",
+			"query_similar",
+			"&gt",
+			"[",
+			"Type[",
+			";",
+			"&lt;",
+			"/code&gt;",
+			"&lt;code&gt",
+			";",
+			"==",
+			"/code&gt",
+			"====",
+			"num",
 			"this",
 			"m_",
 			",",
@@ -1303,7 +1317,7 @@
 	"groups":
 	[
 		{
-			"selected": 2,
+			"selected": 0,
 			"sheets":
 			[
 				{
@@ -1312,15 +1326,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1792,
+						"buffer_size": 1837,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1444,
-								1444
+								1293,
+								1293
 							]
 						],
 						"settings":
@@ -1331,10 +1345,10 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 303.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
@@ -1343,24 +1357,26 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2058,
+						"buffer_size": 3549,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								971,
-								971
+								580,
+								601
 							]
 						],
 						"settings":
 						{
 							"rainbow_inited": true,
-							"syntax": "Packages/Python/Python.sublime-syntax"
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 217.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 1,
@@ -1368,31 +1384,33 @@
 				},
 				{
 					"buffer": 2,
-					"file": "Google-Service/gcd_host/main_app/lib/stopwords.txt",
-					"semi_transient": false,
+					"file": "Google-Service/gcd_host/main_app/lib/short_trans.py",
+					"semi_transient": true,
 					"settings":
 					{
-						"buffer_size": 490,
+						"buffer_size": 1292,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								484,
-								484
+								14,
+								14
 							]
 						],
 						"settings":
 						{
 							"rainbow_inited": true,
-							"syntax": "Packages/MarkdownEditing/Markdown.sublime-syntax"
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 41.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 2,
 					"type": "text"
 				}
 			]
@@ -1998,7 +2016,7 @@
 	"show_minimap": false,
 	"show_open_files": false,
 	"show_tabs": true,
-	"side_bar_visible": false,
+	"side_bar_visible": true,
 	"side_bar_width": 247.0,
 	"status_bar_visible": true,
 	"template_settings":

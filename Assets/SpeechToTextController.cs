@@ -14,14 +14,18 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
 {
     public Text textOutput;
     public TMPro.TextMeshPro xrTextContainer;
+    public TMPro.TextMeshPro xrTopicContainer;
     public EnhancedScroller historyScroller;
     public TransCellView transCellViewPrefab;
     public bool render3DTranscripts;
 
     private const int XR_TRANSCRIPTS_OUTPUT_LIMIT = 30;  // Chars
+    private const int XR_TOPIC_OUTPUT_LIMIT = 3;  // Chars
     private int mWordCount;
+    private const int TOPIC_LIST_LIMIT = 3;
 
     private List<string> _sttHistory;
+    private List<string[]> _sttTopics;
 
     private string _sttHistoryFilePath;
     private string _sttHistoryFilename;
@@ -32,10 +36,25 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
         _sttHistoryFilePath = Path.Combine(Application.persistentDataPath, _sttHistoryFilename);
 
         _sttHistory = new List<string>();
+        _sttTopics = new List<string[]>();
 
         historyScroller.Delegate = this;
         historyScroller.ReloadData();
         ToggleTransHistoryPane();
+    }
+
+    public void SaveTransResponse(SpToTextResult stt)
+    {
+        // Save transcript
+        SaveTranscript(stt.transcript);
+        // Save topics
+        var timestamp = System.DateTime.Now.ToString("MM/dd/HH:mm:ss");
+        SaveToFile(timestamp + ",TOPIC," + string.Join(";", stt.topics) + "\n");
+        if (_sttTopics.Count >= TOPIC_LIST_LIMIT)
+        {
+            _sttTopics.RemoveAt(0);
+        }
+        _sttTopics.Add(stt.topics);
     }
 
     /// <summary>
@@ -49,13 +68,14 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
             if (ts.Length > 0)
             {
                 var timestamp = System.DateTime.Now.ToString("MM/dd/HH:mm:ss");
-                SaveToFile(timestamp + "," + ts + "\n");
+                SaveToFile(timestamp + ",TRANS," + ts + "\n");
                 _sttHistory.Add(ts);
             }
         }
         historyScroller.ReloadData();
+
         //if (historyScroller.gameObject.activeSelf)
-            //historyScroller.JumpToDataIndex(_sttHistory.Count - 1);
+        //historyScroller.JumpToDataIndex(_sttHistory.Count - 1);
     }
 
     private void SaveToFile(string transcript)
@@ -74,14 +94,29 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
         }
         if (render3DTranscripts && xrTextContainer != null)
         {
-            UpdateXrVis();
+            UpdateXrTrans();
         }
+        if (xrTopicContainer != null)
+        {
+            UpdateTopicVis();
+        }
+    }
+
+    private void UpdateTopicVis()
+    {
+        string[] latest = _sttTopics[_sttTopics.Count - 1];
+        string content = "";
+        for (int i = 0; i < latest.Length && i < XR_TOPIC_OUTPUT_LIMIT; i++)
+        {
+            content += "Topic " + (i + 1) + ": " + latest[i] + "\n";
+        }
+        xrTopicContainer.SetText(content);
     }
 
     /// <summary>
     /// Update the visualization in XR
     /// </summary>
-    private void UpdateXrVis()
+    private void UpdateXrTrans()
     {
         mWordCount = 0;
         string textContent = "";
