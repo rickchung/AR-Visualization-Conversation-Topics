@@ -36,11 +36,12 @@ class JavaContentModel:
         self.default_model_path = str(Path(wd, self.default_model_path))
 
     def query_topics_from_raw(self, terms, out_topn=5, term_topn=5):
-        rt = []
+        topics = []
         terms = terms + self.query_similar_terms(terms, topn=term_topn)
         for i in terms:
-            rt.append(self.query_topics(i))
-        return ([i for j in rt for i in j][:out_topn], terms,)
+            topics.append(self.query_topics(i))
+        flatten_topics = [i for j in topics for i in j][:out_topn]
+        return (flatten_topics, terms,)
 
     def query_topics(self, cleaned_term):
         found_topics = list(filter(lambda x: cleaned_term in x, self.m_topic_list))

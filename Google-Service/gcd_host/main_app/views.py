@@ -33,7 +33,7 @@ def upload_file(request):
 
                 # Find relevant keywords (w2v)
                 tokens = javaw2v.doc_to_tokens(' '.join(results))
-                keywords, topics = javaw2v.query_topics_from_raw(tokens)
+                topics, keywords = javaw2v.query_topics_from_raw(tokens)
                 subtopics = [[]]
                 
                 # Find relevant examples
