@@ -9,6 +9,7 @@ class JavaContentModel:
     default_sub_regex = r'[{}\d\\<>/\[\]\'.,;()|%\-:="*?]'
     default_topic_list = 'raw_topic.txt'
 
+    m_stopwords = None
     m_dictionary = None
     m_w2v = None
     m_topic_list = None
@@ -22,7 +23,7 @@ class JavaContentModel:
         terms = terms + self.query_similar_terms(terms, topn=term_topn)
         for i in terms:
             rt.append(self.query_topics(i))
-        return [i for j in rt for i in j][:out_topn]
+        return ([i for j in rt for i in j][:out_topn], terms, )
 
     def query_topics(self, cleaned_term):
         found_topics = list(filter(lambda x: cleaned_term in x, self.m_topic_list))
@@ -51,11 +52,7 @@ class JavaContentModel:
         
         # Preprocess and tokenize
 
-        stopword_source = self.default_stopwords
-        with open(stopword_source, 'r') as fin:
-            stopwords = set([i.strip() for i in fin.readlines()])
-
-        texts = [ self.doc_to_tokens(doc, stopwords) for doc in docs ]
+        texts = [ self.doc_to_tokens(doc) for doc in docs ]
 
         # Build a w2v model
 
@@ -69,7 +66,12 @@ class JavaContentModel:
         self.m_dictionary = dictionary
         self.m_w2v = w2v_model
 
-    def doc_to_tokens(self, doc, stopwords):
+    def doc_to_tokens(self, doc, stopwords=None):
+        if not stopwords and not self.m_stopwords:
+            stopword_source = self.default_stopwords
+            with open(stopword_source, 'r') as fin:
+                self.m_stopwords = set([i.strip() for i in fin.readlines()])
+
         sub_regex = self.default_sub_regex
         _doc = doc
         _doc = _doc.lower().split()
@@ -77,12 +79,20 @@ class JavaContentModel:
         for w in _doc:
             _w = w.strip()
             _w = re.sub(sub_regex, '', _w).replace('\\n', '').strip()
-            if len(_w) > 0 and _w not in stopwords:
+            if len(_w) > 0 and _w not in self.m_stopwords:
                 tokens.append(_w)
         return tokens
 
-if __name__ == '__main__':
+
+def get_java_w2v():
     javaw2v = JavaContentModel()
     javaw2v.train_default_w2v()
+    return javaw2v
+
+javaw2v = get_java_w2v()
+
+
+if __name__ == '__main__':
+    javaw2v = get_java_w2v()
     pprint(javaw2v.query_topics_from_raw(['while']))
 

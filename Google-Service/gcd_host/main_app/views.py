@@ -8,6 +8,8 @@ from tempfile import NamedTemporaryFile
 from .forms import UploadFileForm
 from .lib.short_trans import transcribe_file
 
+from .lib.w2v import javaw2v
+
 # Create your views here.
 def index(request):
     return HttpResponse("Sorry man. Nothing is here")
@@ -30,10 +32,8 @@ def upload_file(request):
                 results = transcribe_file(tmp_filename)
 
                 # Find relevant keywords (w2v)
-                keywords = []
-                
-                # Find relevant topics/subtopics
-                topics = []
+                tokens = javaw2v.doc_to_tokens(' '.join(results))
+                keywords, topics = javaw2v.query_topics_from_raw(tokens)
                 subtopics = [[]]
                 
                 # Find relevant examples
