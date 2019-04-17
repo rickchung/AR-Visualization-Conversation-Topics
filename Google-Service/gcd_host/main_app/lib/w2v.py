@@ -1,9 +1,12 @@
 import re
 import xml.etree.ElementTree as ET
+from pathlib import Path
 from pprint import pprint
 from gensim import corpora, models
 
+
 class JavaContentModel:
+    default_wd = ''
     default_w2v_source = 'java-content-selected.txt'
     default_stopwords = 'stopwords.txt'
     default_sub_regex = r'[{}\d\\<>/\[\]\'.,;()|%\-:="*?]'
@@ -14,16 +17,25 @@ class JavaContentModel:
     m_w2v = None
     m_topic_list = None
 
-    def __init__(self):
+    def __init__(self, wd=None):
+        if wd:
+            self.update_default_paths(wd)
+
         with open(self.default_topic_list, 'r') as fin:
             self.m_topic_list = [i.lower().strip() for i in fin.readlines()]
+
+    def update_default_paths(self, wd):
+        self.default_wd = wd
+        self.default_w2v_source = str(Path(wd, self.default_w2v_source))
+        self.default_stopwords = str(Path(wd, self.default_stopwords))
+        self.default_topic_list = str(Path(wd, self.default_topic_list))
 
     def query_topics_from_raw(self, terms, out_topn=5, term_topn=5):
         rt = []
         terms = terms + self.query_similar_terms(terms, topn=term_topn)
         for i in terms:
             rt.append(self.query_topics(i))
-        return ([i for j in rt for i in j][:out_topn], terms, )
+        return ([i for j in rt for i in j][:out_topn], terms,)
 
     def query_topics(self, cleaned_term):
         found_topics = list(filter(lambda x: cleaned_term in x, self.m_topic_list))
@@ -49,10 +61,10 @@ class JavaContentModel:
                 page_content = filter(lambda x: len(x.strip()) > 0, child.itertext())
                 page_content = "".join(page_content)
                 docs.append(page_content)
-        
+
         # Preprocess and tokenize
 
-        texts = [ self.doc_to_tokens(doc) for doc in docs ]
+        texts = [self.doc_to_tokens(doc) for doc in docs]
 
         # Build a w2v model
 
@@ -84,15 +96,14 @@ class JavaContentModel:
         return tokens
 
 
-def get_java_w2v():
-    javaw2v = JavaContentModel()
+def get_java_w2v(wd=None):
+    javaw2v = JavaContentModel(wd=wd)
     javaw2v.train_default_w2v()
     return javaw2v
 
-javaw2v = get_java_w2v()
 
+javaw2v = get_java_w2v(wd='main_app/lib')
 
 if __name__ == '__main__':
     javaw2v = get_java_w2v()
     pprint(javaw2v.query_topics_from_raw(['while']))
-
