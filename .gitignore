@@ -40,3 +40,6 @@ sysinfo.txt
 *.pyc
 QCAR/somedata16
 *.sublime-workspace
+Google-Service/gcd_host/.idea/workspace.xml
+Google-Service/gcd_host/java-content.dict
+Google-Service/gcd_host/w2c-java-filter.model
