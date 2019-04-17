@@ -48,13 +48,7 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
         // Save transcript
         SaveTranscript(stt.transcript);
         // Save topics
-        var timestamp = System.DateTime.Now.ToString("MM/dd/HH:mm:ss");
-        SaveToFile(timestamp + ",TOPIC," + string.Join(";", stt.topics) + "\n");
-        if (_sttTopics.Count >= TOPIC_LIST_LIMIT)
-        {
-            _sttTopics.RemoveAt(0);
-        }
-        _sttTopics.Add(stt.topics);
+        SaveTopics(stt.topics);
     }
 
     /// <summary>
@@ -63,19 +57,37 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
     /// <param name="text">Text.</param>
     public void SaveTranscript(string[] text)
     {
-        foreach (string ts in text)
+        if (text.Length > 0)
         {
-            if (ts.Length > 0)
+            foreach (string ts in text)
             {
-                var timestamp = System.DateTime.Now.ToString("MM/dd/HH:mm:ss");
-                SaveToFile(timestamp + ",TRANS," + ts + "\n");
-                _sttHistory.Add(ts);
+                if (ts.Length > 0)
+                {
+                    var timestamp = System.DateTime.Now.ToString("MM/dd/HH:mm:ss");
+                    SaveToFile(timestamp + ",TRANS," + ts + "\n");
+                    _sttHistory.Add(ts);
+                }
             }
-        }
-        historyScroller.ReloadData();
+            historyScroller.ReloadData();
 
-        //if (historyScroller.gameObject.activeSelf)
-        //historyScroller.JumpToDataIndex(_sttHistory.Count - 1);
+            //if (historyScroller.gameObject.activeSelf)
+            //historyScroller.JumpToDataIndex(_sttHistory.Count - 1);
+        }
+    }
+
+    public void SaveTopics(string[] topics)
+    {
+        if (topics.Length > 0)
+        {
+            var timestamp = System.DateTime.Now.ToString("MM/dd/HH:mm:ss");
+            SaveToFile(timestamp + ",TOPIC," + string.Join(";", topics) + "\n");
+
+            if (_sttTopics.Count >= TOPIC_LIST_LIMIT)
+            {
+                _sttTopics.RemoveAt(0);
+            }
+            _sttTopics.Add(topics);
+        }
     }
 
     private void SaveToFile(string transcript)
@@ -94,7 +106,7 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
         }
         if (render3DTranscripts && xrTextContainer != null)
         {
-            UpdateXrTrans();
+            UpdateTransVis();
         }
         if (xrTopicContainer != null)
         {
@@ -104,26 +116,29 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
 
     private void UpdateTopicVis()
     {
-        string[] latest = _sttTopics[_sttTopics.Count - 1];
-        string content = "";
-        for (int i = 0; i < latest.Length && i < XR_TOPIC_OUTPUT_LIMIT; i++)
+        if (_sttTopics.Count > 0)
         {
-            content += "Topic " + (i + 1) + ": " + latest[i] + "\n";
+            string[] latest = _sttTopics[_sttTopics.Count - 1];
+            string content = "";
+            for (int i = 0; i < latest.Length && i < XR_TOPIC_OUTPUT_LIMIT; i++)
+            {
+                content += "Topic " + (i + 1) + ": " + latest[i] + "\n";
+            }
+            xrTopicContainer.SetText(content);
         }
-        xrTopicContainer.SetText(content);
     }
 
     /// <summary>
     /// Update the visualization in XR
     /// </summary>
-    private void UpdateXrTrans()
+    private void UpdateTransVis()
     {
         mWordCount = 0;
         string textContent = "";
         for (int i = _sttHistory.Count - 1; i >= 0; i--)
         {
             mWordCount += _sttHistory[i].Length;
-            textContent = _sttHistory[i] + "  " + textContent;
+            textContent = _sttHistory[i] + "  " + textContent + "\n";
 
             if (mWordCount > XR_TRANSCRIPTS_OUTPUT_LIMIT)
                 break;

@@ -81,7 +81,6 @@ public class PartnerSocket : MonoBehaviour
         clientToPartner.RegisterHandler(MsgType.Connect, OnConnected);
         clientToPartner.RegisterHandler(MyMsgType.MSG_TEST, OnTestMsgArrived);
         clientToPartner.RegisterHandler(MyMsgType.MSG_NEW_KEYWORDS, OnReceivedNewKeywords);
-        clientToPartner.RegisterHandler(MyMsgType.MSG_PINNED_KEYWORDS, OnReceivedPinnedKeywords);
         clientToPartner.RegisterHandler(MyMsgType.MSG_TRANS, OnReceiveTranscript);
         clientToPartner.Connect(HOST_SERVER, HOST_SERVER_PORT);
 
@@ -146,19 +145,6 @@ public class PartnerSocket : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Used to test whether the clients can receive a message. Only used for
-    /// development purpose.
-    /// </summary>
-    public void TestServerToClient()
-    {
-        StringMessage testNewConcepts = new StringMessage
-        {
-            value = "C1,C2"
-        };
-        BroadcastToConnected(MyMsgType.MSG_NEW_KEYWORDS, testNewConcepts);
-    }
-
     public void BroadcasetNewKeywords(string[] keywords)
     {
         BroadcastToConnected(MyMsgType.MSG_NEW_KEYWORDS, new StringMessage
@@ -199,7 +185,6 @@ public class PartnerSocket : MonoBehaviour
         clientToPartner.RegisterHandler(MsgType.Connect, OnConnected);
         clientToPartner.RegisterHandler(MyMsgType.MSG_TEST, OnTestMsgArrived);
         clientToPartner.RegisterHandler(MyMsgType.MSG_NEW_KEYWORDS, OnReceivedNewKeywords);
-        clientToPartner.RegisterHandler(MyMsgType.MSG_PINNED_KEYWORDS, OnReceivedPinnedKeywords);
         clientToPartner.RegisterHandler(MyMsgType.MSG_TRANS, OnReceiveTranscript);
         clientToPartner.Connect(partnerIP, UDP_PORT);
     }
@@ -256,15 +241,10 @@ public class PartnerSocket : MonoBehaviour
     private void OnReceivedNewKeywords(NetworkMessage netMsg)
     {
         // Add to the panel
-        var newKeywordsMsg = netMsg.ReadMessage<StringMessage>();
-        foreach (String kw in newKeywordsMsg.value.Split(','))
-        {
-            pinnedConceptController.AddNewConcept(new ConceptData(kw));
-        }
-    }
+        var newKeywordsMsg = netMsg.ReadMessage<StringMessage>().value;
+        speechToTextController.SaveTopics(newKeywordsMsg.Split(','));
+        speechToTextController.UpdateVis();
 
-    private void OnReceivedPinnedKeywords(NetworkMessage netMsg)
-    {
-
+        // Debug.Log("Received keywords: " + newKeywordsMsg);
     }
 }

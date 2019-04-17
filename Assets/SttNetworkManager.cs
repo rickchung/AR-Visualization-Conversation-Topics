@@ -128,6 +128,7 @@ public class SttNetworkManager : MonoBehaviour
 
             // Broadcast the new transcript extracted from the user's speech
             partnerSocket.BroadcastNewTranscript(stt.transcript);
+            partnerSocket.BroadcasetNewKeywords(stt.topics);
         }
     }
 
