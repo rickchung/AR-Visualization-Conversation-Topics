@@ -13,12 +13,12 @@ using System.IO;
 public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
 {
     public Text textOutput;
-    public GameObject xrImageContainer;
+    public TMPro.TextMeshPro xrTextContainer;
     public EnhancedScroller historyScroller;
     public TransCellView transCellViewPrefab;
     public bool render3DTranscripts;
 
-    private const int XR_TRANSCRIPTS_OUTPUT_LIMIT = 20;
+    private const int XR_TRANSCRIPTS_OUTPUT_LIMIT = 10;
 
     private List<string> _sttHistory;
 
@@ -71,7 +71,7 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
         {
             UpdateTxtOutput();
         }
-        if (render3DTranscripts && xrImageContainer != null)
+        if (render3DTranscripts && xrTextContainer != null)
         {
             UpdateXrVis();
         }
@@ -82,35 +82,16 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
     /// </summary>
     private void UpdateXrVis()
     {
-        // Clear the container
-        foreach (Transform child in xrImageContainer.transform)
-        {
-            Destroy(child.gameObject);
-        }
-
-        // Only visualize a limited number of transcripts
         int numToVisualize = XR_TRANSCRIPTS_OUTPUT_LIMIT;
         int indexStart = _sttHistory.Count - numToVisualize;
-        if (indexStart < 0)
-            indexStart = 0;
-        float localPosZStart = 1.0f;
-        float localPosZPad = -0.25f;
+        if (indexStart < 0) indexStart = 0;
+
+        string textContent = "";
         for (int i = indexStart; i < _sttHistory.Count; i++)
         {
-            var xrTxt = Instantiate(Resources.Load<GameObject>("XrTxtModel"));
-            var textMesh = xrTxt.transform.Find("Text");
-            var textBg = xrTxt.transform.Find("TextBg");
-
-            textMesh.GetComponent<TextMesh>().text = _sttHistory[i];
-
-            // Adjust the position/scale of the background
-            textBg.localScale = new Vector3(0.35f, 10.0f, 0.07f);
-            // Adjust the position/scale of the whole text object
-            float zPosition = localPosZStart + i * localPosZPad;
-            xrTxt.transform.parent = xrImageContainer.transform;
-            xrTxt.transform.localPosition = new Vector3(0, 0, zPosition);
-            xrTxt.transform.localEulerAngles = new Vector3(90, 0, 0);
+            textContent += _sttHistory[i] + "\n";
         }
+        xrTextContainer.SetText(textContent);
     }
 
     /// <summary>
@@ -172,5 +153,16 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
     public void ToggleTransHistoryPane()
     {
         historyScroller.gameObject.SetActive(!historyScroller.gameObject.activeSelf);
+    }
+
+    public void _TestAddTextToSttHistory()
+    {
+        SaveTranscript(new string[] {
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. ",
+            "Nulla efficitur nisi at sem porta finibus. Vestibulum ",
+            "lacinia ultrices purus, eu maximus mauris maximus in. " +
+            "In enim sapien, dignissim non maximus in, convallis at eros."
+        });
+        UpdateVis();
     }
 }
