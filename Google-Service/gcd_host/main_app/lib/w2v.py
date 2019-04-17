@@ -117,6 +117,6 @@ def get_java_w2v(wd=None):
 
     return javaw2v
 
-if __name__ == '__main__':
-    javaw2v = get_java_w2v()
-    pprint(javaw2v.query_topics_from_raw(['while']))
+
+javaw2v = get_java_w2v("main_app/lib")
+# pprint(javaw2v.query_topics_from_raw(['while']))
