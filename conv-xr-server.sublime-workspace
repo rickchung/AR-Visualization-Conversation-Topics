@@ -523,7 +523,26 @@
 			"file": "Google-Service/gcd_host/main_app/views.py",
 			"settings":
 			{
-				"buffer_size": 1316,
+				"buffer_size": 1792,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Google-Service/gcd_host/main_app/lib/w2v.py",
+			"settings":
+			{
+				"buffer_size": 2058,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "Google-Service/gcd_host/main_app/lib/stopwords.txt",
+			"settings":
+			{
+				"buffer_size": 490,
+				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		}
@@ -1098,10 +1117,13 @@
 	},
 	"expanded_folders":
 	[
-		"/Users/rickchung/Projects/Conv-XR-DataVis/Google-Service/gcd_host/main_app"
+		"/Users/rickchung/Projects/Conv-XR-DataVis/Google-Service/gcd_host/main_app",
+		"/Users/rickchung/Projects/Conv-XR-DataVis/Google-Service/gcd_host/main_app/lib"
 	],
 	"file_history":
 	[
+		"/Users/rickchung/Projects/ERDE-XR-Project/Mobile-AR-Ebola/.gitignore",
+		"/Users/rickchung/Projects/Conv-XR-DataVis/Google-Service/gcd_host/main_app/lib/java-content-selected.txt",
 		"/Users/rickchung/Projects/Conv-XR-DataVis/Assets/Data/java-concepts.txt",
 		"/Users/rickchung/Projects/Conv-XR-DataVis/Assets/Data/java-toc.txt",
 		"/Users/rickchung/Projects/Conv-XR-DataVis/Assets/Data/java-topic-concepts.txt",
@@ -1126,7 +1148,6 @@
 		"/Users/rickchung/Projects/Ogmented_v2.1/README.md",
 		"/Users/rickchung/Downloads/data.txt",
 		"/Users/rickchung/Downloads/tmp.py",
-		"/Users/rickchung/Projects/ERDE-XR-Project/Mobile-AR-Ebola/.gitignore",
 		"/Users/rickchung/Projects/Ebola XR Project/Mobile-AR-Ebola/Prototype/RServer/xr_server/r_computing_app/signals/handlers.py",
 		"/Users/rickchung/Projects/Ebola XR Project/Mobile-AR-Ebola/Prototype/RServer/xr_server/r_computing_app/models.py",
 		"/Users/rickchung/Projects/Ebola XR Project/Mobile-AR-Ebola/Prototype/RServer/xr_server/r_computing_app/views.py",
@@ -1228,12 +1249,11 @@
 		"/Users/rickchung/Projects/B_Lak19_Proc/data/easychair/easychair_table.csv",
 		"/Users/rickchung/Projects/B_Lak19_Proc/out/page_numbers.csv",
 		"/Users/rickchung/Projects/B_Lak19_Proc/lak_scripts/acm_proceedings/src/4_make_proceedings.sh",
-		"/Users/rickchung/Projects/B_Lak19_Proc/out/ftoc.pdf",
-		"/Users/rickchung/Projects/B_Lak19_Proc/data/main.tex"
+		"/Users/rickchung/Projects/B_Lak19_Proc/out/ftoc.pdf"
 	],
 	"find":
 	{
-		"height": 24.0
+		"height": 37.0
 	},
 	"find_in_files":
 	{
@@ -1247,6 +1267,25 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"this",
+			"m_",
+			",",
+			"trainDefaultWord2Vec",
+			"w2c_model",
+			"’",
+			"‘",
+			"all_pages",
+			"page_elements",
+			"<page>",
+			"http://www.mediawiki.org/xml/export-0.10/",
+			"{http://www.mediawiki.org/xml/export-0.10/}",
+			"{http://www.mediawiki.org/xml/export-0.10/}ns",
+			"<text",
+			"<text>",
+			"text>",
+			": ",
+			"[],",
+			"None"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1264,7 +1303,7 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 2,
 			"sheets":
 			[
 				{
@@ -1273,15 +1312,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1316,
+						"buffer_size": 1792,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								1444,
+								1444
 							]
 						],
 						"settings":
@@ -1290,6 +1329,64 @@
 							"syntax": "Packages/Python/Python.sublime-syntax",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "Google-Service/gcd_host/main_app/lib/w2v.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2058,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								971,
+								971
+							]
+						],
+						"settings":
+						{
+							"rainbow_inited": true,
+							"syntax": "Packages/Python/Python.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "Google-Service/gcd_host/main_app/lib/stopwords.txt",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 490,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								484,
+								484
+							]
+						],
+						"settings":
+						{
+							"rainbow_inited": true,
+							"syntax": "Packages/MarkdownEditing/Markdown.sublime-syntax"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
@@ -1901,7 +1998,7 @@
 	"show_minimap": false,
 	"show_open_files": false,
 	"show_tabs": true,
-	"side_bar_visible": true,
+	"side_bar_visible": false,
 	"side_bar_width": 247.0,
 	"status_bar_visible": true,
 	"template_settings":

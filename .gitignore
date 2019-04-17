@@ -39,3 +39,4 @@ sysinfo.txt
 # Python
 *.pyc
 QCAR/somedata16
+*.sublime-workspace

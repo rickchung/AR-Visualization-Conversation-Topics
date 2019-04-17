@@ -7,11 +7,32 @@ class JavaContentModel:
     default_w2v_source = 'java-content-selected.txt'
     default_stopwords = 'stopwords.txt'
     default_sub_regex = r'[{}\d\\<>/\[\]\'.,;()|%\-:="*?]'
+    default_topic_list = 'raw_topic.txt'
+
     m_dictionary = None
     m_w2v = None
+    m_topic_list = None
 
     def __init__(self):
-        pass
+        with open(self.default_topic_list, 'r') as fin:
+            self.m_topic_list = [i.lower().strip() for i in fin.readlines()]
+
+    def query_topics_from_raw(self, terms, out_topn=5, term_topn=5):
+        rt = []
+        terms = terms + self.query_similar_terms(terms, topn=term_topn)
+        for i in terms:
+            rt.append(self.query_topics(i))
+        return [i for j in rt for i in j][:out_topn]
+
+    def query_topics(self, cleaned_term):
+        found_topics = list(filter(lambda x: cleaned_term in x, self.m_topic_list))
+        return found_topics
+
+    def query_similar_terms(self, terms, topn=10):
+        filtered_terms = [i for i in terms if i in self.m_w2v.wv]
+        if filtered_terms:
+            return [i for i, _ in self.m_w2v.wv.most_similar(filtered_terms, topn=topn)]
+        return []
 
     def train_default_w2v(self):
         # Read the raw content
@@ -63,5 +84,5 @@ class JavaContentModel:
 if __name__ == '__main__':
     javaw2v = JavaContentModel()
     javaw2v.train_default_w2v()
-    pprint( javaw2v.m_w2v.wv.most_similar('while') )
+    pprint(javaw2v.query_topics_from_raw(['while']))
 

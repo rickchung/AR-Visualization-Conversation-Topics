@@ -1,0 +1,114 @@
+Data and Variables
+Sequential
+Sequential Logics
+The Java programming syntax
+Variable declaration statement
+Assignment statements
+Assertion
+Program Control Flow
+Statement Blocks
+Branching Statements
+Unconditional Branching Statements
+Return statement
+Conditional Branching Statements
+Conditional Statements
+If...else statements
+Switch statements
+Iteration Statements
+The while loop
+The do...while loop
+The for loop
+The foreach loop
+The continue and break statements
+Throw statement
+try/catch
+If
+If/else
+If/else-if/else
+Conditional expressions
+Switch
+While
+Do... while
+For
+For-each
+Break and continue keywords
+Try... catch blocks
+Comparative operators
+Boolean operators
+Variables in Java programming
+Kinds of variables
+Creating variables
+Assigning values to variables
+Identifiers
+Naming conventions for identifiers
+Literals (values)
+Numbers in computer science
+Integer types in Java
+Integer numbers and floating point numbers
+Data conversion (casting)
+Boolean Literals
+Numeric Literals
+Integer Literals
+Floating Point Literals
+Character Literals
+String Literals
+null value
+Parameter passing
+Primitive type parameter
+Reference type parameter
+Variable argument list
+Return parameter
+Special method, the constructor
+Static methods
+Immutability
+Concatenation
+Comparing Strings
+Splitting a String
+Substrings
+String cases
+Instantiation and constructors
+Arrays
+Two-Dimensional Arrays
+Multidimensional Array
+Comments and unicode
+Javadoc comments
+Classes and Objects
+Constructors
+Initializers
+Static initializers
+Instance initializers
+The Object class
+Extending interfaces
+Method overloading
+Variable Argument
+Constructor overloading
+Method overriding
+Scope
+Scope of method parameters
+Scope of local variables
+Access modifiers
+Field encapsulation
+Inner classes
+Anonymous Classes
+Class T
+Collection
+Map
+Generics
+Collection classes
+Set
+Detecting duplicate objects in Sets
+SortedSet
+List
+Queue
+Synchronization
+Methods
+Adding Element in ArrayList
+Size of ArrayList
+Get and Set ArrayList Element
+Find Index of ArrayList Element
+Find Element Contain in ArrayList
+Map Classes
+Thread safe maps
+Comparing for reference equality
+Comparing for value equality
+Sorting/Ordering
