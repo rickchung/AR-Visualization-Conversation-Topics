@@ -30,20 +30,7 @@ public class CodeInterpreter : MonoBehaviour
         {
             if (codeObject.commmand.Equals("LOOP"))
             {
-                int repeat = int.Parse(codeObject.args[0]);
-                var codeToRepeat = new List<CodeObject>();
-                for (int i = 1; i < codeObject.args.Length; i++)
-                {
-                    string s = codeObject.args[i];
-                    // Extract command and args
-                    string[] subCode = s.Split('(');
-                    string subCommand = subCode[0];
-                    string[] subArgs = subCode[1].Replace(")", "").Split(',');
-                    codeToRepeat.Add(new CodeObject(subCommand, subArgs));
-                }
-
-                for (int _ = 0; _ < repeat; _++)
-                    procScript.AddRange(codeToRepeat);
+                _ParseLoop(codeObject, procScript);
             }
             else
             {
@@ -53,6 +40,24 @@ public class CodeInterpreter : MonoBehaviour
 
         // Run the script
         StartCoroutine(_RunScript(procScript));
+    }
+
+    private void _ParseLoop(CodeObject codeObject, List<CodeObject> procScript)
+    {
+        int repeat = int.Parse(codeObject.args[0]);
+        var codeToRepeat = new List<CodeObject>();
+        for (int i = 1; i < codeObject.args.Length; i++)
+        {
+            string s = codeObject.args[i];
+            // Extract command and args
+            string[] subCode = s.Split('(');
+            string subCommand = subCode[0];
+            string[] subArgs = subCode[1].Replace(")", "").Split(',');
+            codeToRepeat.Add(new CodeObject(subCommand, subArgs));
+        }
+
+        for (int _ = 0; _ < repeat; _++)
+            procScript.AddRange(codeToRepeat);
     }
 
     private IEnumerator _RunScript(List<CodeObject> script)

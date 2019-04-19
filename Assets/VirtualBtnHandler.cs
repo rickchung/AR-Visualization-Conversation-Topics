@@ -5,11 +5,12 @@ using Vuforia;
 
 public class VirtualBtnHandler : MonoBehaviour, IVirtualButtonEventHandler
 {
-    public VirtualButtonBehaviour virtualButton;
+    private VirtualButtonBehaviour virtualButton;
+    private Vector3 cellPos;
 
-    void Start()
+    public void SetVbName(string name)
     {
-        virtualButton.RegisterEventHandler(this);
+        virtualButton.name = name;
     }
 
     public void OnButtonPressed(VirtualButtonBehaviour vb)

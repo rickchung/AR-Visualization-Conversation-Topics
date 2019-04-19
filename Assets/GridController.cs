@@ -7,6 +7,7 @@ public class GridController : MonoBehaviour
     public Transform exampleTarget;
     public Transform gridStart, gridEnd;
     public Transform gridCellPrefab;
+    public VirtualBtnHandler vbPrefab;
 
     private Vector3[,] cellCoordinates;
 
@@ -32,8 +33,10 @@ public class GridController : MonoBehaviour
             for (int z = 0; z < numInZ; z++)
             {
                 Transform newCell = (Transform)Instantiate(
-                    original: gridCellPrefab, parent: exampleTarget,
-                    instantiateInWorldSpace: false);
+                        original: gridCellPrefab, 
+                        parent: exampleTarget,
+                        instantiateInWorldSpace: false
+                );
                 Vector3 newPos = startingPoint;
                 newPos.x = newPos.x + x * (stepSize + padding);
                 newPos.z = newPos.z - z * (stepSize + padding);
@@ -41,10 +44,15 @@ public class GridController : MonoBehaviour
                 newCell.name = "Cell" + x + z;
 
                 cellCoordinates[x, z] = newPos;
+
+                VirtualBtnHandler cellvb = Instantiate(vbPrefab, exampleTarget, false);
+                cellvb.transform.localPosition = newCell.localPosition;
+                cellvb.gameObject.name = "vb" + x + z;
             }
         }
 
         // Deactivate the starting and end cells
+        vbPrefab.gameObject.SetActive(false);
         gridStart.gameObject.SetActive(false);
         gridEnd.gameObject.SetActive(false);
     }

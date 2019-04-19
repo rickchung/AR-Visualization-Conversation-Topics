@@ -13,12 +13,7 @@ public class AvatarController : MonoBehaviour
 
     private void Start()
     {
-        Vector3 avatarPos = origin.localPosition;
-        avatarPos.y = 0.05f;
-        avatar.localPosition = avatarPos;
-
-        // Assume the avatar is placed at 0, 0 of the grid coordinate.
-        cellPos = new Vector3(0, 0, 0);
+        ResetPosition();
     }
 
     /// <summary>
@@ -49,6 +44,15 @@ public class AvatarController : MonoBehaviour
     {
         Vector3 nextCell = gridController.GetNextCellCoor(cellPos, dir);
         MoveToCell(nextCell);
+    }
+
+    public void ResetPosition()
+    {
+        Vector3 avatarPos = origin.localPosition;
+        avatarPos.y = 0.05f;
+        avatar.localPosition = avatarPos;
+        // Assume the avatar is placed at 0, 0 of the grid coordinate.
+        cellPos = new Vector3(0, 0, 0);
     }
 
     public void _TestAnything(int dir)
