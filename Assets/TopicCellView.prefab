@@ -23,7 +23,7 @@ GameObject:
   - component: {fileID: 114755156955292448}
   - component: {fileID: 114782437642010490}
   m_Layer: 5
-  m_Name: ConceptButton
+  m_Name: Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -41,7 +41,7 @@ GameObject:
   - component: {fileID: 222992189430071516}
   - component: {fileID: 114919157414667166}
   m_Layer: 5
-  m_Name: ConceptCellView
+  m_Name: TopicCellView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -58,7 +58,7 @@ GameObject:
   - component: {fileID: 222111790696143252}
   - component: {fileID: 114866208086750402}
   m_Layer: 5
-  m_Name: ConceptNameText
+  m_Name: Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -72,11 +72,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1358274404422516}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e15654982d660419c8c548e12578892b, type: 3}
+  m_Script: {fileID: 11500000, guid: 95ca93ee680b24f8a8b1a1c13fd61595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cellIdentifier: ConceptCellView
-  conceptNameText: {fileID: 114866208086750402}
+  cellIdentifier: TopicCellView
+  mTopicName: {fileID: 114866208086750402}
+  mTopicButton: {fileID: 114782437642010490}
 --- !u!114 &114755156955292448
 MonoBehaviour:
   m_ObjectHideFlags: 1

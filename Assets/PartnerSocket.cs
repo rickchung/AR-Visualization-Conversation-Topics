@@ -27,7 +27,6 @@ public class PartnerSocket : MonoBehaviour
     public Text localIpDisplay;
     public InputField partnerIPAddress;
     public GameObject serverMsgPanel;
-    public PinnedConceptController pinnedConceptController;
     public SpeechToTextController speechToTextController;
 
     private Button hostConnBtn;

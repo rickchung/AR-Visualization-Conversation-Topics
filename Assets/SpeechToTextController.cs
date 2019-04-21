@@ -17,10 +17,11 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
     public TMPro.TextMeshPro xrTopicContainer;
     public EnhancedScroller historyScroller;
     public TransCellView transCellViewPrefab;
+    public TopicScroller mTopicScroller;
     public bool render3DTranscripts;
 
     private const int XR_TRANSCRIPTS_OUTPUT_LIMIT = 30;  // Chars
-    private const int XR_TOPIC_OUTPUT_LIMIT = 3;  // Chars
+    private const int LIMIT_NUM_TOPIC = 3;  // Chars
     private int mWordCount;
     private const int TOPIC_LIST_LIMIT = 3;
 
@@ -77,6 +78,10 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
         }
     }
 
+    /// <summary>
+    /// Saves the given topics into the transcript file.
+    /// </summary>
+    /// <param name="topics">Topics.</param>
     public void SaveTopics(string[] topics)
     {
         if (topics.Length > 0)
@@ -92,6 +97,10 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
         }
     }
 
+    /// <summary>
+    /// Append a string to the transcript file.
+    /// </summary>
+    /// <param name="transcript">Transcript.</param>
     private void SaveToFile(string transcript)
     {
         File.AppendAllText(_sttHistoryFilePath, transcript);
@@ -118,17 +127,27 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
         }
     }
 
+    /// <summary>
+    /// Update the view of identified topics.
+    /// </summary>
     private void UpdateTopicVis()
     {
         if (_sttTopics.Count > 0)
         {
+            // Find the latest topics
             string[] latest = _sttTopics[_sttTopics.Count - 1];
+            // Make a single string of the latest topics
+            var selected = new List<string>();
             string content = "";
-            for (int i = 0; i < latest.Length && i < XR_TOPIC_OUTPUT_LIMIT; i++)
+            for (int i = 0; i < latest.Length && i < LIMIT_NUM_TOPIC; i++)
             {
                 content += "Topic: " + latest[i] + "\n";
+                selected.Add(latest[i].ToUpper());
             }
+            // Set the AR text
             xrTopicContainer.SetText(content);
+            // Update the 2D scroller
+            mTopicScroller.ReplaceTopicsAndRefresh(selected);
         }
     }
 
@@ -212,12 +231,14 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
     // ======================================================================
 
     /// <summary>
-    /// Show/Hide the transcript history scroller.
+    /// Show/Hide the transcript history scroller. Used by buttons.
     /// </summary>
     public void ToggleTransHistoryPane()
     {
         historyScroller.gameObject.SetActive(!historyScroller.gameObject.activeSelf);
     }
+
+    // ======================================================================
 
     private string[] _testScripts = {
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit. ",
