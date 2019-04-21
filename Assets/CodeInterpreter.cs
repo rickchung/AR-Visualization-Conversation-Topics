@@ -6,15 +6,33 @@ public class CodeInterpreter : MonoBehaviour
 {
     public AvatarController mAvartar;
     public TMPro.TextMeshPro mScriptTextMesh;
+    public GameObject mExampleContainer;
+    public GameObject mControlPanel;
 
     private const float CMD_RUNNING_DELAY = 0.5f;
-
     private ScriptObject loadedScript;
+    private List<string> mAvailableScripts = new List<string>
+    {
+        "SEQUENTIAL"
+    };
 
     public void _TestScript()
     {
-        LoadPredefinedScript("sequential");
+        LoadPredefinedScript("SEQUENTIAL");
         RunLoadedScript();
+    }
+
+    public void ActivateExampleView(bool activated)
+    {
+        mExampleContainer.SetActive(activated);
+        mControlPanel.SetActive(activated);
+    }
+
+    public bool IsTopicSampleAvailable(string topic)
+    {
+        if (mAvailableScripts.Contains(topic))
+            return true;
+        return false;
     }
 
     /// <summary>
@@ -27,7 +45,7 @@ public class CodeInterpreter : MonoBehaviour
 
         switch (scriptName)
         {
-            case "sequential":
+            case "SEQUENTIAL":
                 script = new ScriptObject(new List<CodeObject>() {
                     new CodeObject("MOVE", new string[] {"SOUTH"}),
                     new CodeObject("MOVE", new string[] {"SOUTH"}),
@@ -44,7 +62,10 @@ public class CodeInterpreter : MonoBehaviour
         loadedScript = script;
 
         if (loadedScript != null)
+        {
             mScriptTextMesh.SetText(loadedScript.ToString());
+            ActivateExampleView(true);
+        }
     }
 
     /// <summary>

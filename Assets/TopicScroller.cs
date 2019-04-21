@@ -13,6 +13,7 @@ public class TopicScroller : MonoBehaviour, IEnhancedScrollerDelegate
 
     public EnhancedScroller mTopicScroller;
     public TopicCellView mTopicCellView;
+    public CodeInterpreter mCodeInterpreter;
 
     void Start()
     {
@@ -48,6 +49,13 @@ public class TopicScroller : MonoBehaviour, IEnhancedScrollerDelegate
     {
         TopicCellView cellView = scroller.GetCellView(mTopicCellView) as TopicCellView;
         cellView.SetData(_topics[dataIndex]);
+
+        // If the predefined example is available, set the button event
+        if (mCodeInterpreter.IsTopicSampleAvailable(_topics[dataIndex]))
+            cellView.SetOnClickEvent(() => mCodeInterpreter.LoadPredefinedScript(_topics[dataIndex]));
+        else
+            cellView.DisableButton();
+
         return cellView;
     }
 }
