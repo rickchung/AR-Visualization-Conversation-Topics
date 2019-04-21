@@ -1248,7 +1248,7 @@ GameObject:
   - component: {fileID: 756926161}
   - component: {fileID: 756926160}
   m_Layer: 0
-  m_Name: TextMeshPro (3)
+  m_Name: AxisDirNorth
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3036,7 +3036,7 @@ GameObject:
   - component: {fileID: 1506413186}
   - component: {fileID: 1506413185}
   m_Layer: 0
-  m_Name: TextMeshPro (2)
+  m_Name: AxisDirSouth
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3310,7 +3310,7 @@ GameObject:
   - component: {fileID: 1603941169}
   - component: {fileID: 1603941168}
   m_Layer: 0
-  m_Name: TextMeshPro
+  m_Name: AxisDirWest
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4214,7 +4214,7 @@ GameObject:
   - component: {fileID: 2052460465}
   - component: {fileID: 2052460464}
   m_Layer: 0
-  m_Name: TextMeshPro (1)
+  m_Name: AxisDirEast
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
