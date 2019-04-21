@@ -127,7 +127,7 @@ public class GridController : MonoBehaviour
     {
         public static Vector3 NORTH = new Vector3(0, 0, -1);
         public static Vector3 SOUTH = new Vector3(0, 0, 1);
-        public static Vector3 WEST = new Vector3(1, 0, 0);
-        public static Vector3 EAST = new Vector3(-1, 0, 0);
+        public static Vector3 WEST = new Vector3(-1, 0, 0);
+        public static Vector3 EAST = new Vector3(1, 0, 0);
     }
 }

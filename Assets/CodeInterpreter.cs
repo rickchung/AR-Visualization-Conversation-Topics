@@ -5,24 +5,26 @@ using UnityEngine;
 public class CodeInterpreter : MonoBehaviour
 {
     public AvatarController mAvartar;
+    public TMPro.TextMeshPro mScriptTextMesh;
 
     private const float CMD_RUNNING_DELAY = 0.5f;
 
     public void _TestScript()
     {
-        var script = new List<CodeObject>()
-        {
+        ScriptObject script = new ScriptObject(new List<CodeObject>() {
             new CodeObject("MOVE", new string[] {"SOUTH"}),
             new CodeObject("MOVE", new string[] {"SOUTH"}),
-            new CodeObject("MOVE", new string[] {"WEST"}),
-            new CodeObject("MOVE", new string[] {"WEST"}),
-            new CodeObject("LOOP", new string[] {"2", "MOVE(EAST)", "MOVE(NORTH)"})
-        };
+            new CodeObject("MOVE", new string[] {"EAST"}),
+            new CodeObject("MOVE", new string[] {"EAST"}),
+            new CodeObject("LOOP", new string[] {"2", "MOVE(WEST)", "MOVE(NORTH)"})
+        });
+
+        mScriptTextMesh.SetText(script.ToString());
 
         RunScript(script);
     }
 
-    public void RunScript(List<CodeObject> script)
+    public void RunScript(ScriptObject script)
     {
         // Preprocess the script
         var procScript = new List<CodeObject>();

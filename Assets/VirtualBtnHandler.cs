@@ -8,6 +8,12 @@ public class VirtualBtnHandler : MonoBehaviour, IVirtualButtonEventHandler
     private VirtualButtonBehaviour virtualButton;
     private Vector3 cellPos;
 
+    void Start()
+    {
+        virtualButton = GetComponent<VirtualButtonBehaviour>();
+        virtualButton.RegisterEventHandler(this); 
+    }
+
     public void SetVbName(string name)
     {
         virtualButton.name = name;

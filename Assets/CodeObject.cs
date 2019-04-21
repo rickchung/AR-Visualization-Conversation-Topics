@@ -1,6 +1,4 @@
-﻿
-
-public class CodeObject
+﻿public class CodeObject
 {
     public string commmand;
     public string[] args;
@@ -13,6 +11,21 @@ public class CodeObject
 
     override public string ToString()
     {
-        return commmand + "(" + string.Join(",", args) + ")";
+        string rt = "";
+
+        switch (commmand)
+        {
+            case "LOOP":
+                string numRepeat = args[0];
+                rt += "LOOP {\n";
+                for (int i = 1; i < args.Length; i++)
+                    rt += "    " + args[i] + "\n";
+                rt += "} " + numRepeat + " Times";
+                break;
+            default:
+                rt = commmand + "(" + string.Join(",", args) + ")";
+                break;
+        }
+        return rt;
     }
 }
