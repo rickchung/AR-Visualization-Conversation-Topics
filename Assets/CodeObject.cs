@@ -17,7 +17,7 @@
         {
             case "LOOP":
                 string numRepeat = args[0];
-                rt += "LOOP {\n";
+                rt += "REPEAT {\n";
                 for (int i = 1; i < args.Length; i++)
                     rt += "    " + args[i] + "\n";
                 rt += "} " + numRepeat + " Times";

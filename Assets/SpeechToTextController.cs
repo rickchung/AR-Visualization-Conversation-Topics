@@ -43,6 +43,8 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
         ToggleTransHistoryPane();
     }
 
+    // ======================================================================
+
     public void SaveTransResponse(SpToTextResult stt)
     {
         // Save transcript
@@ -95,6 +97,8 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
         File.AppendAllText(_sttHistoryFilePath, transcript);
     }
 
+    // ======================================================================
+
     /// <summary>
     /// The general update call
     /// </summary>
@@ -122,7 +126,7 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
             string content = "";
             for (int i = 0; i < latest.Length && i < XR_TOPIC_OUTPUT_LIMIT; i++)
             {
-                content += "Topic " + (i + 1) + ": " + latest[i] + "\n";
+                content += "Topic: " + latest[i] + "\n";
             }
             xrTopicContainer.SetText(content);
         }
@@ -159,13 +163,14 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
         textOutput.text = output;
     }
 
+    // ======================================================================
 
     /// <summary>
     /// Gets the number of cells for transcript history scroller.
     /// </summary>
     /// <returns>The number of cells.</returns>
     /// <param name="scroller">Scroller.</param>
-    public int GetNumberOfCells(EnhancedScroller scroller)
+    int IEnhancedScrollerDelegate.GetNumberOfCells(EnhancedScroller scroller)
     {
         return _sttHistory.Count;
     }
@@ -176,7 +181,8 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
     /// <returns>The cell view size.</returns>
     /// <param name="scroller">Scroller.</param>
     /// <param name="dataIndex">Data index.</param>
-    public float GetCellViewSize(EnhancedScroller scroller, int dataIndex)
+    float IEnhancedScrollerDelegate.GetCellViewSize(
+        EnhancedScroller scroller, int dataIndex)
     {
         return 50f;
     }
@@ -188,16 +194,22 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
     /// <param name="scroller">Scroller.</param>
     /// <param name="dataIndex">Data index.</param>
     /// <param name="cellIndex">Cell index.</param>
-    public EnhancedScrollerCellView GetCellView(EnhancedScroller scroller, int dataIndex, int cellIndex)
+    EnhancedScrollerCellView IEnhancedScrollerDelegate.GetCellView(
+        EnhancedScroller scroller, int dataIndex, int cellIndex)
     {
-        TransCellView cellView = scroller.GetCellView(transCellViewPrefab) as TransCellView;
+        TransCellView cellView = scroller.GetCellView(transCellViewPrefab)
+            as TransCellView;
+
         //if (_sttHistory[dataIndex].Contains("P:"))
         //{
         //    cellView.GetComponent<Image>().color = new Color(0xff, 0xff, 0xff, 180);
         //}
+
         cellView.SetData(_sttHistory[dataIndex]);
         return cellView;
     }
+
+    // ======================================================================
 
     /// <summary>
     /// Show/Hide the transcript history scroller.

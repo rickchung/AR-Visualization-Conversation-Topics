@@ -18,7 +18,9 @@ public class GridController : MonoBehaviour
         float distX = Mathf.Abs(startingPoint.x - endPoint.x);
         float distZ = Mathf.Abs(startingPoint.z - endPoint.z);
 
-        float stepSize = gridStart.GetComponent<Renderer>().bounds.size.x;
+        float stepSize = (
+            gridStart.GetComponent<Renderer>().bounds.size.x
+            / gridStart.parent.localScale.x);
         float padding = stepSize * 0.10f;
         int numInX = Mathf.CeilToInt(distX / (stepSize + padding)) + 1;
         int numInZ = Mathf.CeilToInt(distZ / (stepSize + padding)) + 1;
@@ -33,7 +35,7 @@ public class GridController : MonoBehaviour
             for (int z = 0; z < numInZ; z++)
             {
                 Transform newCell = (Transform)Instantiate(
-                        original: gridCellPrefab, 
+                        original: gridCellPrefab,
                         parent: exampleTarget,
                         instantiateInWorldSpace: false
                 );
@@ -121,7 +123,7 @@ public class GridController : MonoBehaviour
 
 
 
-    public enum Direction { NORTH = 0, SOUTH = 1, EAST = 2, WEST = 3 , UNKNOWN}
+    public enum Direction { NORTH = 0, SOUTH = 1, EAST = 2, WEST = 3, UNKNOWN }
 
     public static class DirectionVec
     {
