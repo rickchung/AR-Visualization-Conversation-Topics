@@ -52,7 +52,7 @@ public class TopicScroller : MonoBehaviour, IEnhancedScrollerDelegate
 
         // If the predefined example is available, set the button event
         if (mCodeInterpreter.IsTopicSampleAvailable(_topics[dataIndex]))
-            cellView.SetOnClickEvent(() => mCodeInterpreter.LoadPredefinedScript(_topics[dataIndex]));
+            cellView.SetOnClickEvent(mCodeInterpreter.GetTopicButtonEvent(_topics[dataIndex]));
         else
             cellView.DisableButton();
 

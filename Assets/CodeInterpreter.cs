@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class CodeInterpreter : MonoBehaviour
 {
@@ -8,29 +9,51 @@ public class CodeInterpreter : MonoBehaviour
     public TMPro.TextMeshPro mScriptTextMesh;
     public GameObject mExampleContainer;
     public GameObject mControlPanel;
+    public PartnerSocket mPartnerSocket;
 
     private const float CMD_RUNNING_DELAY = 0.5f;
+    public const string CTRL_CLOSE = "close";
+
     private ScriptObject loadedScript;
     private List<string> mAvailableScripts = new List<string>
     {
         "SEQUENTIAL"
     };
 
-    public void _TestScript()
+
+    void Start()
     {
-        LoadPredefinedScript("SEQUENTIAL");
-        RunLoadedScript();
+        CloseTopicViewAndBroadcast();
     }
 
-    public void ActivateExampleView(bool activated)
+
+    public UnityAction GetTopicButtonEvent(string topic)
+    {
+        UnityAction action = () =>
+        {
+            LoadPredefinedScript(topic, broadcast: true);
+        };
+        return action;
+    }
+
+    public void SetActiveTopicView(bool activated, bool broadcast = false)
     {
         mExampleContainer.SetActive(activated);
         mControlPanel.SetActive(activated);
+        if (broadcast) mPartnerSocket.BroadcastTopicCtrl(CTRL_CLOSE);
     }
+
+    public void CloseTopicViewAndBroadcast()
+    {
+        SetActiveTopicView(false, true);
+    }
+
+
+    // ======================================================================
 
     public bool IsTopicSampleAvailable(string topic)
     {
-        if (mAvailableScripts.Contains(topic))
+        if (mAvailableScripts.Contains(topic.Trim().ToUpper()))
             return true;
         return false;
     }
@@ -39,10 +62,9 @@ public class CodeInterpreter : MonoBehaviour
     /// Load the predefined script template specified by <paramref name="scriptName"/>.
     /// </summary>
     /// <param name="scriptName">Script name.</param>
-    public void LoadPredefinedScript(string scriptName)
+    public void LoadPredefinedScript(string scriptName, bool broadcast = false)
     {
         ScriptObject script = null;
-
         switch (scriptName)
         {
             case "SEQUENTIAL":
@@ -56,17 +78,22 @@ public class CodeInterpreter : MonoBehaviour
                     })
                 });
                 break;
-
+            default:
+                Debug.LogError("The script " + scriptName + " does not exist.");
+                break;
         }
 
         loadedScript = script;
-
         if (loadedScript != null)
         {
             mScriptTextMesh.SetText(loadedScript.ToString());
-            ActivateExampleView(true);
+            SetActiveTopicView(true, broadcast: false);
+            if (broadcast) mPartnerSocket.BroadcastTopicCtrl(scriptName);
         }
     }
+
+
+    // ======================================================================
 
     /// <summary>
     /// Run the loaded script.
@@ -74,7 +101,7 @@ public class CodeInterpreter : MonoBehaviour
     public void RunLoadedScript()
     {
         if (loadedScript != null)
-            RunScript(loadedScript);
+            _RunScript(loadedScript);
     }
 
     /// <summary>
@@ -82,13 +109,13 @@ public class CodeInterpreter : MonoBehaviour
     /// by transforming loops into code sequences.
     /// </summary>
     /// <param name="script">Script.</param>
-    private void RunScript(ScriptObject script)
+    private void _RunScript(ScriptObject script)
     {
         // Preprocess the script
         var procScript = new List<CodeObject>();
         foreach (CodeObject codeObject in script)
         {
-            if (codeObject.commmand.Equals("LOOP"))
+            if (codeObject.command.Equals("LOOP"))
             {
                 _ParseLoop(codeObject, procScript);
             }
@@ -99,7 +126,7 @@ public class CodeInterpreter : MonoBehaviour
         }
 
         // Run the script
-        StartCoroutine(_RunScript(procScript));
+        StartCoroutine(_RunScriptCoroutine(procScript));
     }
 
     /// <summary>
@@ -131,12 +158,14 @@ public class CodeInterpreter : MonoBehaviour
     /// </summary>
     /// <returns>The script.</returns>
     /// <param name="script">Script.</param>
-    private IEnumerator _RunScript(List<CodeObject> script)
+    private IEnumerator _RunScriptCoroutine(List<CodeObject> script)
     {
         int counter = 0;
         while (counter < script.Count)
         {
-            _RunCommand(script[counter++]);
+            CodeObject nextCodeObject = script[counter++];
+            RunCommand(nextCodeObject);
+            mPartnerSocket.BroadcastAvatarCtrl(nextCodeObject);
             yield return new WaitForSeconds(CMD_RUNNING_DELAY);
         }
     }
@@ -145,11 +174,11 @@ public class CodeInterpreter : MonoBehaviour
     /// Run a single command in the given codeObject.
     /// </summary>
     /// <param name="codeObject">Code object.</param>
-    private void _RunCommand(CodeObject codeObject)
+    public void RunCommand(CodeObject codeObject)
     {
         Debug.Log("Running: " + codeObject);
 
-        string command = codeObject.commmand;
+        string command = codeObject.command;
         string[] args = codeObject.args;
 
         switch (command)
@@ -159,6 +188,4 @@ public class CodeInterpreter : MonoBehaviour
                 break;
         }
     }
-
-
 }

@@ -1,11 +1,11 @@
 ﻿public class CodeObject
 {
-    public string commmand;
+    public string command;
     public string[] args;
 
-    public CodeObject(string commmand, string[] args)
+    public CodeObject(string command, string[] args)
     {
-        this.commmand = commmand;
+        this.command = command;
         this.args = args;
     }
 
@@ -13,7 +13,7 @@
     {
         string rt = "";
 
-        switch (commmand)
+        switch (command)
         {
             case "LOOP":
                 string numRepeat = args[0];
@@ -23,9 +23,27 @@
                 rt += "} " + numRepeat + " Times";
                 break;
             default:
-                rt = commmand + "(" + string.Join(",", args) + ")";
+                rt = command + "(" + string.Join(",", args) + ")";
                 break;
         }
         return rt;
+    }
+
+    public string ToNetMessage()
+    {
+        return command + "|" + string.Join(",", args);
+    }
+
+    public static CodeObject FromNetMessage(string netMsg)
+    {
+        string[] split1 = netMsg.Split('|');
+
+        string command = split1[0];
+
+        string[] args = null;
+        if (split1.Length > 1)
+            args = split1[1].Split(',');
+
+        return new CodeObject(command, args);
     }
 }

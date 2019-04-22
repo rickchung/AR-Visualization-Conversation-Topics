@@ -28,16 +28,13 @@ public class PartnerSocket : MonoBehaviour
     public InputField partnerIPAddress;
     public GameObject serverMsgPanel;
     public SpeechToTextController speechToTextController;
+    public CodeInterpreter mCodeInterpreter;
+    public bool useLocalServer;
 
     private Button hostConnBtn;
     private Text serverMsgText;
-
-    public bool useLocalServer;
-
     private string _localIpAddress, _serverIpAddress;
-
     private bool _broadcastByHost;
-
     private NetworkClient clientToPartner;
 
     private static class MyMsgType
@@ -47,7 +44,10 @@ public class PartnerSocket : MonoBehaviour
         public static short MSG_NEW_KEYWORDS = MsgType.Highest + 3;
         public static short MSG_PINNED_KEYWORDS = MsgType.Highest + 4;
         public static short MSG_TRANS = MsgType.Highest + 5;
+        public static short MSG_TOPIC_CTRL = MsgType.Highest + 6;
+        public static short MSG_AVATAR_CTRL = MsgType.Highest + 7;
     }
+
 
     void Start()
     {
@@ -69,6 +69,9 @@ public class PartnerSocket : MonoBehaviour
             SetupLocalServer();
     }
 
+
+    // ============================================================
+
     /// <summary>
     /// Setups the remote server. This method should not be used when the
     /// LAN servers are used.
@@ -76,41 +79,13 @@ public class PartnerSocket : MonoBehaviour
     public void SetupRemoteServer()
     {
         Debug.Log("Trying to connect to the HOST server...");
-        clientToPartner = new NetworkClient();
-        clientToPartner.RegisterHandler(MsgType.Connect, OnConnected);
-        clientToPartner.RegisterHandler(MyMsgType.MSG_TEST, OnTestMsgArrived);
-        clientToPartner.RegisterHandler(MyMsgType.MSG_NEW_KEYWORDS, OnReceivedNewKeywords);
-        clientToPartner.RegisterHandler(MyMsgType.MSG_TRANS, OnReceiveTranscript);
+        clientToPartner = InitNetworkClient();
         clientToPartner.Connect(HOST_SERVER, HOST_SERVER_PORT);
 
         _broadcastByHost = true;
-
         serverMsgText.text = "Trying to find the host...";
         hostConnBtn.interactable = false;
     }
-
-    // ==================== Middleware ==================== 
-
-    /// <summary>
-    /// The helper function that broadcasts the message through the server.
-    /// This method will use the server according to the current connection
-    /// type (LAN or Remote server).
-    /// </summary>
-    /// <param name="msgType">Message type.</param>
-    /// <param name="msg">Message.</param>
-    private void BroadcastToConnected(short msgType, MessageBase msg)
-    {
-        if (!_broadcastByHost)
-        {
-            NetworkServer.SendToAll(msgType, msg);
-        }
-        else
-        {
-            clientToPartner.Send(msgType, msg);
-        }
-    }
-
-    // ==================== Server Side ==================== 
 
     /// <summary>
     /// Setups the local server in LAN environment. This method should not 
@@ -123,6 +98,26 @@ public class PartnerSocket : MonoBehaviour
         NetworkServer.RegisterHandler(MyMsgType.MSG_CLIENT_CONNECTED, OnConnectedClientReport);
 
         _broadcastByHost = false;
+    }
+
+
+    // ============================================================
+    // NetworkServer
+
+    /// <summary>
+    /// The helper function that broadcasts the message through the server.
+    /// This method will use the server according to the current connection
+    /// type (LAN or Remote server).
+    /// </summary>
+    /// <param name="msgType">Message type.</param>
+    /// <param name="msg">Message.</param>
+    private void BroadcastToConnected(short msgType, MessageBase msg)
+    {
+        if (!_broadcastByHost)
+            NetworkServer.SendToAll(msgType, msg);
+        else
+            clientToPartner.Send(msgType, msg);
+
     }
 
     /// <summary>
@@ -171,7 +166,33 @@ public class PartnerSocket : MonoBehaviour
         });
     }
 
-    // ==================== Client Side ==================== 
+    /// <summary>
+    /// Broadcasts the topic ctrl.
+    /// </summary>
+    /// <param name="ctrlMsg">Ctrl message.</param>
+    public void BroadcastTopicCtrl(string ctrlMsg)
+    {
+        BroadcastToConnected(MyMsgType.MSG_TOPIC_CTRL, new StringMessage
+        {
+            value = ctrlMsg
+        });
+    }
+
+    /// <summary>
+    /// Broadcasts the avatar ctrl.
+    /// </summary>
+    /// <param name="code">Code.</param>
+    public void BroadcastAvatarCtrl(CodeObject code)
+    {
+        BroadcastToConnected(MyMsgType.MSG_AVATAR_CTRL, new StringMessage
+        {
+            value = code.ToNetMessage()
+        });
+    }
+
+
+    // ============================================================
+    // NetworkClient
 
     /// <summary>
     /// Create a client handler and connect to the server at partnerIP.
@@ -180,12 +201,24 @@ public class PartnerSocket : MonoBehaviour
     private void SetupClient(string partnerIP)
     {
         Debug.Log("[CLIENT] Trying to connect to the partner at " + partnerIP);
-        clientToPartner = new NetworkClient();
-        clientToPartner.RegisterHandler(MsgType.Connect, OnConnected);
-        clientToPartner.RegisterHandler(MyMsgType.MSG_TEST, OnTestMsgArrived);
-        clientToPartner.RegisterHandler(MyMsgType.MSG_NEW_KEYWORDS, OnReceivedNewKeywords);
-        clientToPartner.RegisterHandler(MyMsgType.MSG_TRANS, OnReceiveTranscript);
+        clientToPartner = InitNetworkClient();
         clientToPartner.Connect(partnerIP, UDP_PORT);
+    }
+
+    /// <summary>
+    /// Initialize a NetworkClient and register the callbacks for messages.
+    /// </summary>
+    /// <returns>The network client.</returns>
+    private NetworkClient InitNetworkClient()
+    {
+        NetworkClient c = new NetworkClient();
+        c.RegisterHandler(MsgType.Connect, OnConnected);
+        c.RegisterHandler(MyMsgType.MSG_TEST, OnTestMsgArrived);
+        c.RegisterHandler(MyMsgType.MSG_NEW_KEYWORDS, OnReceivedNewKeywords);
+        c.RegisterHandler(MyMsgType.MSG_TRANS, OnReceiveTranscript);
+        c.RegisterHandler(MyMsgType.MSG_TOPIC_CTRL, OnReceivedExampleCtrl);
+        c.RegisterHandler(MyMsgType.MSG_AVATAR_CTRL, OnReceivedAvatarCtrl);
+        return c;
     }
 
     /// <summary>
@@ -243,7 +276,48 @@ public class PartnerSocket : MonoBehaviour
         var newKeywordsMsg = netMsg.ReadMessage<StringMessage>().value;
         speechToTextController.SaveTopics(newKeywordsMsg.Split(','));
         speechToTextController.UpdateVis();
-
-        // Debug.Log("Received keywords: " + newKeywordsMsg);
     }
+
+    /// <summary>
+    /// The callback on the reception of example control messages. 
+    /// 
+    /// Init event:
+    /// when one user selects a predefined topic, there will be a message
+    /// broadcasted out which tells all other devices create the same example of
+    /// the topic. 
+    /// </summary>
+    /// 
+    /// Closing event:
+    /// when one user presses the "close" button, a message will be broadcasted
+    /// to tell all the connected devices to close the opened topic.
+    /// 
+    /// <param name="netMsg">Net message.</param>
+    private void OnReceivedExampleCtrl(NetworkMessage netMsg)
+    {
+        var ctrlCmd = netMsg.ReadMessage<StringMessage>().value;
+
+        switch (ctrlCmd)
+        {
+            case CodeInterpreter.CTRL_CLOSE:
+                mCodeInterpreter.SetActiveTopicView(false);
+                break;
+            // By default, if the ctrlCmd is not any predefined control message,
+            // it will be a script name.
+            default:
+                mCodeInterpreter.LoadPredefinedScript(ctrlCmd);
+                break;
+        }
+    }
+
+    /// <summary>
+    /// The callback for the reception of the command of avatar.
+    /// </summary>
+    /// <param name="netMsg">Net message.</param>
+    private void OnReceivedAvatarCtrl(NetworkMessage netMsg)
+    {
+        var ctrlCmd = netMsg.ReadMessage<StringMessage>().value;
+        CodeObject co = CodeObject.FromNetMessage(ctrlCmd);
+        mCodeInterpreter.RunCommand(co);
+    }
+
 }
