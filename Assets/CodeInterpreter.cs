@@ -17,7 +17,7 @@ public class CodeInterpreter : MonoBehaviour
     private ScriptObject loadedScript;
     private List<string> mAvailableScripts = new List<string>
     {
-        "SEQUENTIAL"
+        "SEQUENTIAL", "SEQUENTIAL LOGICS"
     };
 
 
@@ -53,7 +53,7 @@ public class CodeInterpreter : MonoBehaviour
 
     public bool IsTopicSampleAvailable(string topic)
     {
-        if (mAvailableScripts.Contains(topic.Trim().ToUpper()))
+        if (mAvailableScripts.IndexOf(topic.ToUpper()) > 0)
             return true;
         return false;
     }
@@ -68,6 +68,7 @@ public class CodeInterpreter : MonoBehaviour
         switch (scriptName)
         {
             case "SEQUENTIAL":
+            case "SEQUENTIAL LOGICS":
                 script = new ScriptObject(new List<CodeObject>() {
                     new CodeObject("MOVE", new string[] {"SOUTH"}),
                     new CodeObject("MOVE", new string[] {"SOUTH"}),

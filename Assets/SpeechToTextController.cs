@@ -161,7 +161,7 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
         for (int i = _sttHistory.Count - 1; i >= 0; i--)
         {
             mWordCount += _sttHistory[i].Length;
-            textContent = _sttHistory[i] + "  " + textContent + "\n";
+            textContent = _sttHistory[i] + "\n" + textContent + "\n";
 
             if (mWordCount > XR_TRANSCRIPTS_OUTPUT_LIMIT)
                 break;

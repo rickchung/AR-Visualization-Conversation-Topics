@@ -45,3 +45,4 @@ Google-Service/gcd_host/java-content.dict
 Google-Service/gcd_host/w2c-java-filter.model
 Assets/Data/speech-test-data.wav
 Assets/Data/speech-test-data.wav.meta
+*.png
