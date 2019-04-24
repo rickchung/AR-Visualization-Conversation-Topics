@@ -49,6 +49,9 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
     public void SaveTransResponse(SpToTextResult stt)
     {
         // Save transcript
+        string[] text = stt.transcript;
+        string[] topics = stt.topics;
+
         SaveTranscript(stt.transcript);
         // Save topics
         SaveTopics(stt.topics);
@@ -72,9 +75,6 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
                 }
             }
             historyScroller.ReloadData();
-
-            //if (historyScroller.gameObject.activeSelf)
-            //historyScroller.JumpToDataIndex(_sttHistory.Count - 1);
         }
     }
 

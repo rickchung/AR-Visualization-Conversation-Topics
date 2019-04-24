@@ -101,15 +101,43 @@ public class VoiceController : MonoBehaviour
         while (!(Microphone.GetPosition(micName) > latency)) { }
         audioSource.Play();
 
+        // For the merged audio file
+        int clipCount = 0;
+        AudioClip mergedClip = null;
+        var mergedClipData = new List<float>();
+        string mergedClipName = "MergedMicAudio-" + (DateTime.Now.ToString()
+            .Replace('/', '-').Replace(':', '-').Replace(' ', '-'));
+
         while (Microphone.IsRecording(micName))
         {
             yield return new WaitForSeconds(CLIP_SIZE);
+
             // Save the clip after waiting
             if (audioSource.clip != null)
             {
-                string filePath = SaveMicFile(audioSource.clip);
-                // Speech-to-text here
-                networkManager.RequestSpeechToText(filePath);
+                clipCount++;
+
+                // Copy all the data
+                float[] clipData = new float[audioSource.clip.samples];
+                audioSource.clip.GetData(clipData, 0);
+                mergedClipData.AddRange(clipData);
+
+                // Create a new merged clip
+                mergedClip = AudioClip.Create(
+                    "merged", mergedClipData.Count, audioSource.clip.channels,
+                    audioSource.clip.frequency, false);
+                mergedClip.SetData(mergedClipData.ToArray(), 0);
+
+                // Save the audio and send an STT request
+                //string filePath = SaveMicFile(audioSource.clip);
+                //networkManager.RequestSpeechToText(filePath);  // clip
+                string mergedFilePath = SaveMicFile(mergedClipName, mergedClip);
+                networkManager.RequestSpeechToText(mergedFilePath);  // merged
+
+                // Cleanup the clip of mic
+                float[] zeros = new float[audioSource.clip.samples];
+                Array.Clear(zeros, 0, zeros.Length);
+                audioSource.clip.SetData(zeros, 0);
             }
         }
 
@@ -137,9 +165,12 @@ public class VoiceController : MonoBehaviour
         timestamp = timestamp.Replace('/', '-').Replace(':', '-').Replace(' ', '-');
         string micFilename = "MicAudio-" + timestamp;
 
-        // Save the clip
-        string newFilePath = SavWav.Save(micFilename, clip);
+        // Save the clip and return the new filename
+        return SaveMicFile(micFilename, clip);
+    }
 
-        return newFilePath;
+    private string SaveMicFile(string filename, AudioClip clip)
+    {
+        return SavWav.Save(filename, clip);
     }
 }

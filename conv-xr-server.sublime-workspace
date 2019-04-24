@@ -529,19 +529,20 @@
 			}
 		},
 		{
-			"file": "Google-Service/gcd_host/main_app/lib/w2v.py",
+			"file": "Google-Service/gcd_host/main_app/lib/raw_topic.txt",
 			"settings":
 			{
-				"buffer_size": 3549,
+				"buffer_size": 2154,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "Google-Service/gcd_host/main_app/lib/short_trans.py",
+			"file": "Google-Service/gcd_host/main_app/lib/w2v.py",
 			"settings":
 			{
-				"buffer_size": 1292,
+				"buffer_size": 4167,
+				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		}
@@ -1121,10 +1122,11 @@
 	],
 	"file_history":
 	[
+		"/Users/rickchung/Projects/Conv-XR-DataVis/Google-Service/gcd_host/main_app/lib/stopwords.txt",
+		"/Users/rickchung/Projects/Conv-XR-DataVis/Google-Service/gcd_host/main_app/lib/short_trans.py",
 		"/Users/rickchung/Projects/Conv-XR-DataVis/Google-Service/gcd_host/main_app/lib/topics.txt",
 		"/Users/rickchung/Projects/Conv-XR-DataVis/Google-Service/gcd_host/main_app/lib/raw_topic.txt",
 		"/Users/rickchung/Projects/Conv-XR-DataVis/Google-Service/gcd_host/main_app/lib/java-content-selected.txt",
-		"/Users/rickchung/Projects/Conv-XR-DataVis/Google-Service/gcd_host/main_app/lib/stopwords.txt",
 		"/Users/rickchung/Projects/ERDE-XR-Project/Mobile-AR-Ebola/.gitignore",
 		"/Users/rickchung/Projects/Conv-XR-DataVis/Assets/Data/java-concepts.txt",
 		"/Users/rickchung/Projects/Conv-XR-DataVis/Assets/Data/java-toc.txt",
@@ -1247,8 +1249,7 @@
 		"/Users/rickchung/Projects/B_Lak19_Proc/data/easychair/list_pnd.txt",
 		"/Users/rickchung/Projects/B_Lak19_Proc/data/easychair/tmp.csv",
 		"/Users/rickchung/Projects/B_Lak19_Proc/data/easychair/tmp.txt",
-		"/Users/rickchung/Projects/B_Lak19_Proc/uncompressed.pdf",
-		"/Users/rickchung/Projects/B_Lak19_Proc/data/easychair/easychair_table.csv"
+		"/Users/rickchung/Projects/B_Lak19_Proc/uncompressed.pdf"
 	],
 	"find":
 	{
@@ -1266,6 +1267,7 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"Sequential",
 			"doc_to_tokens",
 			"outtopn",
 			"query_similar",
@@ -1317,7 +1319,7 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 2,
 			"sheets":
 			[
 				{
@@ -1333,8 +1335,8 @@
 						"selection":
 						[
 							[
-								1293,
-								1293
+								550,
+								550
 							]
 						],
 						"settings":
@@ -1345,38 +1347,36 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 303.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 2,
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "Google-Service/gcd_host/main_app/lib/w2v.py",
+					"file": "Google-Service/gcd_host/main_app/lib/raw_topic.txt",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 3549,
+						"buffer_size": 2154,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								580,
-								601
+								47,
+								47
 							]
 						],
 						"settings":
 						{
 							"rainbow_inited": true,
-							"syntax": "Packages/Python/Python.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
+							"syntax": "Packages/MarkdownEditing/Markdown.sublime-syntax"
 						},
 						"translation.x": 0.0,
-						"translation.y": 217.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 1,
@@ -1384,19 +1384,19 @@
 				},
 				{
 					"buffer": 2,
-					"file": "Google-Service/gcd_host/main_app/lib/short_trans.py",
-					"semi_transient": true,
+					"file": "Google-Service/gcd_host/main_app/lib/w2v.py",
+					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1292,
+						"buffer_size": 4167,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								14,
-								14
+								0,
+								0
 							]
 						],
 						"settings":
@@ -1407,10 +1407,10 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 41.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 0,
 					"type": "text"
 				}
 			]
