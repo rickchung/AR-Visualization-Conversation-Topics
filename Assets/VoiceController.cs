@@ -16,8 +16,7 @@ public class VoiceController : MonoBehaviour
     public bool playMicrophoneInRealTime;
 
     public int CLIP_SIZE;
-    public int SAMPLING_RATE;
-    public int WHOLE_CLIP_SIZE = 60;
+    public int SAMPLING_RATE;  // Recommended: 16000
     private AudioSource audioSource;
 
     private string micName;
@@ -57,30 +56,6 @@ public class VoiceController : MonoBehaviour
             StopMicInterval();
             //StopMicWholeClip();
         }
-    }
-
-    // ================================================
-
-    private void StartMicWholeClip()
-    {
-        audioSource.clip = Microphone.Start(micName, false, WHOLE_CLIP_SIZE, SAMPLING_RATE);
-        audioSource.loop = true;
-        int latency = 0;
-        while (!(Microphone.GetPosition(micName) > latency)) { }
-        audioSource.Play();
-    }
-
-    private void StopMicWholeClip()
-    {
-        if (audioSource.isPlaying)
-            audioSource.Stop();
-        Microphone.End(micName);
-
-        string filePath = SaveMicFile(audioSource.clip);
-        // Speech-to-text here
-        networkManager.RequestSpeechToText(filePath);
-
-        audioSource.clip = null;
     }
 
     // ================================================

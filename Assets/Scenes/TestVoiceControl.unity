@@ -1280,7 +1280,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.000028812581, y: -0.0000029957544}
+  m_AnchoredPosition: {x: -0.000010599377, y: -0.0000029957544}
   m_SizeDelta: {x: 284.7, y: 78.9}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &453988295
@@ -1922,9 +1922,8 @@ MonoBehaviour:
     type: 2}
   mixerGroupMaster: {fileID: 24300002, guid: aae2b410aae9748a1b88b63001775599, type: 2}
   playMicrophoneInRealTime: 0
-  CLIP_SIZE: 5
+  CLIP_SIZE: 3
   SAMPLING_RATE: 16000
-  WHOLE_CLIP_SIZE: 60
 --- !u!114 &747354410
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2004,7 +2003,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.00002884427, y: -0.000008320146}
+  m_AnchoredPosition: {x: -0.000041761374, y: -0.000009341277}
   m_SizeDelta: {x: 210.6, y: 58.353}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &859717335
@@ -2838,33 +2837,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!21 &1040943208
-Material:
-  serializedVersion: 6
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_Name: 'convxr-target-1Material
-
-    64236'
-  m_Shader: {fileID: 10752, guid: 0000000000000000f000000000000000, type: 0}
-  m_ShaderKeywords: 
-  m_LightmapFlags: 5
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 68e0174d62e44effb9a8d5143a301a55, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Floats: []
-    m_Colors:
-    - _Color: {r: 0.82089555, g: 0.82089555, b: 0.82089555, a: 1}
 --- !u!1 &1061247534
 GameObject:
   m_ObjectHideFlags: 0
@@ -3689,7 +3661,7 @@ MeshFilter:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1554692053}
-  m_Mesh: {fileID: 2005420157}
+  m_Mesh: {fileID: 1943178291}
 --- !u!23 &1554692055
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -3705,7 +3677,7 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RenderingLayerMask: 4294967295
   m_Materials:
-  - {fileID: 1040943208}
+  - {fileID: 1654813846}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -3856,6 +3828,33 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -0.5}
   m_SizeDelta: {x: -20, y: -13}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!21 &1654813846
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: 'convxr-target-1Material
+
+    13168'
+  m_Shader: {fileID: 10752, guid: 0000000000000000f000000000000000, type: 0}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 5
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: 68e0174d62e44effb9a8d5143a301a55, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats: []
+    m_Colors:
+    - _Color: {r: 0.82089555, g: 0.82089555, b: 0.82089555, a: 1}
 --- !u!1 &1660361125
 GameObject:
   m_ObjectHideFlags: 0
@@ -4915,17 +4914,12 @@ MeshFilter:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1939979084}
   m_Mesh: {fileID: 0}
---- !u!224 &2000281247 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 224519420240812536, guid: f995176248ae247818345584d4aec0ec,
-    type: 2}
-  m_PrefabInternal: {fileID: 561046823}
---- !u!43 &2005420157
+--- !u!43 &1943178291
 Mesh:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: ImageTargetMesh64226
+  m_Name: ImageTargetMesh13158
   serializedVersion: 9
   m_SubMeshes:
   - serializedVersion: 2
@@ -5075,6 +5069,11 @@ Mesh:
   m_MeshMetrics[0]: 1
   m_MeshMetrics[1]: 1
   m_MeshOptimized: 0
+--- !u!224 &2000281247 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 224519420240812536, guid: f995176248ae247818345584d4aec0ec,
+    type: 2}
+  m_PrefabInternal: {fileID: 561046823}
 --- !u!1 &2014698787
 GameObject:
   m_ObjectHideFlags: 0
