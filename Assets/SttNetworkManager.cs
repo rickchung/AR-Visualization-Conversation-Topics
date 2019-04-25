@@ -5,14 +5,14 @@ using System.Collections.Generic;
 using System.IO;
 
 /// <summary>
-/// Stt network manager gets an audio fild and sends it to the server. This 
+/// Stt network manager gets an audio fild and sends it to the server. This
 /// class handles all the network connection works.
 /// </summary>
 public class SttNetworkManager : MonoBehaviour
 {
 
     private const string HOST_ADDR = "http://10.218.106.151:8081/main/upload/";
-    private const int TIMEOUT = 5;
+    private const int TIMEOUT = 10;
 
     public SpeechToTextController sttController;
     public PartnerSocket partnerSocket;
@@ -93,7 +93,7 @@ public class SttNetworkManager : MonoBehaviour
 #if UNITY_ANDROID
             // Works on Android
             request.SetRequestHeader("X-CSRFToken", csrfToken);
-#endif 
+#endif
 
             // Fire
             yield return request.SendWebRequest();
@@ -131,8 +131,6 @@ public class SttNetworkManager : MonoBehaviour
             partnerSocket.BroadcasetNewKeywords(stt.topics);
         }
     }
-
-
 
     public void _TestStt()
     {

@@ -48,13 +48,10 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
 
     public void SaveTransResponse(SpToTextResult stt)
     {
-        // Save transcript
         string[] text = stt.transcript;
         string[] topics = stt.topics;
-
-        SaveTranscript(stt.transcript);
-        // Save topics
-        SaveTopics(stt.topics);
+        SaveTranscript(text);
+        SaveTopics(topics);
     }
 
     /// <summary>
