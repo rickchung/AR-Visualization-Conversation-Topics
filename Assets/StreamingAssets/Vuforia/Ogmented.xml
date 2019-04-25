@@ -4,5 +4,6 @@
     <ImageTarget name="convxr-target-2" size="300.000000 300.000000" />
     <ImageTarget name="convxr-target-1" size="0.100000 0.100000" />
     <ImageTarget name="vuforia_stones" size="50.000000 35.000000" />
+    <CylinderTarget name="convr-target-2-cylinder" sideLength="300.000000"/>
   </Tracking>
 </QCARConfig>
