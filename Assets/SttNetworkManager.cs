@@ -40,7 +40,6 @@ public class SttNetworkManager : MonoBehaviour
         }
     }
 
-
     /// <summary>
     /// Posts the speech-to-text request.
     /// </summary>
@@ -132,8 +131,8 @@ public class SttNetworkManager : MonoBehaviour
         }
     }
 
-    public void _TestStt()
+    public void ToggleEcho(bool activated)
     {
-        RequestSpeechToText("Assets/Data/speech-test-data.wav");
+        debugEchoUserStt = activated;
     }
 }

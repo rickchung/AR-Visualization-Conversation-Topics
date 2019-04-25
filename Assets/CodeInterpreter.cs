@@ -15,11 +15,6 @@ public class CodeInterpreter : MonoBehaviour
     public const string CTRL_CLOSE = "close";
 
     private ScriptObject loadedScript;
-    private List<string> mAvailableScripts = new List<string>
-    {
-        "SEQUENTIAL", "SEQUENTIAL LOGICS"
-    };
-
 
     void Start()
     {
@@ -51,13 +46,6 @@ public class CodeInterpreter : MonoBehaviour
 
     // ======================================================================
 
-    public bool IsTopicSampleAvailable(string topic)
-    {
-        if (mAvailableScripts.IndexOf(topic.ToUpper()) > 0)
-            return true;
-        return false;
-    }
-
     /// <summary>
     /// Load the predefined script template specified by <paramref name="scriptName"/>.
     /// </summary>
@@ -69,14 +57,29 @@ public class CodeInterpreter : MonoBehaviour
         {
             case "SEQUENTIAL":
             case "SEQUENTIAL LOGICS":
+            case "SEQUENCES":
                 script = new ScriptObject(new List<CodeObject>() {
                     new CodeObject("MOVE", new string[] {"SOUTH"}),
                     new CodeObject("MOVE", new string[] {"SOUTH"}),
                     new CodeObject("MOVE", new string[] {"EAST"}),
                     new CodeObject("MOVE", new string[] {"EAST"}),
+                });
+                break;
+            case "PROGRAM CONTROL FLOW":
+            case "THE WHILE LOOP":
+            case "THE FOR LOOP":
+            case "THE FOREACH LOOP":
+            case "THE DO...WHILE LOOP":
+                script = new ScriptObject(new List<CodeObject>() {
                     new CodeObject("LOOP", new string[] {
-                        "2", "MOVE(WEST)", "MOVE(NORTH)"
-                    })
+                        "3", "MOVE(SOUTH)", "MOVE(EAST)"
+                    }),
+                    new CodeObject("LOOP", new string[] {
+                        "2", "MOVE(WEST)"
+                    }),
+                    new CodeObject("LOOP", new string[] {
+                        "2", "MOVE(NORTH)", "MOVE(EAST)"
+                    }),
                 });
                 break;
             default:

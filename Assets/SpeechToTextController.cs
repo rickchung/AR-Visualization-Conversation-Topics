@@ -7,7 +7,7 @@ using System.IO;
 
 /// <summary>
 /// Speech to text controller handles the transcription rendering on the screen,
-/// for both 2D and AR GUI. The scrollers of transcripts are handled by 
+/// for both 2D and AR GUI. The scrollers of transcripts are handled by
 /// EnhancedScroller attached to this object.
 /// </summary>
 public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
@@ -131,16 +131,30 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
     {
         if (_sttTopics.Count > 0)
         {
-            // Find the latest topics
-            string[] latest = _sttTopics[_sttTopics.Count - 1];
             // Make a single string of the latest topics
             var selected = new List<string>();
             string content = "";
-            for (int i = 0; i < latest.Length && i < LIMIT_NUM_TOPIC; i++)
+            int contentCount = 0;
+
+            for (int j = _sttTopics.Count - 1; j >= 0; j--)
             {
-                content += "Topic: " + latest[i] + "\n";
-                selected.Add(latest[i].ToUpper());
+                string[] topicArray = _sttTopics[j];
+                for (int i = 0; i < topicArray.Length; i++)
+                {
+                    // content is the text shown in AR, which should not be too long
+                    if (contentCount < LIMIT_NUM_TOPIC)
+                    {
+                        content += "Topic: " + topicArray[i] + "\n";
+                        contentCount++;
+                    }
+                    // "selected" is the topic array containing all the topics so far.
+                    // This will be rendered on the screen scroller.
+                    string topicUpper = topicArray[i].ToUpper();
+                    if (selected.IndexOf(topicUpper) < 0)
+                        selected.Add(topicUpper);
+                }
             }
+
             // Set the AR text
             xrTopicContainer.SetText(content);
             // Update the 2D scroller
@@ -200,7 +214,7 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
     float IEnhancedScrollerDelegate.GetCellViewSize(
         EnhancedScroller scroller, int dataIndex)
     {
-        return 50f;
+        return 75f;
     }
 
     /// <summary>

@@ -50,11 +50,8 @@ public class TopicScroller : MonoBehaviour, IEnhancedScrollerDelegate
         TopicCellView cellView = scroller.GetCellView(mTopicCellView) as TopicCellView;
         cellView.SetData(_topics[dataIndex]);
 
-        // If the predefined example is available, set the button event
-        if (mCodeInterpreter.IsTopicSampleAvailable(_topics[dataIndex]))
-            cellView.SetOnClickEvent(mCodeInterpreter.GetTopicButtonEvent(_topics[dataIndex]));
-        else
-            cellView.DisableButton();
+        // Script addition event
+        cellView.SetOnClickEvent(mCodeInterpreter.GetTopicButtonEvent(_topics[dataIndex]));
 
         return cellView;
     }
