@@ -96,6 +96,10 @@ public class CodeInterpreter : MonoBehaviour
         }
     }
 
+    public void _TestLoadingScript()
+    {
+        LoadPredefinedScript("PROGRAM CONTROL FLOW", true);
+    }
 
     // ======================================================================
 
