@@ -6,7 +6,7 @@ using System.IO;
 
 /// <summary>
 /// Stt network manager gets an audio fild and sends it to the server. This
-/// class handles all the network connection works.
+/// class handles all the network connection tasks.
 /// </summary>
 public class SttNetworkManager : MonoBehaviour
 {
@@ -16,7 +16,11 @@ public class SttNetworkManager : MonoBehaviour
 
     public SpeechToTextController sttController;
     public PartnerSocket partnerSocket;
-    public bool debugEchoUserStt;
+
+    [Tooltip("Whether to echo the user's transcription")]
+    public bool enableSttEchoLocal;
+    [Tooltip("Whether to broadcast the user's transcription by server")]
+    public bool enableSttBroadcastRemote;
 
     /// <summary>
     /// A wrapper function which requests the speech file to text.
@@ -121,18 +125,36 @@ public class SttNetworkManager : MonoBehaviour
 
         if (sttController != null)
         {
-            sttController.SaveTransResponse(stt);
+            // Save the transcription locally
+            sttController.SaveTransResponse(stt, isLocal: true);
 
-            if (debugEchoUserStt) sttController.UpdateVis();
+            // Update the local UI if the option "echo" is enabled
+            if (enableSttEchoLocal)
+            {
+                sttController.UpdateVis();
+            }
 
             // Broadcast the new transcript extracted from the user's speech
-            partnerSocket.BroadcastNewTranscript(stt.transcript);
-            partnerSocket.BroadcasetNewKeywords(stt.topics);
+            if (enableSttBroadcastRemote)
+            {
+                partnerSocket.BroadcastNewTranscript(stt.transcript);
+                partnerSocket.BroadcasetNewKeywords(stt.topics);
+            }
         }
     }
 
-    public void ToggleEcho(bool activated)
+    public void ToggleSttEchoLocal(bool activated)
     {
-        debugEchoUserStt = activated;
+        enableSttEchoLocal = activated;
+    }
+
+    // ==========
+    // Testing functions
+
+    public void TestReceivingSttResult()
+    {
+        string result = "{\"topics\": [\"data and variables\", \"the continue and break statements\", \"break and continue keywords\", \"integer numbers\", \"floating point numbers\", \"instantiation and constructors\"], \"keywords\": [\"top\", \"development\", \"server\", \"and\", \"credential\", \"because\", \"elements\", \"in\", \"error\", \"when\"], \"examples\": [[]], \"msg\": \"valid\", \"transcript\": [\"top 10 the development server and credential\"], \"subtopics\": [[]]}";
+
+        ProcessSpeechToTextResult(result);
     }
 }

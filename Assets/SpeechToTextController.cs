@@ -12,13 +12,16 @@ using System.IO;
 /// </summary>
 public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
 {
-    public Text textOutput;
+    // These variables are assigned in the Unity inspector. They can be None
+    // if you don't need the corresponding outputs.
+    public Text transTextOutput;
     public TMPro.TextMeshPro xrTextContainer;
     public TMPro.TextMeshPro xrTopicContainer;
-    public EnhancedScroller historyScroller;
-    public TransCellView transCellViewPrefab;
-    public TopicScroller mTopicScroller;
-    public bool render3DTranscripts;
+    // The following two variables should be set at the same time.
+    public EnhancedScroller transHistoryScroller;
+    public TransCellView transHistoryCellviewPrefab;
+    public TopicScroller topicHistoryScroller;
+    public StatChartController statChartController;
 
     private const int XR_TRANSCRIPTS_OUTPUT_LIMIT = 30;  // Chars
     private const int LIMIT_NUM_TOPIC = 3;  // Chars
@@ -27,9 +30,16 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
 
     private List<string> _sttHistory;
     private List<string[]> _sttTopics;
+    private int numOfPhases = 0;
+    private int numOfSpokenWords = 0;
+    private int numOfRemotePhases = 0;
+    private int numOfRemoteSpokenWords = 0;
 
     private string _sttHistoryFilePath;
     private string _sttHistoryFilename;
+
+    // ======================================================================
+    // Unity lifecycle
 
     void Start()
     {
@@ -39,26 +49,38 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
         _sttHistory = new List<string>();
         _sttTopics = new List<string[]>();
 
-        historyScroller.Delegate = this;
-        historyScroller.ReloadData();
-        ToggleTransHistoryPane();
+        // Enable the scroller of transaction history
+        if (transHistoryScroller != null)
+        {
+            transHistoryScroller.Delegate = this;
+            transHistoryScroller.ReloadData();
+            ToggleTransHistoryPane();
+        }
     }
 
     // ======================================================================
+    // Saving functions used as interfaces
 
-    public void SaveTransResponse(SpToTextResult stt)
+    /// <summary>
+    /// This wrapper method accepts an SpToTextResult object and save the transcript
+    /// and keywords inside the object. Note it is different from the methods
+    /// SaveTranscript and SaveTopics which are used to perform the actual
+    /// data saving tasks.
+    /// </summary>
+    /// <param name="stt"></param>
+    public void SaveTransResponse(SpToTextResult stt, bool isLocal)
     {
         string[] text = stt.transcript;
         string[] topics = stt.topics;
-        SaveTranscript(text);
-        SaveTopics(topics);
+        SaveTranscript(text, isLocal);
+        SaveTopics(topics, isLocal);
     }
 
     /// <summary>
     /// Save a new transcript
     /// </summary>
     /// <param name="text">Text.</param>
-    public void SaveTranscript(string[] text)
+    public void SaveTranscript(string[] text, bool isLocal)
     {
         if (text.Length > 0)
         {
@@ -70,8 +92,22 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
                     SaveToFile(timestamp + ",TRANS," + ts + "\n");
                     _sttHistory.Add(ts);
                 }
+
+                // Statistics for charts
+                if (isLocal)
+                {
+                    numOfPhases++;
+                    numOfSpokenWords += ts.Split(' ').Length;
+                }
+                else
+                {
+                    numOfRemotePhases++;
+                    numOfRemoteSpokenWords += ts.Split(' ').Length;
+                }
+
             }
-            historyScroller.ReloadData();
+            if (transHistoryScroller != null)
+                transHistoryScroller.ReloadData();
         }
     }
 
@@ -79,7 +115,7 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
     /// Saves the given topics into the transcript file.
     /// </summary>
     /// <param name="topics">Topics.</param>
-    public void SaveTopics(string[] topics)
+    public void SaveTopics(string[] topics, bool isLocal)
     {
         if (topics.Length > 0)
         {
@@ -103,25 +139,19 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
         File.AppendAllText(_sttHistoryFilePath, transcript);
     }
 
+
     // ======================================================================
+    // Uploading functions used as interfaces
 
     /// <summary>
     /// The general update call
     /// </summary>
     public void UpdateVis()
     {
-        if (textOutput != null)
-        {
-            UpdateTxtOutput();
-        }
-        if (render3DTranscripts && xrTextContainer != null)
-        {
-            UpdateTransVis();
-        }
-        if (xrTopicContainer != null)
-        {
-            UpdateTopicVis();
-        }
+        UpdateTransUIText();
+        UpdateTransVis();
+        UpdateTopicVis();
+        UpdateStatCharts();
     }
 
     /// <summary>
@@ -156,9 +186,11 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
             }
 
             // Set the AR text
-            xrTopicContainer.SetText(content);
+            if (xrTopicContainer != null)
+                xrTopicContainer.SetText(content);
             // Update the 2D scroller
-            mTopicScroller.ReplaceTopicsAndRefresh(selected);
+            if (topicHistoryScroller != null)
+                topicHistoryScroller.ReplaceTopicsAndRefresh(selected);
         }
     }
 
@@ -177,23 +209,35 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
             if (mWordCount > XR_TRANSCRIPTS_OUTPUT_LIMIT)
                 break;
         }
-        xrTextContainer.SetText(textContent);
+        if (xrTextContainer != null)
+            xrTextContainer.SetText(textContent);
     }
 
     /// <summary>
     /// Show the latest transcript on the screen
     /// </summary>
-    private void UpdateTxtOutput()
+    private void UpdateTransUIText()
     {
         string output = "";
         if (_sttHistory.Count > 0)
         {
             output = _sttHistory[_sttHistory.Count - 1];
         }
-        textOutput.text = output;
+        if (transTextOutput != null)
+            transTextOutput.text = output;
+    }
+
+    private void UpdateStatCharts()
+    {
+        if (statChartController != null)
+        {
+            statChartController.UpdateNumPhaseChart(numOfPhases, numOfRemotePhases);
+            statChartController.UpdateNumWordChart(numOfSpokenWords, numOfPhases, numOfRemoteSpokenWords, numOfRemotePhases);
+        }
     }
 
     // ======================================================================
+    // Interfaces of the enhanced scroller for history of transcription
 
     /// <summary>
     /// Gets the number of cells for transcript history scroller.
@@ -227,7 +271,7 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
     EnhancedScrollerCellView IEnhancedScrollerDelegate.GetCellView(
         EnhancedScroller scroller, int dataIndex, int cellIndex)
     {
-        TransCellView cellView = scroller.GetCellView(transCellViewPrefab)
+        TransCellView cellView = scroller.GetCellView(transHistoryCellviewPrefab)
             as TransCellView;
 
         //if (_sttHistory[dataIndex].Contains("P:"))
@@ -239,29 +283,15 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
         return cellView;
     }
 
+
     // ======================================================================
+    // UI Controllers
 
     /// <summary>
     /// Show/Hide the transcript history scroller. Used by buttons.
     /// </summary>
     public void ToggleTransHistoryPane()
     {
-        historyScroller.gameObject.SetActive(!historyScroller.gameObject.activeSelf);
-    }
-
-    // ======================================================================
-
-    private string[] _testScripts = {
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. ",
-        "Nulla efficitur nisi at sem porta finibus. Vestibulum ",
-        "lacinia ultrices purus, eu maximus mauris maximus in. ",
-        "In enim sapien, dignissim non maximus in, convallis at eros."
-    };
-    private int testScriptCount = 0;
-    public void _TestAddTextToSttHistory()
-    {
-        SaveTranscript(new string[] { _testScripts[testScriptCount++] });
-        testScriptCount %= _testScripts.Length;
-        UpdateVis();
+        transHistoryScroller.gameObject.SetActive(!transHistoryScroller.gameObject.activeSelf);
     }
 }

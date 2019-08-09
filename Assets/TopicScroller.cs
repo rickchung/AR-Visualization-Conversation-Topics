@@ -10,6 +10,7 @@ using EnhancedUI.EnhancedScroller;
 public class TopicScroller : MonoBehaviour, IEnhancedScrollerDelegate
 {
     private List<string> _topics;
+    private float cellviewSize = 128f;
 
     public EnhancedScroller mTopicScroller;
     public TopicCellView mTopicCellView;
@@ -41,7 +42,7 @@ public class TopicScroller : MonoBehaviour, IEnhancedScrollerDelegate
     float IEnhancedScrollerDelegate.GetCellViewSize(
         EnhancedScroller scroller, int dataIndex)
     {
-        return 32f;
+        return cellviewSize;
     }
 
     EnhancedScrollerCellView IEnhancedScrollerDelegate.GetCellView(
@@ -50,8 +51,9 @@ public class TopicScroller : MonoBehaviour, IEnhancedScrollerDelegate
         TopicCellView cellView = scroller.GetCellView(mTopicCellView) as TopicCellView;
         cellView.SetData(_topics[dataIndex]);
 
-        // Script addition event
-        cellView.SetOnClickEvent(mCodeInterpreter.GetTopicButtonEvent(_topics[dataIndex]));
+        // Simulation effects
+        if (mCodeInterpreter != null)
+            cellView.SetOnClickEvent(mCodeInterpreter.GetTopicButtonEvent(_topics[dataIndex]));
 
         return cellView;
     }

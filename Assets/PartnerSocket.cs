@@ -88,7 +88,7 @@ public class PartnerSocket : MonoBehaviour
     }
 
     /// <summary>
-    /// Setups the local server in LAN environment. This method should not 
+    /// Setups the local server in LAN environment. This method should not
     /// be used when the Remote server is used.
     /// </summary>
     private void SetupLocalServer()
@@ -121,7 +121,7 @@ public class PartnerSocket : MonoBehaviour
     }
 
     /// <summary>
-    /// After the partner connects to this device, 
+    /// After the partner connects to this device,
     /// you have to make your client connect back to the local server
     /// (this is only for LAN server setup).
     /// </summary>
@@ -222,7 +222,7 @@ public class PartnerSocket : MonoBehaviour
     }
 
     /// <summary>
-    /// The callback function that will be invoked when the client connects to 
+    /// The callback function that will be invoked when the client connects to
     /// the server successfully.
     /// </summary>
     /// <param name="netMsg">Net message.</param>
@@ -259,14 +259,14 @@ public class PartnerSocket : MonoBehaviour
     }
 
     /// <summary>
-    /// The callback that will be invoked when the client receives new 
+    /// The callback that will be invoked when the client receives new
     /// broacasted transcripts from the server
     /// </summary>
     /// <param name="netMsg">Net message.</param>
     private void OnReceiveTranscript(NetworkMessage netMsg)
     {
         string transcripts = netMsg.ReadMessage<StringMessage>().value;
-        speechToTextController.SaveTranscript(transcripts.Split('|'));
+        speechToTextController.SaveTranscript(transcripts.Split('|'), isLocal: false);
         speechToTextController.UpdateVis();
     }
 
@@ -274,23 +274,23 @@ public class PartnerSocket : MonoBehaviour
     {
         // Add to the panel
         var newKeywordsMsg = netMsg.ReadMessage<StringMessage>().value;
-        speechToTextController.SaveTopics(newKeywordsMsg.Split(','));
+        speechToTextController.SaveTopics(newKeywordsMsg.Split(','), isLocal: false);
         speechToTextController.UpdateVis();
     }
 
     /// <summary>
-    /// The callback on the reception of example control messages. 
-    /// 
+    /// The callback on the reception of example control messages.
+    ///
     /// Init event:
     /// when one user selects a predefined topic, there will be a message
     /// broadcasted out which tells all other devices create the same example of
-    /// the topic. 
+    /// the topic.
     /// </summary>
-    /// 
+    ///
     /// Closing event:
     /// when one user presses the "close" button, a message will be broadcasted
     /// to tell all the connected devices to close the opened topic.
-    /// 
+    ///
     /// <param name="netMsg">Net message.</param>
     private void OnReceivedExampleCtrl(NetworkMessage netMsg)
     {

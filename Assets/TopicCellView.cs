@@ -4,10 +4,11 @@ using UnityEngine;
 using EnhancedUI.EnhancedScroller;
 using UnityEngine.UI;
 using UnityEngine.Events;
+using TMPro;
 
 public class TopicCellView : EnhancedScrollerCellView
 {
-    public Text mTopicName;
+    public TMPro.TextMeshProUGUI mTopicName;
     public Button mTopicButton;
 
     public void SetData(string data)
