@@ -166,4 +166,12 @@ public class SttNetworkManager : MonoBehaviour
 
         ProcessSpeechToTextResult(result);
     }
+
+    public void TestReceivingRemoteStt()
+    {
+        string result = testCases[testIndex];
+        SpToTextResult stt = SpToTextResult.CreateFromJson(result);
+        sttController.SaveTransResponse(stt, false);
+        sttController.UpdateVis();
+    }
 }

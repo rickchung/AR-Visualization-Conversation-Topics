@@ -22,6 +22,7 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
     public TransCellView transHistoryCellviewPrefab;
     public TopicScroller topicHistoryScroller;
     public StatChartController statChartController;
+    public bool enableSocialVis;
 
     private const int XR_TRANSCRIPTS_OUTPUT_LIMIT = 30;  // Chars
     private const int LIMIT_NUM_TOPIC = 3;  // Chars
@@ -89,7 +90,12 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
                 if (ts.Length > 0)
                 {
                     var timestamp = System.DateTime.Now.ToString("MM/dd/HH:mm:ss");
-                    SaveToFile(timestamp + ",TRANS," + ts + "\n");
+                    var typestamp = "";
+                    if (isLocal)
+                        typestamp = ",TRANS,LOCAL,";
+                    else
+                        typestamp = ",TRANS,REMOTE,";
+                    SaveToFile(timestamp + typestamp + ts + "\n");
                     _sttHistory.Add(ts);
                 }
 
@@ -221,8 +227,8 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
     {
         if (statChartController != null)
         {
-            statChartController.UpdateNumPhaseChart();
-            statChartController.UpdateNumWordChart();
+            statChartController.UpdateNumPhaseChart(useSocialVis: enableSocialVis);
+            statChartController.UpdateNumWordChart(useSocialVis: enableSocialVis);
         }
     }
 

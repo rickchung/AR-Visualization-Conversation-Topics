@@ -32,7 +32,9 @@ public class StatChartController : MonoBehaviour
         bufferRemoteNumSpokenWords = new Queue<float>(bufferSize);
 
         ColorUtility.TryParseHtmlString(COLOR_PALETTE[0], out localColor);
+        localColor.a = 0.5f;
         ColorUtility.TryParseHtmlString(COLOR_PALETTE[1], out remoteColor);
+        remoteColor.a = 0.5f;
     }
 
     public void UpdateStat(int numPhases, int numWords, bool isLocal)
@@ -48,7 +50,7 @@ public class StatChartController : MonoBehaviour
         else
         {
             numOfRemotePhases += numPhases;
-            numOfRemoteSpokenWords += numOfSpokenWords;
+            numOfRemoteSpokenWords += numWords;
             if (bufferRemoteNumSpokenWords.Count >= bufferSize)
                 bufferRemoteNumSpokenWords.Dequeue();
             bufferRemoteNumSpokenWords.Enqueue(numWords);
@@ -78,7 +80,17 @@ public class StatChartController : MonoBehaviour
             chartSpokenWords.ClearChart();
             chartSpokenWords.RenderYAxisLine(localAvg, localColor);
             chartSpokenWords.RenderValues(
-                bufferNumSpokenWords.ToArray(), localColor, chartType: "bar");
+                bufferNumSpokenWords.ToArray(), localColor, chartType: "bar"
+            );
+
+            if (useSocialVis)
+            {
+                float remoteAvg = numOfRemoteSpokenWords / numOfRemotePhases;
+                chartSpokenWords.RenderYAxisLine(remoteAvg, remoteColor);
+                chartSpokenWords.RenderValues(
+                    bufferRemoteNumSpokenWords.ToArray(), remoteColor, chartType: "bar"
+                );
+            }
         }
         catch (System.DivideByZeroException) { }
     }
