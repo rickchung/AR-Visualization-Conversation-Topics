@@ -6,11 +6,13 @@ using UnityEngine.UI;
 public class PieChartContainer : MonoBehaviour
 {
     private RectTransform pieTemplate;
-    private string[] colors = { "#24A0FF", "#FF7600", "#CC4505" };
+    private string[] colors;
 
     private void Start()
     {
         pieTemplate = transform.Find("PieChartTemplate").GetComponent<RectTransform>();
+
+        colors = StatChartController.COLOR_PALETTE;
 
         // Testing the pie chart function
         // RenderPieChart(new float[] { 0.6f, 0.4f });

@@ -13,7 +13,6 @@ public class LineChartContainer : MonoBehaviour
     public Sprite dotImage;
     private RectTransform chartContainer;
     private RectTransform yGuidelineTemplate;
-    private RectTransform currentAvgLine;
     private float chartHeight, chartWidth, yPadding, yLimUpper, xPadding;
 
     private void Start()
@@ -35,7 +34,7 @@ public class LineChartContainer : MonoBehaviour
         // RenderAvgLine(50);
     }
 
-    public void RenderValues(float[] values, string chartType = "dot", int visibleNumValues = -1)
+    public void RenderValues(float[] values, Color color, string chartType = "dot", int visibleNumValues = -1)
     {
         // Only show "visibleNumValues" values in the list
         if (visibleNumValues < 0)
@@ -52,52 +51,40 @@ public class LineChartContainer : MonoBehaviour
             );
 
             if (chartType == "dot")
-                RenderOneDot(position);
+                RenderOneDot(position, color);
             else if (chartType == "bar")
-                RenderOneBar(position);
+                RenderOneBar(position, color);
             else
                 Debug.LogError("Unsupported chartType: " + chartType);
         }
     }
 
-    public void RenderAvgLine(float avgValue)
+    public void RenderYAxisLine(float yValue, Color color)
     {
-        if (currentAvgLine == null)
-        {
-            currentAvgLine = Instantiate(yGuidelineTemplate);
-            currentAvgLine.SetParent(transform, false);
-            currentAvgLine.pivot = Vector2.zero;
-            currentAvgLine.anchorMin = Vector2.zero;
-            currentAvgLine.anchorMax = Vector2.zero;
-            currentAvgLine.gameObject.SetActive(true);
-        }
+        RectTransform targetLine = Instantiate(yGuidelineTemplate);
+        targetLine.name = "AvgLine";
+        targetLine.SetParent(transform, false);
+        targetLine.pivot = Vector2.zero;
+        targetLine.anchorMin = Vector2.zero;
+        targetLine.anchorMax = Vector2.zero;
+        targetLine.gameObject.SetActive(true);
 
-        RenderYAxisLine(avgValue, currentAvgLine);
-    }
+        targetLine.GetComponent<Image>().color = color;
 
-    public void RenderYAxisLine(float yValue, RectTransform targetLine = null)
-    {
-        if (targetLine == null)
-        {
-            targetLine = Instantiate(yGuidelineTemplate);
-            targetLine.SetParent(transform, false);
-            targetLine.pivot = Vector2.zero;
-            targetLine.anchorMin = Vector2.zero;
-            targetLine.anchorMax = Vector2.zero;
-            targetLine.gameObject.SetActive(true);
-        }
         float yNormalizedPosition = (yValue / yLimUpper) * chartHeight;
         targetLine.anchoredPosition = new Vector2(0f, yNormalizedPosition);
     }
 
-    private GameObject RenderOneDot(Vector2 anchoredPosition)
+    private GameObject RenderOneDot(Vector2 anchoredPosition, Color color)
     {
         // Instantiate a new GameObject as a dot
         GameObject newDot = new GameObject("DataPoint", typeof(Image));
         // Move the new dot into the chart container
         newDot.transform.SetParent(chartContainer);
         // Add an image to the new dot
-        newDot.GetComponent<Image>().sprite = dotImage;
+        Image newDotImage = newDot.GetComponent<Image>();
+        newDotImage.sprite = dotImage;
+        newDotImage.color = color;
 
         RectTransform dotRectTransform = newDot.GetComponent<RectTransform>();
         dotRectTransform.pivot = Vector2.zero;
@@ -111,9 +98,9 @@ public class LineChartContainer : MonoBehaviour
         return newDot;
     }
 
-    private void RenderOneBar(Vector2 anchoredPosition, float barWidth = -1)
+    private void RenderOneBar(Vector2 anchoredPosition, Color color, float barWidth = -1)
     {
-        GameObject bar = RenderOneDot(anchoredPosition);
+        GameObject bar = RenderOneDot(anchoredPosition, color);
         RectTransform barRectTransform = bar.GetComponent<RectTransform>();
 
         if (barWidth < 0)
@@ -131,7 +118,7 @@ public class LineChartContainer : MonoBehaviour
     public void ClearChart()
     {
         foreach (Transform child in transform)
-            if (child.name == "DataPoint")
+            if (child.name == "DataPoint" || child.name == "AvgLine")
                 GameObject.Destroy(child.gameObject);
     }
 }

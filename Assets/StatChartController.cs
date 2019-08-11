@@ -6,15 +6,19 @@ using TMPro;
 
 public class StatChartController : MonoBehaviour
 {
+    public static string[] COLOR_PALETTE = { "#24A0FF", "#FF7600", "#CC4505" };
+
     public Transform panChartNumPhases;
     public Transform panChartNumWords;
     private TMPro.TextMeshProUGUI valTxtNumPhases, valTxtNumWords;
     private LineChartContainer chartSpokenWords;
     private PieChartContainer chartNumPhases;
 
-    private float numOfPhases, numOfRemotePhases = 5, numOfSpokenWords, numOfRemoteSpokenWords;
+    private float numOfPhases, numOfRemotePhases, numOfSpokenWords, numOfRemoteSpokenWords;
     private Queue<float> bufferNumSpokenWords, bufferRemoteNumSpokenWords;
     private int bufferSize = 12;
+
+    private Color localColor, remoteColor;
 
     void Start()
     {
@@ -26,6 +30,9 @@ public class StatChartController : MonoBehaviour
 
         bufferNumSpokenWords = new Queue<float>(bufferSize);
         bufferRemoteNumSpokenWords = new Queue<float>(bufferSize);
+
+        ColorUtility.TryParseHtmlString(COLOR_PALETTE[0], out localColor);
+        ColorUtility.TryParseHtmlString(COLOR_PALETTE[1], out remoteColor);
     }
 
     public void UpdateStat(int numPhases, int numWords, bool isLocal)
@@ -52,10 +59,13 @@ public class StatChartController : MonoBehaviour
     {
         valTxtNumPhases.text = numOfPhases + " ps";
 
-        chartNumPhases.ClearPieChart();
-        float localRatio = numOfPhases / (numOfPhases + numOfRemotePhases);
-        float remoteRatio = numOfRemotePhases / (numOfPhases + numOfRemotePhases);
-        chartNumPhases.RenderPieChart(new float[] { localRatio, remoteRatio });
+        if (useSocialVis)
+        {
+            chartNumPhases.ClearPieChart();
+            float localRatio = numOfPhases / (numOfPhases + numOfRemotePhases);
+            float remoteRatio = numOfRemotePhases / (numOfPhases + numOfRemotePhases);
+            chartNumPhases.RenderPieChart(new float[] { localRatio, remoteRatio });
+        }
     }
 
     public void UpdateNumWordChart(bool useSocialVis = false)
@@ -65,9 +75,10 @@ public class StatChartController : MonoBehaviour
             float localAvg = numOfSpokenWords / numOfPhases;
             valTxtNumWords.text = localAvg.ToString("0.0") + " ws/ps";
             // Render charts
-            chartSpokenWords.RenderAvgLine(localAvg);
             chartSpokenWords.ClearChart();
-            chartSpokenWords.RenderValues(bufferNumSpokenWords.ToArray(), chartType: "bar");
+            chartSpokenWords.RenderYAxisLine(localAvg, localColor);
+            chartSpokenWords.RenderValues(
+                bufferNumSpokenWords.ToArray(), localColor, chartType: "bar");
         }
         catch (System.DivideByZeroException) { }
     }
