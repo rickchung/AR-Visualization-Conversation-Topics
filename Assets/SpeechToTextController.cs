@@ -94,17 +94,7 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
                 }
 
                 // Statistics for charts
-                if (isLocal)
-                {
-                    numOfPhases++;
-                    numOfSpokenWords += ts.Split(' ').Length;
-                }
-                else
-                {
-                    numOfRemotePhases++;
-                    numOfRemoteSpokenWords += ts.Split(' ').Length;
-                }
-
+                statChartController.UpdateStat(1, ts.Split(' ').Length, isLocal);
             }
             if (transHistoryScroller != null)
                 transHistoryScroller.ReloadData();
@@ -231,8 +221,8 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
     {
         if (statChartController != null)
         {
-            statChartController.UpdateNumPhaseChart(numOfPhases, numOfRemotePhases);
-            statChartController.UpdateNumWordChart(numOfSpokenWords, numOfPhases, numOfRemoteSpokenWords, numOfRemotePhases);
+            statChartController.UpdateNumPhaseChart();
+            statChartController.UpdateNumWordChart();
         }
     }
 

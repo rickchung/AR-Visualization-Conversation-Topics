@@ -24,30 +24,30 @@ public class LineChartContainer : MonoBehaviour
         chartWidth = chartContainer.sizeDelta.x;
         yPadding = chartHeight * 0.10f;
         xPadding = chartWidth * 0.10f;
-        yLimUpper = 100f;
+        yLimUpper = 10f;
 
         // Get chart components
         yGuidelineTemplate = transform.Find("yGuidelineTemplate").GetComponent<RectTransform>();
 
         // Testing values
-        List<float> data = new List<float> { 1, 21, 51, 61, 71, 91, 61, 31, };
-        RenderValues(data, chartType: "bar");
-        RenderYAxisLine(50);
+        // List<float> data = new List<float> { 1, 21, 51, 61, 71, 91, 61, 31, };
+        // RenderValues(data, chartType: "bar", visibleNumValues: 5);
+        // RenderAvgLine(50);
     }
 
-    private void RenderValues(List<float> values, string chartType = "dot", int visibleNumValues = -1)
+    public void RenderValues(float[] values, string chartType = "dot", int visibleNumValues = -1)
     {
         // Only show "visibleNumValues" values in the list
         if (visibleNumValues < 0)
-            visibleNumValues = values.Count;
+            visibleNumValues = values.Length;
 
         // Adjust the interval between data points on the x-axis
         float xNormalizedInterval = (chartWidth - xPadding) / visibleNumValues;
 
-        for (int i = values.Count - visibleNumValues; i < values.Count; i++)
+        for (int i = values.Length - visibleNumValues, j = 0; i < values.Length; i++, j++)
         {
             Vector2 position = new Vector2(
-                xPadding + i * xNormalizedInterval,
+                xPadding + j * xNormalizedInterval,
                 yPadding + (values[i] / yLimUpper) * chartHeight
             );
 
@@ -60,7 +60,7 @@ public class LineChartContainer : MonoBehaviour
         }
     }
 
-    private void RenderYAxisLine(float yValue)
+    public void RenderAvgLine(float avgValue)
     {
         if (currentAvgLine == null)
         {
@@ -72,14 +72,28 @@ public class LineChartContainer : MonoBehaviour
             currentAvgLine.gameObject.SetActive(true);
         }
 
+        RenderYAxisLine(avgValue, currentAvgLine);
+    }
+
+    public void RenderYAxisLine(float yValue, RectTransform targetLine = null)
+    {
+        if (targetLine == null)
+        {
+            targetLine = Instantiate(yGuidelineTemplate);
+            targetLine.SetParent(transform, false);
+            targetLine.pivot = Vector2.zero;
+            targetLine.anchorMin = Vector2.zero;
+            targetLine.anchorMax = Vector2.zero;
+            targetLine.gameObject.SetActive(true);
+        }
         float yNormalizedPosition = (yValue / yLimUpper) * chartHeight;
-        currentAvgLine.anchoredPosition = new Vector2(0f, yNormalizedPosition);
+        targetLine.anchoredPosition = new Vector2(0f, yNormalizedPosition);
     }
 
     private GameObject RenderOneDot(Vector2 anchoredPosition)
     {
         // Instantiate a new GameObject as a dot
-        GameObject newDot = new GameObject("dot", typeof(Image));
+        GameObject newDot = new GameObject("DataPoint", typeof(Image));
         // Move the new dot into the chart container
         newDot.transform.SetParent(chartContainer);
         // Add an image to the new dot
@@ -97,16 +111,27 @@ public class LineChartContainer : MonoBehaviour
         return newDot;
     }
 
-    private void RenderOneBar(Vector2 anchoredPosition)
+    private void RenderOneBar(Vector2 anchoredPosition, float barWidth = -1)
     {
         GameObject bar = RenderOneDot(anchoredPosition);
         RectTransform barRectTransform = bar.GetComponent<RectTransform>();
-        Vector2 barSize = new Vector2(24f, anchoredPosition.y);
+
+        if (barWidth < 0)
+            barWidth = 48f;
+
+        Vector2 barSize = new Vector2(barWidth, anchoredPosition.y);
         Vector2 barNewPosition = new Vector2(
             barRectTransform.anchoredPosition.x,
             barRectTransform.anchoredPosition.y - barSize.y
         );
         barRectTransform.sizeDelta = barSize;
         barRectTransform.anchoredPosition = barNewPosition;
+    }
+
+    public void ClearChart()
+    {
+        foreach (Transform child in transform)
+            if (child.name == "DataPoint")
+                GameObject.Destroy(child.gameObject);
     }
 }

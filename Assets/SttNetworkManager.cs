@@ -151,9 +151,18 @@ public class SttNetworkManager : MonoBehaviour
     // ==========
     // Testing functions
 
+    private int testIndex = 0;
+    private string[] testCases = {
+        "{\"topics\": [\"data and variables\"], \"keywords\": [\"top\", \"development\", \"server\", \"and\", \"credential\", \"because\", \"elements\", \"in\", \"error\", \"when\"], \"examples\": [[]], \"msg\": \"valid\", \"transcript\": [\"top 10 the development server and credential\"], \"subtopics\": [[]]}",
+        "{\"topics\": [\"the continue and break statements\", \"break and continue keywords\"], \"keywords\": [\"top\", \"development\", \"server\", \"and\", \"credential\", \"because\", \"elements\", \"in\", \"error\", \"when\"], \"examples\": [[]], \"msg\": \"valid\", \"transcript\": [\"the development server and credential\"], \"subtopics\": [[]]}",
+        "{\"topics\": [\"integer numbers\", \"floating point numbers\", \"instantiation and constructors\"], \"keywords\": [\"top\", \"development\", \"server\", \"and\", \"credential\", \"because\", \"elements\", \"in\", \"error\", \"when\"], \"examples\": [[]], \"msg\": \"valid\", \"transcript\": [\"server and credential\"], \"subtopics\": [[]]}"
+    };
     public void TestReceivingSttResult()
     {
-        string result = "{\"topics\": [\"data and variables\", \"the continue and break statements\", \"break and continue keywords\", \"integer numbers\", \"floating point numbers\", \"instantiation and constructors\"], \"keywords\": [\"top\", \"development\", \"server\", \"and\", \"credential\", \"because\", \"elements\", \"in\", \"error\", \"when\"], \"examples\": [[]], \"msg\": \"valid\", \"transcript\": [\"top 10 the development server and credential\"], \"subtopics\": [[]]}";
+        string result = testCases[testIndex];
+        testIndex++;
+        if (testIndex >= testCases.Length)
+            testIndex = 0;
 
         ProcessSpeechToTextResult(result);
     }
