@@ -10,8 +10,9 @@ public class StatChartController : MonoBehaviour
     public Transform panChartNumWords;
     private TMPro.TextMeshProUGUI valTxtNumPhases, valTxtNumWords;
     private LineChartContainer chartSpokenWords;
+    private PieChartContainer chartNumPhases;
 
-    private int numOfPhases, numOfRemotePhases, numOfSpokenWords, numOfRemoteSpokenWords;
+    private float numOfPhases, numOfRemotePhases = 5, numOfSpokenWords, numOfRemoteSpokenWords;
     private Queue<float> bufferNumSpokenWords, bufferRemoteNumSpokenWords;
     private int bufferSize = 12;
 
@@ -21,6 +22,7 @@ public class StatChartController : MonoBehaviour
         valTxtNumPhases = panChartNumPhases.Find("PhText").GetComponent<TMPro.TextMeshProUGUI>();
         valTxtNumWords = panChartNumWords.Find("PhText").GetComponent<TMPro.TextMeshProUGUI>();
         chartSpokenWords = panChartNumWords.GetComponentInChildren<LineChartContainer>();
+        chartNumPhases = panChartNumPhases.GetComponentInChildren<PieChartContainer>();
 
         bufferNumSpokenWords = new Queue<float>(bufferSize);
         bufferRemoteNumSpokenWords = new Queue<float>(bufferSize);
@@ -49,6 +51,11 @@ public class StatChartController : MonoBehaviour
     public void UpdateNumPhaseChart(bool useSocialVis = false)
     {
         valTxtNumPhases.text = numOfPhases + " ps";
+
+        chartNumPhases.ClearPieChart();
+        float localRatio = numOfPhases / (numOfPhases + numOfRemotePhases);
+        float remoteRatio = numOfRemotePhases / (numOfPhases + numOfRemotePhases);
+        chartNumPhases.RenderPieChart(new float[] { localRatio, remoteRatio });
     }
 
     public void UpdateNumWordChart(bool useSocialVis = false)

@@ -16,7 +16,7 @@ public class LineChartContainer : MonoBehaviour
     private RectTransform currentAvgLine;
     private float chartHeight, chartWidth, yPadding, yLimUpper, xPadding;
 
-    private void Awake()
+    private void Start()
     {
         // Get the size of this chart container
         chartContainer = GetComponent<RectTransform>();
