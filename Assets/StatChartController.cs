@@ -10,10 +10,10 @@ public class StatChartController : MonoBehaviour
     public Transform panChartNumWords;
 
     private TMPro.TextMeshProUGUI valTxtNumPhases, valTxtNumWords;
-    private LineChartContainer chartContainerNumWords;
 
     void Start()
     {
+        // Get the placeholders to show values
         valTxtNumPhases = panChartNumPhases.Find("PhText").GetComponent<TMPro.TextMeshProUGUI>();
         valTxtNumWords = panChartNumWords.Find("PhText").GetComponent<TMPro.TextMeshProUGUI>();
     }
