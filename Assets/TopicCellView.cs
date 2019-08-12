@@ -6,23 +6,25 @@ using UnityEngine.UI;
 using UnityEngine.Events;
 using TMPro;
 
+public delegate void TopicCellviewClickedDelegate(string value);
+
 public class TopicCellView : EnhancedScrollerCellView
 {
     public TMPro.TextMeshProUGUI mTopicName;
     public Button mTopicButton;
+
+    public TopicCellviewClickedDelegate onClickedDelegate;
 
     public void SetData(string data)
     {
         mTopicName.text = data;
     }
 
-    public void SetOnClickEvent(UnityAction clickedEvent)
+    public void TopicCellButton_OnClick(string value)
     {
-        mTopicButton.onClick.AddListener(clickedEvent);
-    }
-
-    public void DisableButton()
-    {
-        mTopicButton.interactable = false;
+        if (onClickedDelegate != null)
+        {
+            onClickedDelegate(mTopicName.text);
+        }
     }
 }

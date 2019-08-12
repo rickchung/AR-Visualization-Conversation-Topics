@@ -5,7 +5,10 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/PBL-v0.2.unity
     guid: 547d0962bc6504a089e3e22226f0b4e5
+  - enabled: 1
+    path: Assets/Scenes/PBL-v0.2.1.unity
+    guid: 66ff9fb6b80cc4fe099bb4417f8ecb95
   m_configObjects: {}

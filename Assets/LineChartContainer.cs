@@ -95,6 +95,12 @@ public class LineChartContainer : MonoBehaviour
         dotRectTransform.anchoredPosition = anchoredPosition;
         dotRectTransform.sizeDelta = new Vector2(12, 12);
 
+        // Adjust the dot's rotation and position in the world space
+        Vector3 localPosition = dotRectTransform.localPosition;
+        localPosition.z = 0f;
+        dotRectTransform.localPosition = localPosition;
+        dotRectTransform.localRotation = new Quaternion(0, 0, 0, 0);
+
         return newDot;
     }
 

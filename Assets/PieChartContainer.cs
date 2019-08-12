@@ -37,6 +37,12 @@ public class PieChartContainer : MonoBehaviour
             newSector.sizeDelta = pieTemplate.sizeDelta;
             newSector.localScale = pieTemplate.localScale;
             newSector.gameObject.SetActive(true);
+
+            // Adjust the sector's position in the world space
+            Vector3 localPosition = newSector.localPosition;
+            localPosition.z = 0f;
+            newSector.localPosition = localPosition;
+
             // Get the Image component and fill an amount
             Image sectorImage = newSector.GetComponent<Image>();
             sectorImage.fillAmount = values[i];
@@ -44,8 +50,11 @@ public class PieChartContainer : MonoBehaviour
             Color newColor;
             ColorUtility.TryParseHtmlString(colors[i % colors.Length], out newColor);
             sectorImage.color = newColor;
+
             // Rotate the sector according to its portion
+            newSector.localRotation = new Quaternion(0, 0, 0, 0);
             newSector.Rotate(new Vector3(0, 0, rotationAngle), Space.Self);
+
             rotationAngle += values[i] * 360f;
         }
     }

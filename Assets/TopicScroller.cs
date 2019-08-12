@@ -17,6 +17,8 @@ public class TopicScroller : MonoBehaviour, IEnhancedScrollerDelegate
     public EnhancedScroller scroller;
     public TopicCellView cellview;
     public CodeInterpreter codeInterpreter;
+    public Transform problemSolvingWorkspace;
+    private Transform cardTemplate;
 
     private string localColor, remoteColor;
 
@@ -31,6 +33,8 @@ public class TopicScroller : MonoBehaviour, IEnhancedScrollerDelegate
         scroller.gameObject.SetActive(true);
         scroller.Delegate = this;
         scroller.ReloadData(scrollPositionFactor: 0.0f);
+
+        cardTemplate = problemSolvingWorkspace.Find("CardTemplate");
     }
 
     public void AddTopic(string topic, string speaker)
@@ -68,12 +72,19 @@ public class TopicScroller : MonoBehaviour, IEnhancedScrollerDelegate
         );
         cellView.SetData(cellViewContent);
 
-        // Simulation effects (if available)
-        if (codeInterpreter != null)
-        {
-            cellView.SetOnClickEvent(codeInterpreter.GetTopicButtonEvent(topicList[dataIndex]));
-        }
+        cellView.onClickedDelegate = TopicCellClicked;
 
         return cellView;
+    }
+
+    private void TopicCellClicked(string value)
+    {
+        Transform cardClone = Instantiate(cardTemplate);
+        cardClone.SetParent(problemSolvingWorkspace);
+        cardClone.localPosition = new Vector3(0, 0, -50f);
+        cardClone.localRotation = new Quaternion(0, 0, 0, 0);
+        TMPro.TextMeshProUGUI text = cardClone.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+        text.text = value;
+        cardClone.gameObject.SetActive(true);
     }
 }
