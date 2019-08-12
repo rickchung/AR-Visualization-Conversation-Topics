@@ -43,7 +43,7 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
         _sttHistory = new List<string>();
 
         // Enable the scroller of transaction history
-        if (transHistoryScroller != null)
+        if (transHistoryScroller != null && transHistoryScroller.gameObject.activeSelf)
         {
             transHistoryScroller.Delegate = this;
             transHistoryScroller.ReloadData();

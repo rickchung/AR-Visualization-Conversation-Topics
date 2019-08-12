@@ -34,9 +34,9 @@ public class StatChartController : MonoBehaviour
         bufferRemoteNumSpokenWords = new Queue<float>(bufferSize);
 
         ColorUtility.TryParseHtmlString(COLOR_PALETTE[0], out localColor);
-        localColor.a = 0.5f;
+        localColor.a = 0.6f;
         ColorUtility.TryParseHtmlString(COLOR_PALETTE[1], out remoteColor);
-        remoteColor.a = 0.5f;
+        remoteColor.a = 0.6f;
     }
 
     public void UpdateStat(int numPhases, int numWords, bool isLocal)
