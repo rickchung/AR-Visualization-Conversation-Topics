@@ -25,16 +25,9 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
     public bool enableSocialVis;
 
     private const int XR_TRANSCRIPTS_OUTPUT_LIMIT = 30;  // Chars
-    private const int LIMIT_NUM_TOPIC = 3;  // Chars
     private int mWordCount;
-    private const int TOPIC_LIST_LIMIT = 3;
 
     private List<string> _sttHistory;
-    private List<string[]> _sttTopics;
-    private int numOfPhases = 0;
-    private int numOfSpokenWords = 0;
-    private int numOfRemotePhases = 0;
-    private int numOfRemoteSpokenWords = 0;
 
     private string _sttHistoryFilePath;
     private string _sttHistoryFilename;
@@ -48,7 +41,6 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
         _sttHistoryFilePath = Path.Combine(Application.persistentDataPath, _sttHistoryFilename);
 
         _sttHistory = new List<string>();
-        _sttTopics = new List<string[]>();
 
         // Enable the scroller of transaction history
         if (transHistoryScroller != null)
@@ -73,8 +65,9 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
     {
         string[] text = stt.transcript;
         string[] topics = stt.topics;
+        string[] keywords = stt.keywords;
         SaveTranscript(text, isLocal);
-        SaveTopics(topics, isLocal);
+        SaveTopics(keywords, isLocal);
     }
 
     /// <summary>
@@ -116,13 +109,13 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
         if (topics.Length > 0)
         {
             var timestamp = System.DateTime.Now.ToString("MM/dd/HH:mm:ss");
-            SaveToFile(timestamp + ",TOPIC," + string.Join(";", topics) + "\n");
+            var joinedTopics = string.Join(", ", topics);
+            var speaker = (isLocal ? StatChartController.USERNAME_LOCAL :
+                StatChartController.USERNAME_REMOTE);
+            var typestamp = ",TOPIC," + speaker + ",";
 
-            if (_sttTopics.Count >= TOPIC_LIST_LIMIT)
-            {
-                _sttTopics.RemoveAt(0);
-            }
-            _sttTopics.Add(topics);
+            SaveToFile(timestamp + typestamp + string.Join(";", topics) + "\n");
+            topicHistoryScroller.AddTopic(joinedTopics, speaker);
         }
     }
 
@@ -155,39 +148,8 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
     /// </summary>
     private void UpdateTopicVis()
     {
-        if (_sttTopics.Count > 0)
-        {
-            // Make a single string of the latest topics
-            var selected = new List<string>();
-            string content = "";
-            int contentCount = 0;
-
-            for (int j = _sttTopics.Count - 1; j >= 0; j--)
-            {
-                string[] topicArray = _sttTopics[j];
-                for (int i = 0; i < topicArray.Length; i++)
-                {
-                    // content is the text shown in AR, which should not be too long
-                    if (contentCount < LIMIT_NUM_TOPIC)
-                    {
-                        content += "Topic: " + topicArray[i] + "\n";
-                        contentCount++;
-                    }
-                    // "selected" is the topic array containing all the topics so far.
-                    // This will be rendered on the screen scroller.
-                    string topicUpper = topicArray[i].ToUpper();
-                    if (selected.IndexOf(topicUpper) < 0)
-                        selected.Add(topicUpper);
-                }
-            }
-
-            // Set the AR text
-            if (xrTopicContainer != null)
-                xrTopicContainer.SetText(content);
-            // Update the 2D scroller
-            if (topicHistoryScroller != null)
-                topicHistoryScroller.ReplaceTopicsAndRefresh(selected);
-        }
+        if (topicHistoryScroller != null)
+            topicHistoryScroller.Refresh();
     }
 
     /// <summary>

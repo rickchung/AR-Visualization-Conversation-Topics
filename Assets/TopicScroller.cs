@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using EnhancedUI.EnhancedScroller;
 
 /// <summary>
@@ -9,51 +10,69 @@ using EnhancedUI.EnhancedScroller;
 /// </summary>
 public class TopicScroller : MonoBehaviour, IEnhancedScrollerDelegate
 {
-    private List<string> _topics;
-    private float cellviewSize = 128f;
+    private List<string> topicList;
+    private List<string> speakerList;
+    private float cellviewSize = 148f;
 
-    public EnhancedScroller mTopicScroller;
-    public TopicCellView mTopicCellView;
-    public CodeInterpreter mCodeInterpreter;
+    public EnhancedScroller scroller;
+    public TopicCellView cellview;
+    public CodeInterpreter codeInterpreter;
+
+    private string localColor, remoteColor;
 
     void Start()
     {
-        _topics = new List<string>();
+        topicList = new List<string>();
+        speakerList = new List<string>();
 
-        mTopicScroller.gameObject.SetActive(true);
-        mTopicScroller.Delegate = this;
-        mTopicScroller.ReloadData();
+        localColor = StatChartController.COLOR_PALETTE[0];
+        remoteColor = StatChartController.COLOR_PALETTE[1];
+
+        scroller.gameObject.SetActive(true);
+        scroller.Delegate = this;
+        scroller.ReloadData(scrollPositionFactor: 0.0f);
     }
 
-    public void ReplaceTopicsAndRefresh(IEnumerable<string> topics)
+    public void AddTopic(string topic, string speaker)
     {
-        _topics.Clear();
-        _topics.AddRange(topics);
-        mTopicScroller.ReloadData();
+        topicList.Insert(0, topic);
+        speakerList.Insert(0, speaker);
+        scroller.ReloadData(scrollPositionFactor: 0.0f);
+    }
+
+    public void Refresh()
+    {
+        scroller.ReloadData(scrollPositionFactor: 0.0f);
     }
 
     // ======================================================================
 
     int IEnhancedScrollerDelegate.GetNumberOfCells(EnhancedScroller scroller)
     {
-        return _topics.Count;
+        return topicList.Count;
     }
 
-    float IEnhancedScrollerDelegate.GetCellViewSize(
-        EnhancedScroller scroller, int dataIndex)
+    float IEnhancedScrollerDelegate.GetCellViewSize(EnhancedScroller scroller, int dataIndex)
     {
         return cellviewSize;
     }
 
-    EnhancedScrollerCellView IEnhancedScrollerDelegate.GetCellView(
-        EnhancedScroller scroller, int dataIndex, int cellIndex)
+    EnhancedScrollerCellView IEnhancedScrollerDelegate.GetCellView(EnhancedScroller scroller, int dataIndex, int cellIndex)
     {
-        TopicCellView cellView = scroller.GetCellView(mTopicCellView) as TopicCellView;
-        cellView.SetData(_topics[dataIndex]);
+        TopicCellView cellView = scroller.GetCellView(cellview) as TopicCellView;
 
-        // Simulation effects
-        if (mCodeInterpreter != null)
-            cellView.SetOnClickEvent(mCodeInterpreter.GetTopicButtonEvent(_topics[dataIndex]));
+        var speaker = speakerList[dataIndex];
+        var color = (speaker == StatChartController.USERNAME_LOCAL ? localColor : remoteColor);
+        var cellViewContent = string.Format(
+            "<mark={0}aa>{1}:</mark> {2}", color, speaker, topicList[dataIndex]
+        );
+        cellView.SetData(cellViewContent);
+
+        // Simulation effects (if available)
+        if (codeInterpreter != null)
+        {
+            cellView.SetOnClickEvent(codeInterpreter.GetTopicButtonEvent(topicList[dataIndex]));
+        }
 
         return cellView;
     }

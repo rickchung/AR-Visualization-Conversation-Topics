@@ -153,9 +153,9 @@ public class SttNetworkManager : MonoBehaviour
 
     private int testIndex = 0;
     private string[] testCases = {
-        "{\"topics\": [\"data and variables\"], \"keywords\": [\"top\", \"development\", \"server\", \"and\", \"credential\", \"because\", \"elements\", \"in\", \"error\", \"when\"], \"examples\": [[]], \"msg\": \"valid\", \"transcript\": [\"top 10 the development server and credential\"], \"subtopics\": [[]]}",
-        "{\"topics\": [\"the continue and break statements\", \"break and continue keywords\"], \"keywords\": [\"top\", \"development\", \"server\", \"and\", \"credential\", \"because\", \"elements\", \"in\", \"error\", \"when\"], \"examples\": [[]], \"msg\": \"valid\", \"transcript\": [\"the development server and credential\"], \"subtopics\": [[]]}",
-        "{\"topics\": [\"integer numbers\", \"floating point numbers\", \"instantiation and constructors\"], \"keywords\": [\"top\", \"development\", \"server\", \"and\", \"credential\", \"because\", \"elements\", \"in\", \"error\", \"when\"], \"examples\": [[]], \"msg\": \"valid\", \"transcript\": [\"server and credential\"], \"subtopics\": [[]]}"
+        "{\"topics\": [\"data and variables\"], \"keywords\": [\"k11\", \"k12\", \"k13\"], \"examples\": [[]], \"msg\": \"valid\", \"transcript\": [\"top 10 the development server and credential\"], \"subtopics\": [[]]}",
+        "{\"topics\": [\"the continue and break statements\", \"break and continue keywords\"], \"keywords\": [\"k21\", \"k22\", \"k23\"], \"examples\": [[]], \"msg\": \"valid\", \"transcript\": [\"the development server and credential\"], \"subtopics\": [[]]}",
+        "{\"topics\": [\"integer numbers\", \"floating point numbers\", \"instantiation and constructors\"], \"keywords\": [\"k31\", \"k32\", \"k33\"], \"examples\": [[]], \"msg\": \"valid\", \"transcript\": [\"server and credential\"], \"subtopics\": [[]]}"
     };
     public void TestReceivingSttResult()
     {

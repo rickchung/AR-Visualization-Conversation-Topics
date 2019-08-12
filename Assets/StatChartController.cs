@@ -7,6 +7,8 @@ using TMPro;
 public class StatChartController : MonoBehaviour
 {
     public static string[] COLOR_PALETTE = { "#24A0FF", "#FF7600", "#CC4505" };
+    public static string USERNAME_LOCAL = "Local";
+    public static string USERNAME_REMOTE = "Remote";
 
     public Transform panChartNumPhases;
     public Transform panChartNumWords;
