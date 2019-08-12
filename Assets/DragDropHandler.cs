@@ -5,17 +5,12 @@ using UnityEngine.EventSystems;
 
 public class DragDropHandler : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
 {
-    private Vector3 initPosition;
+    public CardRemoveTrigger removingArea;
+
     private Vector2? prevPointerPosition;
     private Vector2 xBound, yBound;
     public void OnBeginDrag(PointerEventData eventData)
     {
-        GameObject hitGameObject = eventData.pointerPressRaycast.gameObject;
-        if (hitGameObject != null)
-        {
-            initPosition = hitGameObject.transform.parent.localPosition;
-        }
-
         xBound = new Vector2(-450, 450);
         yBound = new Vector2(-100, 200);
     }
@@ -35,12 +30,16 @@ public class DragDropHandler : MonoBehaviour, IDragHandler, IBeginDragHandler, I
                 transform.Translate(diffPos, Space.Self);
             }
         }
-
         prevPointerPosition = eventData.pointerCurrentRaycast.screenPosition;
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
         prevPointerPosition = null;
+        if (removingArea.isTriggered)
+        {
+            removingArea.TriggerExitFunc();
+            Destroy(gameObject);
+        }
     }
 }

@@ -81,7 +81,7 @@ public class TopicScroller : MonoBehaviour, IEnhancedScrollerDelegate
     {
         Transform cardClone = Instantiate(cardTemplate);
         cardClone.SetParent(problemSolvingWorkspace);
-        cardClone.localPosition = new Vector3(0, 0, -50f);
+        cardClone.localPosition = new Vector3(0, 0, -5f);
         cardClone.localRotation = new Quaternion(0, 0, 0, 0);
         TMPro.TextMeshProUGUI text = cardClone.GetComponentInChildren<TMPro.TextMeshProUGUI>();
         text.text = value;
