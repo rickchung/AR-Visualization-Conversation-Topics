@@ -43,7 +43,7 @@ def upload_file(request):
             return JsonResponse({
                 'msg': 'valid', 
                 'transcript': results,
-                'keywords': keywords,
+                'keywords': tokens,
                 'topics': topics,
                 'subtopics': subtopics,
                 'examples': examples,
