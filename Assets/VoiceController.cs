@@ -15,11 +15,14 @@ public class VoiceController : MonoBehaviour
     public AudioMixerGroup mixerGroupMic, mixerGroupMaster;
     public bool playMicrophoneInRealTime;
 
+    public bool sendEveryClip, sendCumulativeClip, sendFinalClip;
+
     public int CLIP_SIZE;
     public int SAMPLING_RATE;  // Recommended: 16000
     private AudioSource audioSource;
 
     private string micName;
+    private string mergedFilePath;
 
     void Start()
     {
@@ -48,13 +51,11 @@ public class VoiceController : MonoBehaviour
         {
             Debug.Log("[LOG] Start recording");
             StartMicInterval();
-            //StartMicWholeClip();
         }
         else
         {
             Debug.Log("[LOG] Stop recording");
             StopMicInterval();
-            //StopMicWholeClip();
         }
     }
 
@@ -103,11 +104,20 @@ public class VoiceController : MonoBehaviour
                     audioSource.clip.frequency, false);
                 mergedClip.SetData(mergedClipData.ToArray(), 0);
 
-                // Save the audio and send an STT request
-                //string filePath = SaveMicFile(audioSource.clip);
-                //networkManager.RequestSpeechToText(filePath);  // clip
-                string mergedFilePath = SaveMicFile(mergedClipName, mergedClip);
-                networkManager.RequestSpeechToText(mergedFilePath);  // merged
+                // Save the merged file
+                mergedFilePath = SaveMicFile(mergedClipName, mergedClip);
+
+                // Send an STT request for every clip
+                if (sendEveryClip)
+                {
+                    networkManager.RequestSpeechToText(SaveMicFile(audioSource.clip));
+                }
+
+                // Send an STT request for a cumulative clip
+                if (sendCumulativeClip)
+                {
+                    networkManager.RequestSpeechToText(mergedFilePath);
+                }
 
                 // Cleanup the clip of mic
                 float[] zeros = new float[audioSource.clip.samples];
@@ -118,6 +128,11 @@ public class VoiceController : MonoBehaviour
 
         // Clear the audio source
         audioSource.clip = null;
+        // Send one STT request for a final cumulative clip
+        if (sendFinalClip)
+        {
+            networkManager.RequestSpeechToText(mergedFilePath);
+        }
     }
 
     private void StopMicInterval()
