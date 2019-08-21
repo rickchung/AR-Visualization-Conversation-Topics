@@ -5,6 +5,8 @@ using Vuforia;
 
 public class CameraFocusControl : MonoBehaviour
 {
+    public bool initWithARCamera;
+
     public Camera normalCamera;
     public Camera arCamera;
     public Transform arImageTarget;
@@ -21,6 +23,10 @@ public class CameraFocusControl : MonoBehaviour
         vuforiaInstance.RegisterOnPauseCallback(OnVuforiaPaused);
 
         normalCamera.gameObject.SetActive(false);
+        if (!initWithARCamera)
+        {
+            ToggleARCamera();
+        }
     }
 
     private void SetCameraAF()
@@ -56,11 +62,7 @@ public class CameraFocusControl : MonoBehaviour
             viewContainer.rotation = new Quaternion();
             viewContainer.position = Vector3.zero;
 
-            foreach (Transform child in viewContainer)
-            {
-                child.GetComponent<MeshRenderer>().enabled = true;
-                child.GetComponent<BoxCollider>().enabled = true;
-            }
+            _SwitchArHelper(viewContainer, true);
         }
 
         if (arCamera.gameObject.activeSelf)
@@ -69,11 +71,19 @@ public class CameraFocusControl : MonoBehaviour
             viewContainer.position = prevPos;
             viewContainer.SetParent(arImageTarget);
 
-            foreach (Transform child in viewContainer)
-            {
-                child.GetComponent<MeshRenderer>().enabled = false;
-                child.GetComponent<BoxCollider>().enabled = false;
-            }
+            _SwitchArHelper(viewContainer, false);
+        }
+    }
+
+    private void _SwitchArHelper(Transform child, bool enabled)
+    {
+        foreach (Transform c in child)
+        {
+            var t1 = c.GetComponent<MeshRenderer>();
+            var t2 = c.GetComponent<BoxCollider>();
+            if (t1 != null) t1.enabled = enabled;
+            if (t2 != null) t2.enabled = enabled;
+            _SwitchArHelper(c, enabled);
         }
     }
 }

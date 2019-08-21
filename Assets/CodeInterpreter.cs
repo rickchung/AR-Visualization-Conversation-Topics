@@ -33,8 +33,8 @@ public class CodeInterpreter : MonoBehaviour
 
     public void SetActiveTopicView(bool activated, bool broadcast = false)
     {
-        mExampleContainer.SetActive(activated);
-        mControlPanel.SetActive(activated);
+        if (mExampleContainer) mExampleContainer.SetActive(activated);
+        if (mControlPanel) mControlPanel.SetActive(activated);
         if (broadcast) mPartnerSocket.BroadcastTopicCtrl(CTRL_CLOSE);
     }
 

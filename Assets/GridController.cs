@@ -4,10 +4,8 @@ using UnityEngine;
 
 public class GridController : MonoBehaviour
 {
-    public Transform exampleTarget;
     public Transform gridStart, gridEnd;
     public Transform gridCellPrefab;
-    public VirtualBtnHandler vbPrefab;
 
     private Vector3[,] cellCoordinates;
 
@@ -18,13 +16,12 @@ public class GridController : MonoBehaviour
         float distX = Mathf.Abs(startingPoint.x - endPoint.x);
         float distZ = Mathf.Abs(startingPoint.z - endPoint.z);
 
-        float stepSize = (
-            gridStart.GetComponent<Renderer>().bounds.size.x
-            / gridStart.parent.localScale.x);
+        float stepSize = gridStart.localScale.x;
         float padding = stepSize * 0.10f;
         int numInX = Mathf.CeilToInt(distX / (stepSize + padding)) + 1;
         int numInZ = Mathf.CeilToInt(distZ / (stepSize + padding)) + 1;
 
+        Debug.Log("Grid Step Size: " + stepSize);
         Debug.Log("Grid: numInX=" + numInX + ", numInZ=" + numInZ);
 
         cellCoordinates = new Vector3[numInX, numInZ];
@@ -35,9 +32,9 @@ public class GridController : MonoBehaviour
             for (int z = 0; z < numInZ; z++)
             {
                 Transform newCell = (Transform)Instantiate(
-                        original: gridCellPrefab,
-                        parent: exampleTarget,
-                        instantiateInWorldSpace: false
+                    original: gridCellPrefab,
+                    parent: transform,
+                    instantiateInWorldSpace: false
                 );
                 Vector3 newPos = startingPoint;
                 newPos.x = newPos.x + x * (stepSize + padding);
@@ -46,15 +43,10 @@ public class GridController : MonoBehaviour
                 newCell.name = "Cell" + x + z;
 
                 cellCoordinates[x, z] = newPos;
-
-                VirtualBtnHandler cellvb = Instantiate(vbPrefab, exampleTarget, false);
-                cellvb.transform.localPosition = newCell.localPosition;
-                cellvb.gameObject.name = "vb" + x + z;
             }
         }
 
         // Deactivate the starting and end cells
-        vbPrefab.gameObject.SetActive(false);
         gridStart.gameObject.SetActive(false);
         gridEnd.gameObject.SetActive(false);
     }
@@ -120,8 +112,6 @@ public class GridController : MonoBehaviour
         }
         return dir;
     }
-
-
 
     public enum Direction { NORTH = 0, SOUTH = 1, EAST = 2, WEST = 3, UNKNOWN }
 
