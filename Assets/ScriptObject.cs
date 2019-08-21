@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 public class ScriptObject : IEnumerable
 {
@@ -28,9 +27,11 @@ public class ScriptObject : IEnumerable
     {
         string rt = "";
 
+        int lineNumber = 1;
         foreach (CodeObject c in mScript)
         {
-            rt += c + "\n";
+            rt += "<color=#24A0FF>L" + lineNumber.ToString() + "</color>: " + c + "\n\n";
+            lineNumber += 1;
         }
 
         return rt;

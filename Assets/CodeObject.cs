@@ -1,4 +1,6 @@
-﻿public class CodeObject
+﻿using EnhancedUI.EnhancedScroller;
+
+public class CodeObject
 {
     public string command;
     public string[] args;
@@ -9,10 +11,32 @@
         this.args = args;
     }
 
+    // ====================
+
     override public string ToString()
     {
-        string rt = "";
+        string argstr = CmdArgToString(command, args);
+        return command + " " + argstr;
+    }
 
+    public string GetCommand()
+    {
+        return command;
+    }
+
+    public string[] GetArgs()
+    {
+        return args;
+    }
+
+    public string GetArgString()
+    {
+        return CmdArgToString(command, args);
+    }
+
+    private static string CmdArgToString(string command, string[] args)
+    {
+        string rt = "";
         switch (command)
         {
             case "LOOP":
@@ -23,11 +47,13 @@
                 rt += "} " + numRepeat + " Times";
                 break;
             default:
-                rt = command + "(" + string.Join(",", args) + ")";
+                rt = "(" + string.Join(",", args) + ")";
                 break;
         }
         return rt;
     }
+
+    // ====================
 
     public string ToNetMessage()
     {

@@ -2,11 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using EnhancedUI.EnhancedScroller;
 
-public class CodeInterpreter : MonoBehaviour
+public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
 {
     public AvatarController avatar;
-    public TMPro.TextMeshPro scriptTextMesh;
+    public TMPro.TextMeshProUGUI scriptTextMesh;
+    public EnhancedScroller scriptScroller;
+    public CodeObjectCellView codeObjectCellViewPrefab;
+
     public PartnerSocket partnerSocket;
     public GameObject ViewContainer;
     public GameObject codingPanel;
@@ -21,8 +25,10 @@ public class CodeInterpreter : MonoBehaviour
     {
         scriptVariables = new Dictionary<string, float>();
         CloseTopicViewAndBroadcast();
-    }
 
+        scriptScroller.Delegate = this;
+        scriptScroller.ReloadData(scrollPositionFactor: 0.0f);
+    }
 
     public UnityAction GetTopicButtonEvent(string topic)
     {
@@ -50,8 +56,8 @@ public class CodeInterpreter : MonoBehaviour
         SetActiveTopicView(false, true);
     }
 
-
-    // ======================================================================
+    // ====================
+    // Interfaces of script operations
 
     /// <summary>
     /// Load the predefined script template specified by <paramref name="scriptName"/>.
@@ -99,6 +105,8 @@ public class CodeInterpreter : MonoBehaviour
         {
             // Display the script
             scriptTextMesh.SetText(loadedScript.ToString());
+            scriptScroller.ReloadData(scrollPositionFactor: 0.0f);
+
             // Enable the viewer
             SetActiveTopicView(true, broadcast: false);
             // Enable the viewer on the remote device
@@ -106,7 +114,8 @@ public class CodeInterpreter : MonoBehaviour
         }
     }
 
-    // ======================================================================
+    // ====================
+    // Internal code compiler
 
     /// <summary>
     /// Run the loaded script.
@@ -209,6 +218,36 @@ public class CodeInterpreter : MonoBehaviour
     private void ResetVariableList()
     {
         scriptVariables.Clear();
+    }
+
+    // ====================
+    // Implementation of EnhancedScroller interfaces
+
+    public int GetNumberOfCells(EnhancedScroller scroller)
+    {
+        if (loadedScript != null)
+            return loadedScript.GetScript().Count;
+        else
+            return 0;
+    }
+
+    public float GetCellViewSize(EnhancedScroller scroller, int dataIndex)
+    {
+        // Model
+        CodeObject codeObject = loadedScript.GetScript()[dataIndex];
+        return codeObject.GetArgs().Length * 50f;
+    }
+
+    public EnhancedScrollerCellView GetCellView(EnhancedScroller scroller, int dataIndex, int cellIndex)
+    {
+        // Model
+        CodeObject codeObject = loadedScript.GetScript()[dataIndex];
+
+        // View
+        CodeObjectCellView cellView = scroller.GetCellView(codeObjectCellViewPrefab) as CodeObjectCellView;
+        cellView.SetData(codeObject);
+
+        return cellView;
     }
 
     // ====================
