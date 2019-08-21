@@ -10,6 +10,7 @@ using EnhancedUI.EnhancedScroller;
 /// </summary>
 public class TopicScroller : MonoBehaviour, IEnhancedScrollerDelegate
 {
+    public bool enableCellOnClickEvent;
     private List<string> topicList;
     private List<string> speakerList;
     private float cellviewSize = 148f;
@@ -49,7 +50,14 @@ public class TopicScroller : MonoBehaviour, IEnhancedScrollerDelegate
         scroller.ReloadData(scrollPositionFactor: 0.0f);
     }
 
+    public void ToggleHistoryCardTimeline()
+    {
+        GameObject parent = scroller.transform.parent.gameObject;
+        parent.SetActive(!parent.activeSelf);
+    }
+
     // ======================================================================
+    // Implementation of EnhancedScroller interfaces
 
     int IEnhancedScrollerDelegate.GetNumberOfCells(EnhancedScroller scroller)
     {
@@ -61,7 +69,8 @@ public class TopicScroller : MonoBehaviour, IEnhancedScrollerDelegate
         return cellviewSize;
     }
 
-    EnhancedScrollerCellView IEnhancedScrollerDelegate.GetCellView(EnhancedScroller scroller, int dataIndex, int cellIndex)
+    EnhancedScrollerCellView IEnhancedScrollerDelegate.GetCellView(
+        EnhancedScroller scroller, int dataIndex, int cellIndex)
     {
         TopicCellView cellView = scroller.GetCellView(cellview) as TopicCellView;
 
@@ -72,7 +81,10 @@ public class TopicScroller : MonoBehaviour, IEnhancedScrollerDelegate
         );
         cellView.SetData(cellViewContent);
 
-        cellView.onClickedDelegate = TopicCellClicked;
+        if (enableCellOnClickEvent)
+        {
+            cellView.onClickedDelegate = TopicCellClicked;
+        }
 
         return cellView;
     }
