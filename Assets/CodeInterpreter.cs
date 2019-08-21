@@ -5,19 +5,21 @@ using UnityEngine.Events;
 
 public class CodeInterpreter : MonoBehaviour
 {
-    public AvatarController mAvartar;
-    public TMPro.TextMeshPro mScriptTextMesh;
-    public GameObject mExampleContainer;
-    public GameObject mControlPanel;
-    public PartnerSocket mPartnerSocket;
+    public AvatarController avatar;
+    public TMPro.TextMeshPro scriptTextMesh;
+    public PartnerSocket partnerSocket;
+    public GameObject ViewContainer;
+    public GameObject codingPanel;
 
     private const float CMD_RUNNING_DELAY = 0.5f;
     public const string CTRL_CLOSE = "close";
 
     private ScriptObject loadedScript;
+    private Dictionary<string, float> scriptVariables;
 
     void Start()
     {
+        scriptVariables = new Dictionary<string, float>();
         CloseTopicViewAndBroadcast();
     }
 
@@ -31,11 +33,16 @@ public class CodeInterpreter : MonoBehaviour
         return action;
     }
 
+    /// <summary>
+    /// Enable or disable the avatar visualization
+    /// </summary>
+    /// <param name="activated"></param>
+    /// <param name="broadcast"></param>
     public void SetActiveTopicView(bool activated, bool broadcast = false)
     {
-        if (mExampleContainer) mExampleContainer.SetActive(activated);
-        if (mControlPanel) mControlPanel.SetActive(activated);
-        if (broadcast) mPartnerSocket.BroadcastTopicCtrl(CTRL_CLOSE);
+        if (ViewContainer) ViewContainer.SetActive(activated);
+        if (codingPanel) codingPanel.SetActive(activated);
+        if (broadcast) partnerSocket.BroadcastTopicCtrl(CTRL_CLOSE);
     }
 
     public void CloseTopicViewAndBroadcast()
@@ -90,15 +97,13 @@ public class CodeInterpreter : MonoBehaviour
         loadedScript = script;
         if (loadedScript != null)
         {
-            mScriptTextMesh.SetText(loadedScript.ToString());
+            // Display the script
+            scriptTextMesh.SetText(loadedScript.ToString());
+            // Enable the viewer
             SetActiveTopicView(true, broadcast: false);
-            if (broadcast) mPartnerSocket.BroadcastTopicCtrl(scriptName);
+            // Enable the viewer on the remote device
+            if (broadcast) partnerSocket.BroadcastTopicCtrl(scriptName);
         }
-    }
-
-    public void _TestLoadingScript()
-    {
-        LoadPredefinedScript("PROGRAM CONTROL FLOW", true);
     }
 
     // ======================================================================
@@ -109,7 +114,10 @@ public class CodeInterpreter : MonoBehaviour
     public void RunLoadedScript()
     {
         if (loadedScript != null)
+        {
+            avatar.ResetPosition();
             _RunScript(loadedScript);
+        }
     }
 
     /// <summary>
@@ -134,6 +142,7 @@ public class CodeInterpreter : MonoBehaviour
         }
 
         // Run the script
+        ResetVariableList();
         StartCoroutine(_RunScriptCoroutine(procScript));
     }
 
@@ -173,7 +182,7 @@ public class CodeInterpreter : MonoBehaviour
         {
             CodeObject nextCodeObject = script[counter++];
             RunCommand(nextCodeObject);
-            mPartnerSocket.BroadcastAvatarCtrl(nextCodeObject);
+            partnerSocket.BroadcastAvatarCtrl(nextCodeObject);
             yield return new WaitForSeconds(CMD_RUNNING_DELAY);
         }
     }
@@ -192,8 +201,20 @@ public class CodeInterpreter : MonoBehaviour
         switch (command)
         {
             case "MOVE":
-                mAvartar.Move(args[0]);
+                avatar.Move(args[0]);
                 break;
         }
+    }
+
+    private void ResetVariableList()
+    {
+        scriptVariables.Clear();
+    }
+
+    // ====================
+
+    public void _TestLoadingScript()
+    {
+        LoadPredefinedScript("PROGRAM CONTROL FLOW", false);
     }
 }

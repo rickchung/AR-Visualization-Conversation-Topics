@@ -36,6 +36,8 @@ public class TopicScroller : MonoBehaviour, IEnhancedScrollerDelegate
         scroller.ReloadData(scrollPositionFactor: 0.0f);
 
         cardTemplate = problemSolvingWorkspace.Find("CardTemplate");
+
+        ToggleHistoryCardTimeline();
     }
 
     public void AddTopic(string topic, string speaker)

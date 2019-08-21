@@ -5,9 +5,18 @@ using UnityEngine;
 public class GridController : MonoBehaviour
 {
     public Transform gridStart, gridEnd;
+    /// <summary>
+    /// A predefined prefab of grid cells
+    /// </summary>
     public Transform gridCellPrefab;
+    public AvatarController avatarController;
 
+    /// <summary>
+    /// The coordinate (or map) of the game.
+    /// </summary>
     private Vector3[,] cellCoordinates;
+    private Transform[,] cellObjsOnCoordinates;
+    private int numInX, numInZ;
 
     void Start()
     {
@@ -16,15 +25,17 @@ public class GridController : MonoBehaviour
         float distX = Mathf.Abs(startingPoint.x - endPoint.x);
         float distZ = Mathf.Abs(startingPoint.z - endPoint.z);
 
+        // Measure the size of one step and padding
         float stepSize = gridStart.localScale.x;
         float padding = stepSize * 0.10f;
-        int numInX = Mathf.CeilToInt(distX / (stepSize + padding)) + 1;
-        int numInZ = Mathf.CeilToInt(distZ / (stepSize + padding)) + 1;
+        numInX = Mathf.CeilToInt(distX / (stepSize + padding)) + 1;
+        numInZ = Mathf.CeilToInt(distZ / (stepSize + padding)) + 1;
 
         Debug.Log("Grid Step Size: " + stepSize);
         Debug.Log("Grid: numInX=" + numInX + ", numInZ=" + numInZ);
 
         cellCoordinates = new Vector3[numInX, numInZ];
+        cellObjsOnCoordinates = new Transform[numInX, numInZ];
 
         // Generate grid cells
         for (int x = 0; x < numInX; x++)
@@ -43,12 +54,39 @@ public class GridController : MonoBehaviour
                 newCell.name = "Cell" + x + z;
 
                 cellCoordinates[x, z] = newPos;
+                cellObjsOnCoordinates[x, z] = newCell;
             }
         }
 
         // Deactivate the starting and end cells
         gridStart.gameObject.SetActive(false);
         gridEnd.gameObject.SetActive(false);
+
+        // When the grid is ready, reset the positions of avatars
+        avatarController.ResetPosition();
+    }
+
+    // ====================
+    // Coordinate-related
+
+    public Transform GetTheLastCellInGrid()
+    {
+        return cellObjsOnCoordinates[numInX - 1, numInZ - 1];
+    }
+
+    public Transform GetTheFirstCellInGrid()
+    {
+        return cellObjsOnCoordinates[0, 0];
+    }
+
+    public enum Direction { NORTH = 0, SOUTH = 1, EAST = 2, WEST = 3, UNKNOWN }
+
+    public static class DirectionVec
+    {
+        public static Vector3 NORTH = new Vector3(0, 0, -1);
+        public static Vector3 SOUTH = new Vector3(0, 0, 1);
+        public static Vector3 WEST = new Vector3(-1, 0, 0);
+        public static Vector3 EAST = new Vector3(1, 0, 0);
     }
 
     /// <summary>
@@ -92,6 +130,11 @@ public class GridController : MonoBehaviour
         return newPos;
     }
 
+    /// <summary>
+    /// Convert a direction in string into a value of the Direction type
+    /// </summary>
+    /// <param name="direction"></param>
+    /// <returns></returns>
     public Direction GetDirFromString(string direction)
     {
         Direction dir = Direction.UNKNOWN;
@@ -111,15 +154,5 @@ public class GridController : MonoBehaviour
                 break;
         }
         return dir;
-    }
-
-    public enum Direction { NORTH = 0, SOUTH = 1, EAST = 2, WEST = 3, UNKNOWN }
-
-    public static class DirectionVec
-    {
-        public static Vector3 NORTH = new Vector3(0, 0, -1);
-        public static Vector3 SOUTH = new Vector3(0, 0, 1);
-        public static Vector3 WEST = new Vector3(-1, 0, 0);
-        public static Vector3 EAST = new Vector3(1, 0, 0);
     }
 }

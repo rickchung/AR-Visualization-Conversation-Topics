@@ -24,7 +24,6 @@ public class ScriptObject : IEnumerable
         }
     }
 
-
     override public string ToString()
     {
         string rt = "";
