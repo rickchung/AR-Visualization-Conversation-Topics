@@ -12,8 +12,11 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     public CodeObjectCellView codeObjectCellViewPrefab;
 
     public PartnerSocket partnerSocket;
+    public CodeEditor codeEditor;
+
     public GameObject ViewContainer;
     public GameObject codingPanel;
+
 
     private const float CMD_RUNNING_DELAY = 0.5f;
     public const string CTRL_CLOSE = "close";
@@ -84,6 +87,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
             case "THE FOREACH LOOP":
             case "THE DO...WHILE LOOP":
                 script = new ScriptObject(new List<CodeObject>() {
+                    new CodeObject("MOVE", new string[] {"EAST"}),
                     new CodeObject("LOOP", new string[] {
                         "3", "MOVE(SOUTH)", "MOVE(EAST)"
                     }),
@@ -104,8 +108,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         if (loadedScript != null)
         {
             // Display the script
-            scriptTextMesh.SetText(loadedScript.ToString());
-            scriptScroller.ReloadData(scrollPositionFactor: 0.0f);
+            UpdateCodeViewer();
 
             // Enable the viewer
             SetActiveTopicView(true, broadcast: false);
@@ -247,13 +250,35 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         CodeObjectCellView cellView = scroller.GetCellView(codeObjectCellViewPrefab) as CodeObjectCellView;
         cellView.SetData(codeObject);
 
+        // Onclick event
+        cellView.SetCodeModifyingDelegate(ModifyCodeObject);
+
         return cellView;
+    }
+
+    /// <summary>
+    /// Used to modify the codeObject when a CodeView is clicked.
+    ///
+    /// Note: This is a delegate that will be passed into cellviews.
+    /// </summary>
+    /// <param name="codeObject"></param>
+    private void ModifyCodeObject(CodeObject codeObject)
+    {
+        codeEditor.DispatchEditor(codeObject);
+    }
+
+    public void UpdateCodeViewer()
+    {
+        // Display the script
+        scriptTextMesh.SetText(loadedScript.ToString());
+        scriptScroller.ReloadData(scrollPositionFactor: 0.0f);
     }
 
     // ====================
 
     public void _TestLoadingScript()
     {
-        LoadPredefinedScript("PROGRAM CONTROL FLOW", false);
+        // LoadPredefinedScript("PROGRAM CONTROL FLOW", false);
+        LoadPredefinedScript("SEQUENTIAL", false);
     }
 }

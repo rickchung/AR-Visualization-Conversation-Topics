@@ -34,6 +34,16 @@ public class CodeObject
         return CmdArgToString(command, args);
     }
 
+    public void SetCommand(string command)
+    {
+        this.command = command;
+    }
+
+    public void SetArgs(string[] args)
+    {
+        this.args = args;
+    }
+
     private static string CmdArgToString(string command, string[] args)
     {
         string rt = "";
