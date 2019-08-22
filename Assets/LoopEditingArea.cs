@@ -12,13 +12,21 @@ public class LoopEditingArea : MonoBehaviour, IEnhancedScrollerDelegate, Editing
     public TextMeshProUGUI loopTimesLabel;
     public Button loopTimesPlusBtn, loopTimesMinusBtn;
     public Button loopSubmitBtn;
+    public EnhancedScroller nestedCmdScroller;
+    public OneCmdEditingArea oneCmdEditingAreaPrefab;
 
-    private CodeObjectOneCommand attachedCodeObject;
+    private CodeObjectLoop attachedCodeObject;
     private int loopTimes;
+
+    private void Start()
+    {
+        // nestedCmdScroller.Delegate = this;
+    }
 
     public void AttachCodeObject(CodeObjectOneCommand codeObject, List<string> argOptions)
     {
-        attachedCodeObject = codeObject;
+        attachedCodeObject = (CodeObjectLoop)codeObject;
+
         string command = attachedCodeObject.GetCommand();
         string[] args = attachedCodeObject.GetArgs();
         loopTimes = Int32.Parse(args[0]);
@@ -32,6 +40,10 @@ public class LoopEditingArea : MonoBehaviour, IEnhancedScrollerDelegate, Editing
         {
             string[] args = attachedCodeObject.GetArgs();
             args[0] = loopTimes.ToString();
+
+            attachedCodeObject.SetArgs(args);
+            attachedCodeObject.SetLoopTimes(loopTimes);
+
             // Clean up
             attachedCodeObject = null;
             editorDispatcher.DismissEditor();
@@ -51,16 +63,17 @@ public class LoopEditingArea : MonoBehaviour, IEnhancedScrollerDelegate, Editing
 
     public int GetNumberOfCells(EnhancedScroller scroller)
     {
-        throw new System.NotImplementedException();
+        return attachedCodeObject.GetNumOfNestedCmd();
     }
 
     public float GetCellViewSize(EnhancedScroller scroller, int dataIndex)
     {
-        throw new System.NotImplementedException();
+        return 100f;
     }
 
     public EnhancedScrollerCellView GetCellView(EnhancedScroller scroller, int dataIndex, int cellIndex)
     {
-        throw new System.NotImplementedException();
+        CodeObjectOneCommand co = attachedCodeObject.GetNestedCommands()[dataIndex];
+        return null;
     }
 }

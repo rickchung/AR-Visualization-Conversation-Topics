@@ -22,9 +22,19 @@ public class CodeObjectLoop : CodeObjectOneCommand
         return loopTimes;
     }
 
+    public void SetLoopTimes(int value)
+    {
+        loopTimes = value;
+    }
+
+    public int GetNumOfNestedCmd()
+    {
+        return nestedCommands.Count;
+    }
+
     override public int GetLength()
     {
-        return nestedCommands.Count + 1;
+        return GetNumOfNestedCmd() + 1;
     }
 
 
@@ -36,7 +46,7 @@ public class CodeObjectLoop : CodeObjectOneCommand
     override public string GetArgString()
     {
         string rt = "";
-        string numRepeat = GetArgs()[0];
+        string numRepeat = loopTimes.ToString();
 
         rt += "REPEAT {\n";
         foreach (CodeObjectOneCommand c in nestedCommands)
