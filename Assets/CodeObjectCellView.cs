@@ -4,17 +4,17 @@ using UnityEngine;
 using EnhancedUI.EnhancedScroller;
 using TMPro;
 
-public delegate void CodeModifyingDelegate(CodeObject codeObject);
+public delegate void CodeModifyingDelegate(CodeObjectOneCommand codeObject);
 
 public class CodeObjectCellView : EnhancedScrollerCellView
 {
-    public CodeObject codeObject;
+    public CodeObjectOneCommand codeObject;
     public TMPro.TextMeshProUGUI commandText;
     public TMPro.TextMeshProUGUI argumentsText;
     private CodeModifyingDelegate codeModifyingDelegate;
 
 
-    public void SetData(CodeObject codeObject)
+    public void SetData(CodeObjectOneCommand codeObject)
     {
         this.codeObject = codeObject;
         commandText.text = codeObject.GetCommand();

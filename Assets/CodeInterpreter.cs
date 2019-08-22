@@ -71,32 +71,36 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         ScriptObject script = null;
         switch (scriptName)
         {
-            case "SEQUENTIAL":
-            case "SEQUENTIAL LOGICS":
-            case "SEQUENCES":
-                script = new ScriptObject(new List<CodeObject>() {
-                    new CodeObject("MOVE", new string[] {"SOUTH"}),
-                    new CodeObject("MOVE", new string[] {"SOUTH"}),
-                    new CodeObject("MOVE", new string[] {"EAST"}),
-                    new CodeObject("MOVE", new string[] {"EAST"}),
-                });
-                break;
             case "PROGRAM CONTROL FLOW":
             case "THE WHILE LOOP":
             case "THE FOR LOOP":
             case "THE FOREACH LOOP":
             case "THE DO...WHILE LOOP":
-                script = new ScriptObject(new List<CodeObject>() {
-                    new CodeObject("MOVE", new string[] {"EAST"}),
-                    new CodeObject("LOOP", new string[] {
-                        "3", "MOVE(SOUTH)", "MOVE(EAST)"
-                    }),
-                    new CodeObject("LOOP", new string[] {
-                        "2", "MOVE(WEST)"
-                    }),
-                    new CodeObject("LOOP", new string[] {
-                        "2", "MOVE(NORTH)", "MOVE(EAST)"
-                    }),
+                script = new ScriptObject(new List<CodeObjectOneCommand>() {
+                    new CodeObjectOneCommand("MOVE", new string[] {"EAST"}),
+                    new CodeObjectLoop(
+                        "LOOP",
+                        new string[] {"3"},
+                        new List<CodeObjectOneCommand>() {
+                            new CodeObjectOneCommand("MOVE", new string[] {"SOUTH"}),
+                            new CodeObjectOneCommand("MOVE", new string[] {"EAST"}),
+                        }
+                    ),
+                    new CodeObjectLoop(
+                        "LOOP",
+                        new string[] {"2"},
+                        new List<CodeObjectOneCommand>() {
+                            new CodeObjectOneCommand("MOVE", new string[] {"WEST"}),
+                        }
+                    ),
+                    new CodeObjectLoop(
+                        "LOOP",
+                        new string[] {"3"},
+                        new List<CodeObjectOneCommand>() {
+                            new CodeObjectOneCommand("MOVE", new string[] {"NORTH"}),
+                            new CodeObjectOneCommand("MOVE", new string[] {"EAST"}),
+                        }
+                    ),
                 });
                 break;
             default:
@@ -140,12 +144,12 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     private void _RunScript(ScriptObject script)
     {
         // Preprocess the script
-        var procScript = new List<CodeObject>();
-        foreach (CodeObject codeObject in script)
+        var procScript = new List<CodeObjectOneCommand>();
+        foreach (CodeObjectOneCommand codeObject in script)
         {
-            if (codeObject.command.Equals("LOOP"))
+            if (codeObject.GetCommand().Equals("LOOP"))
             {
-                _ParseLoop(codeObject, procScript);
+                _ParseLoop((CodeObjectLoop)codeObject, procScript);
             }
             else
             {
@@ -164,18 +168,19 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     /// </summary>
     /// <param name="codeObject">Code object.</param>
     /// <param name="procScript">Proc script.</param>
-    private void _ParseLoop(CodeObject codeObject, List<CodeObject> procScript)
+    private void _ParseLoop(CodeObjectOneCommand codeObject, List<CodeObjectOneCommand> procScript)
     {
-        int repeat = int.Parse(codeObject.args[0]);
-        var codeToRepeat = new List<CodeObject>();
-        for (int i = 1; i < codeObject.args.Length; i++)
+        int repeat = int.Parse(codeObject.GetArgs()[0]);
+
+        var codeToRepeat = new List<CodeObjectOneCommand>();
+        for (int i = 1; i < codeObject.GetArgs().Length; i++)
         {
-            string s = codeObject.args[i];
+            string s = codeObject.GetArgs()[i];
             // Extract command and args
             string[] subCode = s.Split('(');
             string subCommand = subCode[0];
             string[] subArgs = subCode[1].Replace(")", "").Split(',');
-            codeToRepeat.Add(new CodeObject(subCommand, subArgs));
+            codeToRepeat.Add(new CodeObjectOneCommand(subCommand, subArgs));
         }
 
         for (int _ = 0; _ < repeat; _++)
@@ -183,16 +188,31 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     }
 
     /// <summary>
+    /// Parse a loop command made by the new loop object.
+    /// </summary>
+    /// <param name="codeObject"></param>
+    /// <param name="procScript"></param>
+    private void _ParseLoop(CodeObjectLoop codeObject, List<CodeObjectOneCommand> procScript)
+    {
+        var repeat = codeObject.GetLoopTimes();
+        var codeToRepeat = codeObject.GetNestedCommands();
+        for (int _ = 0; _ < repeat; _++)
+        {
+            procScript.AddRange(codeToRepeat);
+        }
+    }
+
+    /// <summary>
     /// The coroutine for the script to run in the background.
     /// </summary>
     /// <returns>The script.</returns>
     /// <param name="script">Script.</param>
-    private IEnumerator _RunScriptCoroutine(List<CodeObject> script)
+    private IEnumerator _RunScriptCoroutine(List<CodeObjectOneCommand> script)
     {
         int counter = 0;
         while (counter < script.Count)
         {
-            CodeObject nextCodeObject = script[counter++];
+            CodeObjectOneCommand nextCodeObject = script[counter++];
             RunCommand(nextCodeObject);
             partnerSocket.BroadcastAvatarCtrl(nextCodeObject);
             yield return new WaitForSeconds(CMD_RUNNING_DELAY);
@@ -203,12 +223,12 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     /// Run a single command in the given codeObject.
     /// </summary>
     /// <param name="codeObject">Code object.</param>
-    public void RunCommand(CodeObject codeObject)
+    public void RunCommand(CodeObjectOneCommand codeObject)
     {
         Debug.Log("Running: " + codeObject);
 
-        string command = codeObject.command;
-        string[] args = codeObject.args;
+        string command = codeObject.GetCommand();
+        string[] args = codeObject.GetArgs();
 
         switch (command)
         {
@@ -237,14 +257,14 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     public float GetCellViewSize(EnhancedScroller scroller, int dataIndex)
     {
         // Model
-        CodeObject codeObject = loadedScript.GetScript()[dataIndex];
-        return codeObject.GetArgs().Length * 50f;
+        CodeObjectOneCommand codeObject = loadedScript.GetScript()[dataIndex];
+        return codeObject.GetLength() * 45f;
     }
 
     public EnhancedScrollerCellView GetCellView(EnhancedScroller scroller, int dataIndex, int cellIndex)
     {
         // Model
-        CodeObject codeObject = loadedScript.GetScript()[dataIndex];
+        CodeObjectOneCommand codeObject = loadedScript.GetScript()[dataIndex];
 
         // View
         CodeObjectCellView cellView = scroller.GetCellView(codeObjectCellViewPrefab) as CodeObjectCellView;
@@ -262,7 +282,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     /// Note: This is a delegate that will be passed into cellviews.
     /// </summary>
     /// <param name="codeObject"></param>
-    private void ModifyCodeObject(CodeObject codeObject)
+    private void ModifyCodeObject(CodeObjectOneCommand codeObject)
     {
         codeEditor.DispatchEditor(codeObject);
     }
@@ -278,7 +298,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
 
     public void _TestLoadingScript()
     {
-        // LoadPredefinedScript("PROGRAM CONTROL FLOW", false);
-        LoadPredefinedScript("SEQUENTIAL", false);
+        LoadPredefinedScript("PROGRAM CONTROL FLOW", false);
+        // LoadPredefinedScript("SEQUENTIAL", false);
     }
 }

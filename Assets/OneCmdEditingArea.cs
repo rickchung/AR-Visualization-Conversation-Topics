@@ -5,16 +5,16 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class OneCmdEditingArea : MonoBehaviour
+public class OneCmdEditingArea : MonoBehaviour, EditingArea
 {
     public CodeEditor editorDispatcher;
     public TextMeshProUGUI oneCmdLabel;
     public TMP_Dropdown oneCmdDropdown;
     public Button oneCmdSubmitBtn;
 
-    private CodeObject attachedCodeObject;
+    private CodeObjectOneCommand attachedCodeObject;
 
-    public void AttachCodeObject(CodeObject codeObject, List<string> argOptions)
+    public void AttachCodeObject(CodeObjectOneCommand codeObject, List<string> argOptions)
     {
         attachedCodeObject = codeObject;
 

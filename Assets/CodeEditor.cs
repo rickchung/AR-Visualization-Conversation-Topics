@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class CodeEditor : MonoBehaviour
@@ -23,7 +22,7 @@ public class CodeEditor : MonoBehaviour
         loopEditingArea.gameObject.SetActive(false);
     }
 
-    public void DispatchEditor(CodeObject codeObject)
+    public void DispatchEditor(CodeObjectOneCommand codeObject)
     {
         Debug.Log("Modifying code: " + codeObject.ToString());
 
@@ -36,7 +35,7 @@ public class CodeEditor : MonoBehaviour
                 break;
             case "LOOP":
                 Debug.Log("Showing loop editor");
-                loopEditingArea.AttachCodeObject(codeObject);
+                loopEditingArea.AttachCodeObject(codeObject, null);
                 DispatchRoutine(loopEditingArea.gameObject);
                 break;
         }

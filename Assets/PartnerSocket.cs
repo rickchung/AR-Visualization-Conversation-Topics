@@ -182,7 +182,7 @@ public class PartnerSocket : MonoBehaviour
     /// Broadcasts the avatar ctrl.
     /// </summary>
     /// <param name="code">Code.</param>
-    public void BroadcastAvatarCtrl(CodeObject code)
+    public void BroadcastAvatarCtrl(CodeObjectOneCommand code)
     {
         BroadcastToConnected(MyMsgType.MSG_AVATAR_CTRL, new StringMessage
         {
@@ -316,7 +316,7 @@ public class PartnerSocket : MonoBehaviour
     private void OnReceivedAvatarCtrl(NetworkMessage netMsg)
     {
         var ctrlCmd = netMsg.ReadMessage<StringMessage>().value;
-        CodeObject co = CodeObject.FromNetMessage(ctrlCmd);
+        CodeObjectOneCommand co = CodeObjectOneCommand.FromNetMessage(ctrlCmd);
         mCodeInterpreter.RunCommand(co);
     }
 

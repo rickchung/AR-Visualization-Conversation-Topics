@@ -80,12 +80,6 @@ public class GridController : MonoBehaviour
     }
 
     public enum Direction { NORTH = 0, SOUTH = 1, EAST = 2, WEST = 3, UNKNOWN }
-    public static List<string> availableMoveDirections = new List<string>() {
-        Direction.NORTH.ToString(),
-        Direction.SOUTH.ToString(),
-        Direction.EAST.ToString(),
-        Direction.WEST.ToString()
-    };
 
     public static class DirectionVec
     {
