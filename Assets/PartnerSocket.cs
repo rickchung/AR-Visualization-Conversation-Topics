@@ -102,7 +102,8 @@ public class PartnerSocket : MonoBehaviour
 
 
     // ============================================================
-    // NetworkServer
+    // NetworkServer: This section defines how and what to broadcast to
+    // the connected clients on the server.
 
     /// <summary>
     /// The helper function that broadcasts the message through the server.
@@ -184,15 +185,25 @@ public class PartnerSocket : MonoBehaviour
     /// <param name="code">Code.</param>
     public void BroadcastAvatarCtrl(CodeObjectOneCommand code)
     {
-        BroadcastToConnected(MyMsgType.MSG_AVATAR_CTRL, new StringMessage
+        // If the local is connected to the server, broadcast the message
+        if (_serverIpAddress != null)
         {
-            value = code.ToNetMessage()
-        });
+            BroadcastToConnected(
+                MyMsgType.MSG_AVATAR_CTRL,
+                new StringMessage { value = code.ToNetMessage() }
+            );
+        }
+        // Otherwise, send back the command to the local rival avatar
+        else
+        {
+            mCodeInterpreter.RunCommand(code, forRival: true);
+        }
     }
 
 
     // ============================================================
-    // NetworkClient
+    // NetworkClient: This section defines what the local should do when
+    // receiving a network message.
 
     /// <summary>
     /// Create a client handler and connect to the server at partnerIP.
@@ -310,14 +321,13 @@ public class PartnerSocket : MonoBehaviour
     }
 
     /// <summary>
-    /// The callback for the reception of the command of avatar.
+    /// The callback for reception of commands of avatars.
     /// </summary>
     /// <param name="netMsg">Net message.</param>
     private void OnReceivedAvatarCtrl(NetworkMessage netMsg)
     {
         var ctrlCmd = netMsg.ReadMessage<StringMessage>().value;
         CodeObjectOneCommand co = CodeObjectOneCommand.FromNetMessage(ctrlCmd);
-        mCodeInterpreter.RunCommand(co);
+        mCodeInterpreter.RunCommand(co, forRival: true);
     }
-
 }

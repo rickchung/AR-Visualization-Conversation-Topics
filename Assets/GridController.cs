@@ -5,16 +5,9 @@ using UnityEngine;
 public class GridController : MonoBehaviour
 {
     public Transform gridStart, gridEnd;
-    /// <summary>
-    /// A predefined prefab of grid cells
-    /// </summary>
     public Transform gridCellPrefab;
-    public AvatarController avatarController;
-
-    /// <summary>
-    /// The coordinate (or map) of the game.
-    /// </summary>
-    private Vector3[,] cellCoordinates;
+    public AvatarController avatarController, rivalAvatarController;
+    private Vector3[,] cellCoordinates;  // The coordinate (or map) of the game.
     private Transform[,] cellObjsOnCoordinates;
     private int numInX, numInZ;
 
@@ -64,6 +57,7 @@ public class GridController : MonoBehaviour
 
         // When the grid is ready, reset the positions of avatars
         avatarController.ResetPosition();
+        rivalAvatarController.ResetPosition();
     }
 
     // ====================
@@ -77,6 +71,11 @@ public class GridController : MonoBehaviour
     public Transform GetTheFirstCellInGrid()
     {
         return cellObjsOnCoordinates[0, 0];
+    }
+
+    public Vector3 GetSizeOfCoor()
+    {
+        return new Vector3(numInX, 0, numInZ);
     }
 
     public enum Direction { NORTH = 0, SOUTH = 1, EAST = 2, WEST = 3, UNKNOWN }

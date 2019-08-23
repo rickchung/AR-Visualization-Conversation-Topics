@@ -6,7 +6,7 @@ using EnhancedUI.EnhancedScroller;
 
 public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
 {
-    public AvatarController avatar;
+    public AvatarController avatar, rivalAvatar;
     public TMPro.TextMeshProUGUI scriptTextMesh;
     public EnhancedScroller scriptScroller;
     public CodeObjectCellView codeObjectCellViewPrefab;
@@ -163,8 +163,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     }
 
     /// <summary>
-    /// Parse a loop command. A loop command will be simply rolled out as a
-    /// sequence of commands.
+    /// Parse a loop command. A loop command will be simply rolled out as a sequence of commands.
     /// </summary>
     /// <param name="codeObject">Code object.</param>
     /// <param name="procScript">Proc script.</param>
@@ -214,18 +213,23 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         {
             CodeObjectOneCommand nextCodeObject = script[counter++];
             RunCommand(nextCodeObject);
+
+            // Send the current command to the remote clients
             partnerSocket.BroadcastAvatarCtrl(nextCodeObject);
+
             yield return new WaitForSeconds(CMD_RUNNING_DELAY);
         }
     }
 
     /// <summary>
-    /// Run a single command in the given codeObject.
+    /// Run a single command in the given codeObject. This is the place to define additional commands of avatar if needed.
     /// </summary>
     /// <param name="codeObject">Code object.</param>
-    public void RunCommand(CodeObjectOneCommand codeObject)
+    public void RunCommand(CodeObjectOneCommand codeObject, bool forRival = false)
     {
-        Debug.Log("Running: " + codeObject);
+        AvatarController runner = (!forRival) ? avatar : rivalAvatar;
+
+        Debug.Log(string.Format("Running Cmd, {0}, {1}", forRival, codeObject));
 
         string command = codeObject.GetCommand();
         string[] args = codeObject.GetArgs();
@@ -233,7 +237,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         switch (command)
         {
             case "MOVE":
-                avatar.Move(args[0]);
+                runner.Move(args[0]);
                 break;
         }
     }
@@ -241,6 +245,12 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     private void ResetVariableList()
     {
         scriptVariables.Clear();
+    }
+
+    public void ResetAvatars()
+    {
+        avatar.ResetPosition();
+        rivalAvatar.ResetPosition();
     }
 
     // ====================

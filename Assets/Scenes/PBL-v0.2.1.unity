@@ -169,7 +169,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1621897772}
   m_HandleRect: {fileID: 1621897770}
   m_Direction: 0
-  m_Value: 1
+  m_Value: 0
   m_Size: 0.99999994
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -262,7 +262,7 @@ Transform:
   - {fileID: 687921799}
   - {fileID: 42534840}
   m_Father: {fileID: 231099677}
-  m_RootOrder: 3
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!64 &29596152
 MeshCollider:
@@ -1019,7 +1019,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.000029536968, y: 0}
+  m_AnchoredPosition: {x: -0.00003666849, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &160336697
@@ -1830,7 +1830,6 @@ GameObject:
   m_Component:
   - component: {fileID: 231099677}
   - component: {fileID: 231099680}
-  - component: {fileID: 231099679}
   - component: {fileID: 231099678}
   m_Layer: 0
   m_Name: CodingController
@@ -1850,10 +1849,10 @@ Transform:
   m_LocalScale: {x: 8.6064, y: 8.6064, z: 8.6064}
   m_Children:
   - {fileID: 422338188}
+  - {fileID: 1503419780}
   - {fileID: 1724598718}
   - {fileID: 1342738141}
   - {fileID: 29596151}
-  - {fileID: 1503419780}
   m_Father: {fileID: 602620850}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1868,7 +1867,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d9f7aa808dee946d78df510c0f2aff67, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  avatar: {fileID: 231099679}
+  avatar: {fileID: 422338193}
+  rivalAvatar: {fileID: 1503419785}
   scriptTextMesh: {fileID: 668640285}
   scriptScroller: {fileID: 1488670764}
   codeObjectCellViewPrefab: {fileID: 114783964119019170, guid: 5b0cd770eb46f4207a1ea3695e3e45bf,
@@ -1877,20 +1877,6 @@ MonoBehaviour:
   codeEditor: {fileID: 1015207215}
   ViewContainer: {fileID: 0}
   codingPanel: {fileID: 0}
---- !u!114 &231099679
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 231099676}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 862cb99ecd51b46d393cc209f7d22cdc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  avatar: {fileID: 422338188}
-  remoteAvatar: {fileID: 1503419780}
-  gridController: {fileID: 231099680}
 --- !u!114 &231099680
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1905,7 +1891,8 @@ MonoBehaviour:
   gridStart: {fileID: 1724598718}
   gridEnd: {fileID: 1342738141}
   gridCellPrefab: {fileID: 1724598718}
-  avatarController: {fileID: 231099679}
+  avatarController: {fileID: 422338193}
+  rivalAvatarController: {fileID: 1503419785}
 --- !u!1001 &257409504
 Prefab:
   m_ObjectHideFlags: 0
@@ -2946,7 +2933,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 231099679}
+      - m_Target: {fileID: 0}
         m_MethodName: _TestAnything
         m_Mode: 3
         m_Arguments:
@@ -3150,6 +3137,7 @@ GameObject:
   - component: {fileID: 422338191}
   - component: {fileID: 422338190}
   - component: {fileID: 422338189}
+  - component: {fileID: 422338193}
   m_Layer: 0
   m_Name: Avatar
   m_TagString: Untagged
@@ -3240,6 +3228,20 @@ MeshFilter:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 422338187}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &422338193
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 422338187}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 862cb99ecd51b46d393cc209f7d22cdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  avatar: {fileID: 422338188}
+  gridController: {fileID: 231099680}
+  isRival: 0
 --- !u!1 &429096536
 GameObject:
   m_ObjectHideFlags: 0
@@ -4988,7 +4990,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 231099679}
+      - m_Target: {fileID: 0}
         m_MethodName: _TestAnything
         m_Mode: 3
         m_Arguments:
@@ -6055,7 +6057,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.000043844728, y: -0.000022597507}
+  m_AnchoredPosition: {x: 0.0000028488437, y: -0.000023277014}
   m_SizeDelta: {x: 210.6, y: 58.353}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &863201691
@@ -7103,7 +7105,7 @@ MonoBehaviour:
   partnerIPAddress: {fileID: 271664007}
   serverMsgPanel: {fileID: 1667627387}
   speechToTextController: {fileID: 747354411}
-  mCodeInterpreter: {fileID: 0}
+  mCodeInterpreter: {fileID: 231099678}
   useLocalServer: 0
 --- !u!4 &1014079041
 Transform:
@@ -9358,7 +9360,7 @@ Transform:
   m_LocalScale: {x: 0.15583, y: 0.01947864, z: 0.15583}
   m_Children: []
   m_Father: {fileID: 231099677}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &1342738142
 BoxCollider:
@@ -10003,6 +10005,7 @@ GameObject:
   - component: {fileID: 1503419783}
   - component: {fileID: 1503419782}
   - component: {fileID: 1503419781}
+  - component: {fileID: 1503419785}
   m_Layer: 0
   m_Name: RemoteAvatar
   m_TagString: Untagged
@@ -10022,7 +10025,7 @@ Transform:
   m_Children:
   - {fileID: 524006200}
   m_Father: {fileID: 231099677}
-  m_RootOrder: 4
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &1503419781
 Rigidbody:
@@ -10093,6 +10096,20 @@ MeshFilter:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1503419779}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1503419785
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1503419779}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 862cb99ecd51b46d393cc209f7d22cdc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  avatar: {fileID: 1503419780}
+  gridController: {fileID: 231099680}
+  isRival: 1
 --- !u!1 &1533257208
 GameObject:
   m_ObjectHideFlags: 0
@@ -11105,7 +11122,7 @@ Transform:
   m_LocalScale: {x: 0.15583274, y: 0.008039256, z: 0.15583274}
   m_Children: []
   m_Father: {fileID: 231099677}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &1724598719
 Rigidbody:
@@ -11507,7 +11524,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 231099679}
+      - m_Target: {fileID: 0}
         m_MethodName: _TestAnything
         m_Mode: 3
         m_Arguments:
@@ -11828,8 +11845,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 231099679}
-        m_MethodName: ResetPosition
+      - m_Target: {fileID: 231099678}
+        m_MethodName: ResetAvatars
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -11951,7 +11968,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 231099679}
+      - m_Target: {fileID: 0}
         m_MethodName: _TestAnything
         m_Mode: 3
         m_Arguments:
