@@ -71,11 +71,17 @@ public class AvatarController : MonoBehaviour
         Vector3 avatarPos = startingCellInGrid.localPosition;
         avatarPos.y = AVATAR_Y_POS;
         avatar.localPosition = avatarPos;
+        avatar.localRotation = new Quaternion();
         cellPos = startingCellInVec;
         // Reset the physics
         var rigidbody = avatar.GetComponent<Rigidbody>();
         rigidbody.velocity = Vector3.zero;
         rigidbody.angularVelocity = Vector3.zero;
+        rigidbody.constraints = (
+            RigidbodyConstraints.FreezePositionX |
+            RigidbodyConstraints.FreezePositionZ |
+            RigidbodyConstraints.FreezeRotation)
+        ;
     }
 
     // ====================
