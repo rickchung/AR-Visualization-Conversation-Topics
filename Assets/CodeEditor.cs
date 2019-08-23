@@ -22,13 +22,13 @@ public class CodeEditor : MonoBehaviour
         switch (codeObject.GetCommand())
         {
             case "MOVE":
-                Debug.Log("Showing one command editor");
                 oneCmdEditingArea.AttachCodeObject(codeObject);
+                oneCmdEditingArea.codeViewUpdateDelegate = UpdateCodeViewer;
                 DispatchRoutine(oneCmdEditingArea.gameObject);
                 break;
             case "LOOP":
-                Debug.Log("Showing loop editor");
                 loopEditingArea.AttachCodeObject(codeObject);
+                loopEditingArea.codeViewUpdateDelegate = UpdateCodeViewer;
                 DispatchRoutine(loopEditingArea.gameObject);
                 break;
         }
@@ -40,6 +40,11 @@ public class CodeEditor : MonoBehaviour
         loopEditingArea.gameObject.SetActive(false);
         oneCmdEditingArea.gameObject.SetActive(false);
         transform.gameObject.SetActive(false);
+        UpdateCodeViewer();
+    }
+
+    public void UpdateCodeViewer()
+    {
         codeInterpreter.UpdateCodeViewer();
     }
 

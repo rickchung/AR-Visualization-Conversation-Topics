@@ -14,6 +14,8 @@ public class OneCmdEditingAreaCellView : EnhancedScrollerCellView
     private CodeObjectOneCommand attachedCodeObject;
     private List<string> availableMoveDirections = OneCmdEditingArea.availableMoveDirections;
 
+    public CodeViewUpdateDelegate codeViewUpdateDelegate;
+
     public void AttachCodeObject(CodeObjectOneCommand codeObject)
     {
         string command = codeObject.GetCommand();
@@ -36,10 +38,18 @@ public class OneCmdEditingAreaCellView : EnhancedScrollerCellView
     {
         if (attachedCodeObject != null)
         {
-            Debug.Log("OnChanged! " + attachedCodeObject);
             int newArg = value;
             string newArgStr = Enum.ToObject(typeof(GridController.Direction), newArg).ToString();
+
+            Debug.Log(
+                "Code Modified , " +
+                attachedCodeObject.GetArgString() + " , " + newArgStr
+            );
+
             attachedCodeObject.SetArgs(new string[] { newArgStr });
+
+            if (codeViewUpdateDelegate != null)
+                codeViewUpdateDelegate();
         }
     }
 }

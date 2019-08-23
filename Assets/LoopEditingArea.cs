@@ -16,6 +16,8 @@ public class LoopEditingArea : MonoBehaviour, EditingArea, IEnhancedScrollerDele
     private CodeObjectLoop attachedCodeObject;
     private int loopTimes;
 
+    [HideInInspector] public CodeViewUpdateDelegate codeViewUpdateDelegate;
+
     private void Start()
     {
         nestedCmdContainer.Delegate = this;
@@ -65,6 +67,9 @@ public class LoopEditingArea : MonoBehaviour, EditingArea, IEnhancedScrollerDele
         args[0] = loopTimes.ToString();
         attachedCodeObject.SetArgs(args);
         attachedCodeObject.SetLoopTimes(loopTimes);
+
+        if (codeViewUpdateDelegate != null)
+            codeViewUpdateDelegate();
     }
 
     // ====================
@@ -85,6 +90,7 @@ public class LoopEditingArea : MonoBehaviour, EditingArea, IEnhancedScrollerDele
             as OneCmdEditingAreaCellView;
         var nestedCode = attachedCodeObject.GetNestedCommands()[dataIndex];
         cellView.AttachCodeObject(nestedCode);
+        cellView.codeViewUpdateDelegate = codeViewUpdateDelegate;
         return cellView;
     }
 }

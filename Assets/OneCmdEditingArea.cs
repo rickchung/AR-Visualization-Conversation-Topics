@@ -14,6 +14,9 @@ public class OneCmdEditingArea : MonoBehaviour, EditingArea
 
     private CodeObjectOneCommand attachedCodeObject;
 
+    public CodeViewUpdateDelegate codeViewUpdateDelegate;
+
+
     public static List<string> availableMoveDirections = new List<string>() {
         GridController.Direction.NORTH.ToString(),
         GridController.Direction.SOUTH.ToString(),
@@ -44,6 +47,9 @@ public class OneCmdEditingArea : MonoBehaviour, EditingArea
 
         attachedCodeObject.SetCommand(newCommand);
         attachedCodeObject.SetArgs(new string[] { newArgStr });
+
+        if (codeViewUpdateDelegate != null)
+            codeViewUpdateDelegate();
     }
 
     public void DismissEditor()
