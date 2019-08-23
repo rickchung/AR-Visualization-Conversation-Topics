@@ -14,8 +14,8 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     public PartnerSocket partnerSocket;
     public CodeEditor codeEditor;
 
-    public GameObject ViewContainer;
-    public GameObject codingPanel;
+    [HideInInspector] public GameObject ViewContainer;
+    [HideInInspector] public GameObject codingPanel;
 
     private const float CMD_RUNNING_DELAY = 0.5f;
     public const string CTRL_CLOSE = "close";

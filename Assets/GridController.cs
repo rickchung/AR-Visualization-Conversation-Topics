@@ -7,8 +7,8 @@ public class GridController : MonoBehaviour
     public Transform gridStart, gridEnd;
     public Transform gridCellPrefab;
     public AvatarController avatarController, rivalAvatarController;
-    private Vector3[,] cellCoordinates;  // The coordinate (or map) of the game.
-    private Transform[,] cellObjsOnCoordinates;
+    private Vector3[,] cellCoordinates;  // The real-world map of the game.
+    private Transform[,] cellObjsOnCoordinates;  // The map of grid cells
     private int numInX, numInZ;
 
     void Start()
@@ -89,7 +89,7 @@ public class GridController : MonoBehaviour
     }
 
     /// <summary>
-    /// Transforms the position from the grid coordinate to the real coordinate.
+    /// Transforms a grid coordinate into the corresponding real-world coordinate (Vector3). If the result goes out of the boundary, the method returns null.
     /// </summary>
     /// <returns>The cell to real.</returns>
     /// <param name="x">The x coordinate.</param>
@@ -176,4 +176,6 @@ public class GridController : MonoBehaviour
         }
         return dir;
     }
+
+
 }
