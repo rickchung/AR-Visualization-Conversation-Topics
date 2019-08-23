@@ -227,16 +227,19 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         while (counter < script.Count)
         {
             CodeObjectOneCommand nextCodeObject = script[counter++];
-            RunCommand(nextCodeObject);
-
-            // Send the current command to the remote clients
-            partnerSocket.BroadcastAvatarCtrl(nextCodeObject);
-
+            RunCodeObject(nextCodeObject);
             yield return new WaitForSeconds(CMD_RUNNING_DELAY);
         }
         isScriptRunning = false;
 
         Debug.Log("SCRIPT, The execution of a script has finished");
+    }
+
+    private void RunCodeObject(CodeObjectOneCommand co)
+    {
+        RunCommand(co);
+        // Send the current command to the remote clients
+        partnerSocket.BroadcastAvatarCtrl(co);
     }
 
     /// <summary>
@@ -292,6 +295,14 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         {
             rivalAvatar.ResetPosition();
         }
+    }
+
+    public void SwitchCodeView()
+    {
+        // var tmp1 = scriptTextMesh.transform.parent.gameObject;
+        // tmp1.SetActive(!tmp1.activeSelf);
+        var tmp2 = scriptScroller.gameObject;
+        tmp2.SetActive(!tmp2.activeSelf);
     }
 
     // ====================
@@ -351,5 +362,25 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     {
         LoadPredefinedScript("PROGRAM CONTROL FLOW", false);
         // LoadPredefinedScript("SEQUENTIAL", false);
+    }
+
+    public void _TestAnything(int dir)
+    {
+        switch ((GridController.Direction)dir)
+        {
+            case GridController.Direction.NORTH:
+                RunCodeObject(new CodeObjectOneCommand("MOVE", new string[] { "NORTH" }));
+                break;
+            case GridController.Direction.SOUTH:
+                RunCodeObject(new CodeObjectOneCommand("MOVE", new string[] { "SOUTH" }));
+                break;
+            case GridController.Direction.EAST:
+                RunCodeObject(new CodeObjectOneCommand("MOVE", new string[] { "EAST" }));
+                break;
+            case GridController.Direction.WEST:
+                RunCodeObject(new CodeObjectOneCommand("MOVE", new string[] { "WEST" }));
+                break;
+
+        }
     }
 }

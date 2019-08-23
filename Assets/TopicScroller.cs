@@ -17,7 +17,7 @@ public class TopicScroller : MonoBehaviour, IEnhancedScrollerDelegate
 
     public EnhancedScroller scroller;
     public TopicCellView cellview;
-    public CodeInterpreter codeInterpreter;
+    [HideInInspector] public CodeInterpreter codeInterpreter;
     public Transform problemSolvingWorkspace;
     private Transform cardTemplate;
 
@@ -42,14 +42,16 @@ public class TopicScroller : MonoBehaviour, IEnhancedScrollerDelegate
 
     public void AddTopic(string topic, string speaker)
     {
-        topicList.Insert(0, topic);
-        speakerList.Insert(0, speaker);
-        scroller.ReloadData(scrollPositionFactor: 0.0f);
+        // topicList.Insert(0, topic);
+        // speakerList.Insert(0, speaker);
+        topicList.Add(topic);
+        speakerList.Add(speaker);
+        scroller.ReloadData(scrollPositionFactor: 1.0f);
     }
 
     public void Refresh()
     {
-        scroller.ReloadData(scrollPositionFactor: 0.0f);
+        scroller.ReloadData(scrollPositionFactor: 1.0f);
     }
 
     public void ToggleHistoryCardTimeline()

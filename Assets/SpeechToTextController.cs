@@ -14,9 +14,9 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
 {
     // These variables are assigned in the Unity inspector. They can be None
     // if you don't need the corresponding outputs.
-    public Text transTextOutput;
-    public TMPro.TextMeshPro xrTextContainer;
-    public TMPro.TextMeshPro xrTopicContainer;
+    [HideInInspector] public Text transTextOutput;
+    [HideInInspector] public TMPro.TextMeshPro xrTextContainer;
+    [HideInInspector] public TMPro.TextMeshPro xrTopicContainer;
     // The following two variables should be set at the same time.
     public EnhancedScroller transHistoryScroller;
     public TransCellView transHistoryCellviewPrefab;
