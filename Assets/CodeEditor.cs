@@ -8,13 +8,6 @@ public class CodeEditor : MonoBehaviour
     public LoopEditingArea loopEditingArea;
     private GameObject openedEditorArea;
 
-    private static List<string> availableMoveDirections = new List<string>() {
-        GridController.Direction.NORTH.ToString(),
-        GridController.Direction.SOUTH.ToString(),
-        GridController.Direction.EAST.ToString(),
-        GridController.Direction.WEST.ToString()
-    };
-
     private void Start()
     {
         transform.gameObject.SetActive(false);
@@ -30,12 +23,12 @@ public class CodeEditor : MonoBehaviour
         {
             case "MOVE":
                 Debug.Log("Showing one command editor");
-                oneCmdEditingArea.AttachCodeObject(codeObject, availableMoveDirections);
+                oneCmdEditingArea.AttachCodeObject(codeObject);
                 DispatchRoutine(oneCmdEditingArea.gameObject);
                 break;
             case "LOOP":
                 Debug.Log("Showing loop editor");
-                loopEditingArea.AttachCodeObject(codeObject, null);
+                loopEditingArea.AttachCodeObject(codeObject);
                 DispatchRoutine(loopEditingArea.gameObject);
                 break;
         }

@@ -2,7 +2,7 @@
 
 public interface EditingArea
 {
-    void AttachCodeObject(CodeObjectOneCommand codeObject, List<string> argOptions);
-    void ApplyChangeToCodeObject();
+    void AttachCodeObject(CodeObjectOneCommand codeObject, bool showSubmitBtn);
+    void DismissEditor();
 
 }

@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using EnhancedUI.EnhancedScroller;
 
 public class OneCmdEditingArea : MonoBehaviour, EditingArea
 {
@@ -15,7 +14,14 @@ public class OneCmdEditingArea : MonoBehaviour, EditingArea
 
     private CodeObjectOneCommand attachedCodeObject;
 
-    public void AttachCodeObject(CodeObjectOneCommand codeObject, List<string> argOptions)
+    public static List<string> availableMoveDirections = new List<string>() {
+        GridController.Direction.NORTH.ToString(),
+        GridController.Direction.SOUTH.ToString(),
+        GridController.Direction.EAST.ToString(),
+        GridController.Direction.WEST.ToString()
+    };
+
+    public void AttachCodeObject(CodeObjectOneCommand codeObject, bool showSubmitBtn = true)
     {
         attachedCodeObject = codeObject;
 
@@ -24,19 +30,26 @@ public class OneCmdEditingArea : MonoBehaviour, EditingArea
 
         oneCmdLabel.text = command;
         oneCmdDropdown.ClearOptions();
-        oneCmdDropdown.AddOptions(argOptions);
+        oneCmdDropdown.AddOptions(availableMoveDirections);
         oneCmdDropdown.value = (int)Enum.Parse(typeof(GridController.Direction), args[0]);
+
+        oneCmdSubmitBtn.gameObject.SetActive(showSubmitBtn);
     }
 
-    public void ApplyChangeToCodeObject()
+    public void OnArgChange(int value)
+    {
+        string newCommand = oneCmdLabel.text;
+        int newArg = value;
+        string newArgStr = Enum.ToObject(typeof(GridController.Direction), newArg).ToString();
+
+        attachedCodeObject.SetCommand(newCommand);
+        attachedCodeObject.SetArgs(new string[] { newArgStr });
+    }
+
+    public void DismissEditor()
     {
         if (attachedCodeObject != null)
         {
-            string newCommand = oneCmdLabel.text;
-            int newArg = oneCmdDropdown.value;
-            string newArgStr = Enum.ToObject(typeof(GridController.Direction), newArg).ToString();
-            attachedCodeObject.SetCommand(newCommand);
-            attachedCodeObject.SetArgs(new string[] { newArgStr });
             // Clean up
             attachedCodeObject = null;
             editorDispatcher.DismissEditor();
