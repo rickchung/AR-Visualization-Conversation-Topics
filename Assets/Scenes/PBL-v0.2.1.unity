@@ -169,7 +169,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1621897772}
   m_HandleRect: {fileID: 1621897770}
   m_Direction: 0
-  m_Value: 0
+  m_Value: 1
   m_Size: 0.99999994
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -1019,7 +1019,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.0000009238225, y: 0}
+  m_AnchoredPosition: {x: -0.000029536968, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &160336697
@@ -6055,7 +6055,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.000016265292, y: -0.000012470361}
+  m_AnchoredPosition: {x: -0.000043844728, y: -0.000022597507}
   m_SizeDelta: {x: 210.6, y: 58.353}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &863201691
@@ -7879,26 +7879,6 @@ Prefab:
         type: 2}
       propertyPath: m_isInputParsingRequired
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 114065940837791262, guid: 88fc3744e95c344519eac07016194575,
-        type: 2}
-      propertyPath: m_Color.r
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114065940837791262, guid: 88fc3744e95c344519eac07016194575,
-        type: 2}
-      propertyPath: m_Color.g
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114065940837791262, guid: 88fc3744e95c344519eac07016194575,
-        type: 2}
-      propertyPath: m_Color.b
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114065940837791262, guid: 88fc3744e95c344519eac07016194575,
-        type: 2}
-      propertyPath: m_Color.a
-      value: 0.78431374
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 88fc3744e95c344519eac07016194575, type: 2}
