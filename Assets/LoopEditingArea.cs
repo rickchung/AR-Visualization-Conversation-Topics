@@ -57,15 +57,17 @@ public class LoopEditingArea : MonoBehaviour, EditingArea, IEnhancedScrollerDele
 
     public void ChangeLoopTimes(int value)
     {
-        loopTimes += value;
-        if (loopTimes < 0)
-            loopTimes = 0;
+        int newLoopTimes = loopTimes + value;
+        if (newLoopTimes < 0)
+            newLoopTimes = 0;
+
+        Debug.Log(string.Format(
+            "Code Modified, loopTimes {0}, loopTimes {1}", newLoopTimes, loopTimes));
+
+        loopTimes = newLoopTimes;
         loopTimesLabel.text = "} " + loopTimes + " Times";
 
         // Apply the change to the code object
-        string[] args = attachedCodeObject.GetArgs();
-        args[0] = loopTimes.ToString();
-        attachedCodeObject.SetArgs(args);
         attachedCodeObject.SetLoopTimes(loopTimes);
 
         if (codeViewUpdateDelegate != null)
@@ -73,6 +75,7 @@ public class LoopEditingArea : MonoBehaviour, EditingArea, IEnhancedScrollerDele
     }
 
     // ====================
+    // EnhancedScroller interfaces for the nested command view
 
     public int GetNumberOfCells(EnhancedScroller scroller)
     {

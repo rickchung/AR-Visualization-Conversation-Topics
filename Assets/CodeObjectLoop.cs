@@ -25,6 +25,9 @@ public class CodeObjectLoop : CodeObjectOneCommand
     public void SetLoopTimes(int value)
     {
         loopTimes = value;
+        string[] args = GetArgs();
+        args[0] = loopTimes.ToString();
+        SetArgs(args);
     }
 
     public int GetNumOfNestedCmd()

@@ -45,6 +45,12 @@ public class OneCmdEditingArea : MonoBehaviour, EditingArea
         int newArg = value;
         string newArgStr = Enum.ToObject(typeof(GridController.Direction), newArg).ToString();
 
+        Debug.Log(string.Format(
+            "Code Modified, {0}, {1}",
+            newCommand + " " + newArgStr,
+            attachedCodeObject.GetCommand() + " " + attachedCodeObject.GetArgString()
+        ));
+
         attachedCodeObject.SetCommand(newCommand);
         attachedCodeObject.SetArgs(new string[] { newArgStr });
 

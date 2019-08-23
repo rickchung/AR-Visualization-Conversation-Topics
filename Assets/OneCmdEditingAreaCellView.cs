@@ -42,8 +42,7 @@ public class OneCmdEditingAreaCellView : EnhancedScrollerCellView
             string newArgStr = Enum.ToObject(typeof(GridController.Direction), newArg).ToString();
 
             Debug.Log(
-                "Code Modified , " +
-                attachedCodeObject.GetArgString() + " , " + newArgStr
+                string.Format("Code Modified, {0}, {1}", newArgStr, attachedCodeObject.GetArgString())
             );
 
             attachedCodeObject.SetArgs(new string[] { newArgStr });
