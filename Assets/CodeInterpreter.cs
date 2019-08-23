@@ -283,7 +283,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
             StopRunningScript();
             avatar.ResetPosition();
             // Broadcast your reset message
-            CodeObjectOneCommand resetCmd = new CodeObjectOneCommand("RESET_POS", null);
+            CodeObjectOneCommand resetCmd = new CodeObjectOneCommand("RESET_POS", new string[] { });
             partnerSocket.BroadcastAvatarCtrl(resetCmd);
 
             Debug.Log("SCRIPT, Reset Avater");
