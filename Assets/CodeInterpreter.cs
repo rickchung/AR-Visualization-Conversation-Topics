@@ -17,12 +17,13 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     public GameObject ViewContainer;
     public GameObject codingPanel;
 
-
     private const float CMD_RUNNING_DELAY = 0.5f;
     public const string CTRL_CLOSE = "close";
 
     private ScriptObject loadedScript;
     private Dictionary<string, float> scriptVariables;
+
+    private bool isScriptRunning;
 
     void Start()
     {
@@ -131,8 +132,18 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     {
         if (loadedScript != null)
         {
+            StopRunningScript();
             avatar.ResetPosition();
             _RunScript(loadedScript);
+        }
+    }
+
+    private void StopRunningScript()
+    {
+        if (isScriptRunning)
+        {
+            StopCoroutine("_RunScriptCoroutine");
+            isScriptRunning = false;
         }
     }
 
@@ -159,7 +170,8 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
 
         // Run the script
         ResetVariableList();
-        StartCoroutine(_RunScriptCoroutine(procScript));
+        StartCoroutine("_RunScriptCoroutine", procScript);
+        isScriptRunning = true;
     }
 
     /// <summary>
@@ -249,6 +261,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
 
     public void ResetAvatars()
     {
+        StopRunningScript();
         avatar.ResetPosition();
         rivalAvatar.ResetPosition();
     }
