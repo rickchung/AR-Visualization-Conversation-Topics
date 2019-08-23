@@ -134,23 +134,45 @@ public class GridController : MonoBehaviour
     /// </summary>
     /// <param name="direction"></param>
     /// <returns></returns>
-    public Direction GetDirFromString(string direction)
+    public Direction GetDirFromString(string direction, bool mirror = false)
     {
         Direction dir = Direction.UNKNOWN;
-        switch (direction)
+
+        if (!mirror)
         {
-            case "NORTH":
-                dir = Direction.NORTH;
-                break;
-            case "SOUTH":
-                dir = Direction.SOUTH;
-                break;
-            case "WEST":
-                dir = Direction.WEST;
-                break;
-            case "EAST":
-                dir = Direction.EAST;
-                break;
+            switch (direction)
+            {
+                case "NORTH":
+                    dir = Direction.NORTH;
+                    break;
+                case "SOUTH":
+                    dir = Direction.SOUTH;
+                    break;
+                case "WEST":
+                    dir = Direction.WEST;
+                    break;
+                case "EAST":
+                    dir = Direction.EAST;
+                    break;
+            }
+        }
+        else
+        {
+            switch (direction)
+            {
+                case "NORTH":
+                    dir = Direction.SOUTH;
+                    break;
+                case "SOUTH":
+                    dir = Direction.NORTH;
+                    break;
+                case "WEST":
+                    dir = Direction.EAST;
+                    break;
+                case "EAST":
+                    dir = Direction.WEST;
+                    break;
+            }
         }
         return dir;
     }

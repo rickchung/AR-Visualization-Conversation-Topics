@@ -18,7 +18,7 @@ public class AvatarController : MonoBehaviour
     /// <param name="dir"></param>
     public void Move(string dir)
     {
-        MoveInDir(gridController.GetDirFromString(dir));
+        MoveInDir(gridController.GetDirFromString(dir, mirror: isRival));
     }
 
     /// <summary>
@@ -68,7 +68,7 @@ public class AvatarController : MonoBehaviour
         }
 
         Vector3 avatarPos = startingCellInGrid.localPosition;
-        avatarPos.y = 0.05f;
+        avatarPos.y = AVATAR_Y_POS;
         avatar.localPosition = avatarPos;
         cellPos = startingCellInVec;
     }
