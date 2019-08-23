@@ -132,18 +132,20 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     {
         if (loadedScript != null)
         {
-            StopRunningScript();
-            avatar.ResetPosition();
-            _RunScript(loadedScript);
+            if (isScriptRunning == false)
+            {
+                Debug.Log("SCRIPT, Start running the loaded script");
+                ResetAvatars();
+                _RunScript(loadedScript);
+            }
+            else
+            {
+                Debug.Log("WARNING, A script is running but trying to re-run it");
+            }
         }
-    }
-
-    private void StopRunningScript()
-    {
-        if (isScriptRunning)
+        else
         {
-            StopCoroutine("_RunScriptCoroutine");
-            isScriptRunning = false;
+            Debug.Log("ERROR, No loaded script found.");
         }
     }
 
@@ -172,6 +174,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         ResetVariableList();
         StartCoroutine("_RunScriptCoroutine", procScript);
         isScriptRunning = true;
+
     }
 
     /// <summary>
@@ -231,6 +234,9 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
 
             yield return new WaitForSeconds(CMD_RUNNING_DELAY);
         }
+        isScriptRunning = false;
+
+        Debug.Log("SCRIPT, The execution of a script has finished");
     }
 
     /// <summary>
@@ -241,7 +247,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     {
         AvatarController runner = (!forRival) ? avatar : rivalAvatar;
 
-        Debug.Log(string.Format("Running Cmd, {0}, {1}", forRival, codeObject));
+        Debug.Log(string.Format("SCRIPT, Running Cmd, {0}, {1}", forRival, codeObject));
 
         string command = codeObject.GetCommand();
         string[] args = codeObject.GetArgs();
@@ -259,11 +265,33 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         scriptVariables.Clear();
     }
 
-    public void ResetAvatars()
+    private void StopRunningScript()
     {
-        StopRunningScript();
-        avatar.ResetPosition();
-        rivalAvatar.ResetPosition();
+        if (isScriptRunning)
+        {
+            StopCoroutine("_RunScriptCoroutine");
+            isScriptRunning = false;
+
+            Debug.Log("SCRIPT, Script is Interrupted");
+        }
+    }
+
+    public void ResetAvatars(bool forRival = false)
+    {
+        if (!forRival)
+        {
+            StopRunningScript();
+            avatar.ResetPosition();
+            // Broadcast your reset message
+            CodeObjectOneCommand resetCmd = new CodeObjectOneCommand("RESET_POS", null);
+            partnerSocket.BroadcastAvatarCtrl(resetCmd);
+
+            Debug.Log("SCRIPT, Reset Avater");
+        }
+        else
+        {
+            rivalAvatar.ResetPosition();
+        }
     }
 
     // ====================

@@ -196,7 +196,7 @@ public class PartnerSocket : MonoBehaviour
         // Otherwise, send back the command to the local rival avatar
         else
         {
-            mCodeInterpreter.RunCommand(code, forRival: true);
+            ProcessAvtarCtrl(code);
         }
     }
 
@@ -328,6 +328,18 @@ public class PartnerSocket : MonoBehaviour
     {
         var ctrlCmd = netMsg.ReadMessage<StringMessage>().value;
         CodeObjectOneCommand co = CodeObjectOneCommand.FromNetMessage(ctrlCmd);
-        mCodeInterpreter.RunCommand(co, forRival: true);
+        ProcessAvtarCtrl(co);
+    }
+
+    private void ProcessAvtarCtrl(CodeObjectOneCommand co)
+    {
+        if (co.GetCommand().Equals("RESET_POS"))
+        {
+            mCodeInterpreter.ResetAvatars(forRival: true);
+        }
+        else
+        {
+            mCodeInterpreter.RunCommand(co, forRival: true);
+        }
     }
 }
