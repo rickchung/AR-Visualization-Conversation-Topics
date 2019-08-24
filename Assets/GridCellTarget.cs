@@ -4,12 +4,18 @@ using UnityEngine;
 
 public class GridCellTarget : MonoBehaviour
 {
-    public GridController gridController;
+    private GridCellType cellType = GridCellType.REWARD;
     private Transform flagPole;
+    private GridCellUpdateDelegate updateDelegate;
 
     void Start()
     {
         flagPole = transform.Find("FlagPole");
+    }
+
+    public void SetUpdateDelegate(GridCellUpdateDelegate d)
+    {
+        updateDelegate = d;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -18,6 +24,10 @@ public class GridCellTarget : MonoBehaviour
         {
             Debug.Log(string.Format("GRID, {0}, Target Collected", other.name));
             flagPole.gameObject.SetActive(false);
+            if (updateDelegate != null)
+            {
+                updateDelegate(this.cellType);
+            }
         }
     }
 

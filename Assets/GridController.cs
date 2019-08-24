@@ -1,18 +1,29 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
+using System.IO;
 using UnityEngine;
+
+public enum GridCellType { BASE, TRAP, REWARD };
+public delegate void GridCellUpdateDelegate(GridCellType cellType);
 
 public class GridController : MonoBehaviour
 {
     public Transform gridStart, gridEnd;
-    public Transform gridCellPrefab;
+    public Transform gridCellPrefab, gridCellTargetPrefab, girdCellTrapPrefab;
     public AvatarController avatarController, rivalAvatarController;
-    private Vector3[,] cellCoordinates;  // The real-world map of the game.
-    private Transform[,] cellObjsOnCoordinates;  // The map of grid cells
+    private Vector3[,] cellVectorMap;  // The real-world map of the game.
+    private Transform[,] cellObjectsMap;  // The map of grid cells
+    private GridCellType[,] cellTypeMap;
     private int numInX, numInZ;
 
     void Start()
     {
+        GenerateDefaultMap();
+    }
+
+    private void GenerateDefaultMap()
+    {
+        Debug.Log("GRID, Loading a default map");
+
         Vector3 startingPoint = gridStart.localPosition;
         Vector3 endPoint = gridEnd.localPosition;
         float distX = Mathf.Abs(startingPoint.x - endPoint.x);
@@ -27,8 +38,9 @@ public class GridController : MonoBehaviour
         Debug.Log("Grid Step Size: " + stepSize);
         Debug.Log("Grid: numInX=" + numInX + ", numInZ=" + numInZ);
 
-        cellCoordinates = new Vector3[numInX, numInZ];
-        cellObjsOnCoordinates = new Transform[numInX, numInZ];
+        cellVectorMap = new Vector3[numInX, numInZ];
+        cellObjectsMap = new Transform[numInX, numInZ];
+        cellTypeMap = new GridCellType[numInX, numInZ];
 
         // Generate grid cells
         for (int x = 0; x < numInX; x++)
@@ -44,10 +56,12 @@ public class GridController : MonoBehaviour
                 newPos.x = newPos.x + x * (stepSize + padding);
                 newPos.z = newPos.z - z * (stepSize + padding);
                 newCell.transform.localPosition = newPos;
-                newCell.name = "Cell" + x + z;
+                newCell.name = "CellClone";
+                newCell.gameObject.SetActive(true);
 
-                cellCoordinates[x, z] = newPos;
-                cellObjsOnCoordinates[x, z] = newCell;
+                cellVectorMap[x, z] = newPos;
+                cellObjectsMap[x, z] = newCell;
+                cellTypeMap[x, z] = GridCellType.BASE;
             }
         }
 
@@ -58,19 +72,173 @@ public class GridController : MonoBehaviour
         // When the grid is ready, reset the positions of avatars
         avatarController.ResetPosition();
         rivalAvatarController.ResetPosition();
+
+        // // Testing export function
+        // ExportGridAndProblem(cellTypeMap, "Default.map.txt");
+        // ImportGridAndProblem("Default.map.txt");
     }
 
-    // ====================
-    // Coordinate-related
+    private void GenerateMapFromCells(GridCellType[,] cells)
+    {
+        // Map geo info
+        var startingPoint = gridStart.localPosition;
+        var endPoint = gridEnd.localPosition;
+        var distX = Mathf.Abs(startingPoint.x - endPoint.x);
+        var distZ = Mathf.Abs(startingPoint.z - endPoint.z);
+        var stepSize = gridStart.localScale.x;
+        var padding = stepSize * 0.10f;
+        numInX = cells.GetLength(0);
+        numInZ = cells.GetLength(1);
+
+        // Init map objects
+        cellVectorMap = new Vector3[numInX, numInZ];
+        cellObjectsMap = new Transform[numInX, numInZ];
+        cellTypeMap = cells;
+
+        // Generate grid cells
+        for (var x = 0; x < numInX; x++)
+        {
+            for (var z = 0; z < numInZ; z++)
+            {
+                var cellType = cellTypeMap[x, z];
+                Transform cellPrefab;
+                switch (cellType)
+                {
+                    case GridCellType.REWARD:
+                        cellPrefab = gridCellTargetPrefab;
+                        break;
+                    case GridCellType.TRAP:
+                        cellPrefab = girdCellTrapPrefab;
+                        break;
+                    default:
+                        cellPrefab = gridCellPrefab;
+                        break;
+                }
+
+                Transform newCell = (Transform)Instantiate(
+                    original: cellPrefab,
+                    parent: transform,
+                    instantiateInWorldSpace: false
+                );
+                // Set the position
+                Vector3 newPos = startingPoint;
+                newPos.x = newPos.x + x * (stepSize + padding);
+                newPos.z = newPos.z - z * (stepSize + padding);
+                newCell.transform.localPosition = newPos;
+                newCell.name = "CellClone";
+                newCell.gameObject.SetActive(true);
+                // Save for future references
+                cellVectorMap[x, z] = newPos;
+                cellObjectsMap[x, z] = newCell;
+                cellTypeMap[x, z] = GridCellType.BASE;
+            }
+        }
+
+        // Deactivate the starting and end cells
+        gridStart.gameObject.SetActive(false);
+        gridEnd.gameObject.SetActive(false);
+        // When the grid is ready, reset the positions of avatars
+        avatarController.ResetPosition();
+        rivalAvatarController.ResetPosition();
+    }
+
+    public void LoadGridMap(string mapName)
+    {
+        RemoveGridMap();
+
+        if (mapName.Equals("default"))
+        {
+            GenerateDefaultMap();
+        }
+        else
+        {
+            var map = ImportGridAndProblem(mapName);
+            GenerateMapFromCells(map);
+        }
+    }
+
+    private void RemoveGridMap()
+    {
+        foreach (Transform o in transform)
+            if (o.name.Equals("CellClone"))
+                Destroy(o.gameObject);
+    }
+
+    // ==================== Problem-Design Utilities ====================
+
+    private void GridCellUpdateCallback(GridCellType cellType)
+    {
+        switch (cellType)
+        {
+            case GridCellType.TRAP:
+                break;
+            case GridCellType.REWARD:
+                break;
+            case GridCellType.BASE:
+                break;
+        }
+    }
+
+    private static void ExportGridAndProblem(GridCellType[,] map, string mapName)
+    {
+        var cellNumInX = map.GetLength(0);
+        var cellNumInZ = map.GetLength(1);
+        var mapStr = cellNumInX + "\n" + cellNumInZ + "\n";
+        for (int i = 0; i < cellNumInX; i++)
+        {
+            for (int j = 0; j < cellNumInZ; j++)
+            {
+                mapStr += ((int)map[i, j]).ToString();
+            }
+            mapStr += "\n";
+        }
+
+        var path = Path.Combine("Assets", "Resources");
+        path = Path.Combine(path, mapName);
+        var writer = new StreamWriter(path, false);
+        writer.WriteLine(mapStr);
+        writer.Close();
+
+        Debug.Log(string.Format("FILE, Export a map as {0}", path));
+    }
+
+    private static GridCellType[,] ImportGridAndProblem(string mapName)
+    {
+        var path = Path.Combine("Assets", "Resources");
+        path = Path.Combine(path, mapName);
+
+        var reader = new StreamReader(path);
+        var cellNumInX = int.Parse(reader.ReadLine());
+        var cellNumInZ = int.Parse(reader.ReadLine());
+        var importedCellMap = new GridCellType[cellNumInX, cellNumInZ];
+
+        for (int i = 0; i < cellNumInX; i++)
+        {
+            var row = reader.ReadLine();
+            var rowCells = row.ToCharArray();
+            for (int j = 0; j < cellNumInZ; j++)
+            {
+                importedCellMap[i, j] = (GridCellType)Char.GetNumericValue(rowCells[j]);
+            }
+        }
+
+        Debug.Log(string.Format(
+            "GRID, Loading a map from {0}", path
+        ));
+
+        return importedCellMap;
+    }
+
+    // ==================== Coordinate Transformation ====================
 
     public Transform GetTheLastCellInGrid()
     {
-        return cellObjsOnCoordinates[numInX - 1, numInZ - 1];
+        return cellObjectsMap[numInX - 1, numInZ - 1];
     }
 
     public Transform GetTheFirstCellInGrid()
     {
-        return cellObjsOnCoordinates[0, 0];
+        return cellObjectsMap[0, 0];
     }
 
     public Vector3 GetSizeOfCoor()
@@ -96,9 +264,9 @@ public class GridController : MonoBehaviour
     /// <param name="z">The z coordinate.</param>
     public Vector3? TransformCellCoorToPos(int x, int z)
     {
-        if (x < 0 || z < 0 || x >= cellCoordinates.GetLength(0) || z >= cellCoordinates.GetLength(1))
+        if (x < 0 || z < 0 || x >= cellVectorMap.GetLength(0) || z >= cellVectorMap.GetLength(1))
             return null;
-        return cellCoordinates[x, z];
+        return cellVectorMap[x, z];
     }
 
     /// <summary>
@@ -176,6 +344,4 @@ public class GridController : MonoBehaviour
         }
         return dir;
     }
-
-
 }

@@ -60,8 +60,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         SetActiveTopicView(false, true);
     }
 
-    // ====================
-    // Interfaces of script operations
+    // ==================== Interfaces of script operations ====================
 
     /// <summary>
     /// Load the predefined script template specified by <paramref name="scriptName"/>.
@@ -122,8 +121,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         }
     }
 
-    // ====================
-    // Internal code compiler
+    // ==================== Internal code compiler ====================
 
     /// <summary>
     /// Run the loaded script.
@@ -305,8 +303,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         tmp2.SetActive(!tmp2.activeSelf);
     }
 
-    // ====================
-    // Implementation of EnhancedScroller interfaces
+    // ==================== Implementation of EnhancedScroller interfaces ====================
 
     public int GetNumberOfCells(EnhancedScroller scroller)
     {
