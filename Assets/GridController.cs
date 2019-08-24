@@ -101,25 +101,26 @@ public class GridController : MonoBehaviour
             for (var z = 0; z < numInZ; z++)
             {
                 var cellType = cellTypeMap[x, z];
-                Transform cellPrefab;
+                Transform newCell;
                 switch (cellType)
                 {
                     case GridCellType.REWARD:
-                        cellPrefab = gridCellTargetPrefab;
+                        newCell = (Transform)Instantiate(gridCellTargetPrefab, transform, false);
+                        newCell.GetComponent<GridCellTarget>().SetUpdateDelegate(
+                            GridCellUpdateCallback
+                        );
                         break;
                     case GridCellType.TRAP:
-                        cellPrefab = girdCellTrapPrefab;
+                        newCell = (Transform)Instantiate(girdCellTrapPrefab, transform, false);
+                        newCell.GetComponent<GridCellTrap>().SetUpdateDelegate(
+                            GridCellUpdateCallback
+                        );
                         break;
                     default:
-                        cellPrefab = gridCellPrefab;
+                        newCell = (Transform)Instantiate(gridCellPrefab, transform, false);
                         break;
                 }
 
-                Transform newCell = (Transform)Instantiate(
-                    original: cellPrefab,
-                    parent: transform,
-                    instantiateInWorldSpace: false
-                );
                 // Set the position
                 Vector3 newPos = startingPoint;
                 newPos.x = newPos.x + x * (stepSize + padding);
@@ -171,8 +172,10 @@ public class GridController : MonoBehaviour
         switch (cellType)
         {
             case GridCellType.TRAP:
+                Debug.Log("GRID, A trap called back");
                 break;
             case GridCellType.REWARD:
+                Debug.Log("GRID, A reward called back");
                 break;
             case GridCellType.BASE:
                 break;
