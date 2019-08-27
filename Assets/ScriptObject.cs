@@ -1,6 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 
+/// <summary>
+/// ScriptObject collects CodeObjectOneCommand objects in a list, which acts like a programming script.
+/// </summary>
 public class ScriptObject : IEnumerable
 {
     private List<CodeObjectOneCommand> mScript;

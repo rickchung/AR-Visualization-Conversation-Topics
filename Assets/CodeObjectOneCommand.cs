@@ -13,14 +13,52 @@
 
     // ====================
 
-    public string GetCommand()
+    /// <summary>
+    /// Get the command of this code object. The richtext flag specifies whether to return the string command reflecting the state of this code object. For example, when the code is disabled, the string will show in a faded font.
+    /// </summary>
+    /// <param name="richtext"></param>
+    /// <returns></returns>
+    public string GetCommand(bool richtext = false)
     {
-        return command;
+        var rt = command;
+
+        if (!richtext)
+            return rt;
+
+        if (!disabled)
+            return rt;
+        else
+            return string.Format("<alpha=#44><s>{0}</s><alpha=#FF>", rt);
     }
 
     public string[] GetArgs()
     {
         return args;
+    }
+
+    /// <summary>
+    /// Return the arg of this code as a string. The richtext flag specifies whether to return the string command reflecting the state of this code object. For example, when the code is disabled, the string will show in a faded font.
+    virtual public string GetArgString(bool richtext = false)
+    {
+        var rt = "(" + string.Join(",", args) + ")";
+
+        if (richtext && IsDisabled())
+        {
+            rt = string.Format("<alpha=#44><s>{0}</s><alpha=#FF>", rt);
+        }
+
+        return rt;
+    }
+
+
+    public bool IsDisabled()
+    {
+        return this.disabled;
+    }
+
+    virtual public int GetLength()
+    {
+        return GetArgs().Length;
     }
 
     public void SetCommand(string command)
@@ -38,16 +76,6 @@
         this.disabled = disabled;
     }
 
-    public bool IsDisabled()
-    {
-        return this.disabled;
-    }
-
-    virtual public int GetLength()
-    {
-        return GetArgs().Length;
-    }
-
     // ====================
 
     override public string ToString()
@@ -61,10 +89,6 @@
         return command + " " + argstr + ";";
     }
 
-    virtual public string GetArgString()
-    {
-        return "(" + string.Join(",", args) + ")";
-    }
 
     // ====================
 

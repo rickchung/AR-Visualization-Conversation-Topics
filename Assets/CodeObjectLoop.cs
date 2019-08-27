@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
+/// <summary>
+/// This is a specific CodeObject designed for loop commands.
+/// </summary>
 public class CodeObjectLoop : CodeObjectOneCommand
 {
     private List<CodeObjectOneCommand> nestedCommands;
@@ -12,9 +15,21 @@ public class CodeObjectLoop : CodeObjectOneCommand
         loopTimes = Int32.Parse(args[0]);
     }
 
+    /// <summary>
+    /// Get the nested commands in this loop excluding disabled commands.
+    /// </summary>
+    /// <returns></returns>
     public List<CodeObjectOneCommand> GetNestedCommands()
     {
-        return nestedCommands;
+        var rtList = new List<CodeObjectOneCommand>();
+        foreach (var c in nestedCommands)
+        {
+            if (!c.IsDisabled())
+            {
+                rtList.Add(c);
+            }
+        }
+        return rtList;
     }
 
     public int GetLoopTimes()
@@ -40,13 +55,12 @@ public class CodeObjectLoop : CodeObjectOneCommand
         return GetNumOfNestedCmd() + 1;
     }
 
-
     override public string ConvertCodetoString()
     {
         return "LOOP " + GetArgString() + ";";
     }
 
-    override public string GetArgString()
+    override public string GetArgString(bool richtext = false)
     {
         string rt = "";
         string numRepeat = loopTimes.ToString();
@@ -54,9 +68,14 @@ public class CodeObjectLoop : CodeObjectOneCommand
         rt += "REPEAT {\n";
         foreach (CodeObjectOneCommand c in nestedCommands)
         {
-            rt += "    " + c.ToString() + "\n";
+            rt += "    " + c.GetCommand(richtext) + " " + c.GetArgString(richtext) + "\n";
         }
         rt += "} " + numRepeat + " Times";
+
+        if (richtext && IsDisabled())
+        {
+            rt = string.Format("<alpha=#44><s>{0}</s><alpha=#FF>", rt);
+        }
 
         return rt;
     }

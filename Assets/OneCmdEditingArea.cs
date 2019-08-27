@@ -36,7 +36,9 @@ public class OneCmdEditingArea : MonoBehaviour, EditingArea
         oneCmdLabel.text = command;
         oneCmdDropdown.ClearOptions();
         oneCmdDropdown.AddOptions(availableMoveDirections);
-        oneCmdDropdown.value = (int)Enum.Parse(typeof(GridController.Direction), args[0]);
+        oneCmdDropdown.value = (int)Enum.Parse(
+            typeof(GridController.Direction), args[0]
+        );
 
         codeToggle.isOn = !attachedCodeObject.IsDisabled();
 
@@ -77,7 +79,8 @@ public class OneCmdEditingArea : MonoBehaviour, EditingArea
         attachedCodeObject.SetDisabled(!value);
 
         Debug.Log(string.Format(
-           "Code Disabled, {0}, {1}", newCommand, value
+           "Code Disabled, {0}, {1}",
+           attachedCodeObject.ToString(), value
         ));
 
         if (codeViewUpdateDelegate != null)

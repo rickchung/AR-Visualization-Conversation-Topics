@@ -17,7 +17,7 @@ public class CodeEditor : MonoBehaviour
 
     public void DispatchEditor(CodeObjectOneCommand codeObject)
     {
-        Debug.Log("Modifying code: " + codeObject.ToString());
+        Debug.Log("Open code editor for: " + codeObject.ToString());
 
         switch (codeObject.GetCommand())
         {
