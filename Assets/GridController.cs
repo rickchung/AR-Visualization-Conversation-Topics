@@ -14,10 +14,25 @@ public class GridController : MonoBehaviour
     private Transform[,] cellObjectsMap;  // The map of grid cells
     private GridCellType[,] cellTypeMap;
     private int numInX, numInZ;
+    private static string dataFolderPath;
 
     void Start()
     {
         GenerateDefaultMap();
+
+        // Load predefined maps to the data folder
+        dataFolderPath = Application.persistentDataPath;
+        string[] predefinedMaps = { "Default1.OgMap", "Default2.OgMap" };
+        foreach (var s in predefinedMaps)
+        {
+            var path = Path.Combine(dataFolderPath, s) + ".txt";
+            var txt = (TextAsset)Resources.Load(s, typeof(TextAsset));
+            using (var writer = new StreamWriter(path))
+            {
+                writer.Write(txt.text);
+            }
+            Debug.Log("Saving a predefined map to " + path);
+        }
     }
 
     private void GenerateDefaultMap()
@@ -72,10 +87,6 @@ public class GridController : MonoBehaviour
         // When the grid is ready, reset the positions of avatars
         avatarController.ResetPosition();
         rivalAvatarController.ResetPosition();
-
-        // // Testing export function
-        // ExportGridAndProblem(cellTypeMap, "Default.map.txt");
-        // ImportGridAndProblem("Default.map.txt");
     }
 
     private void GenerateMapFromCells(GridCellType[,] cells)
@@ -196,8 +207,7 @@ public class GridController : MonoBehaviour
             mapStr += "\n";
         }
 
-        var path = Path.Combine("Assets", "Resources");
-        path = Path.Combine(path, mapName);
+        var path = Path.Combine(dataFolderPath, mapName);
         var writer = new StreamWriter(path, false);
         writer.WriteLine(mapStr);
         writer.Close();
@@ -207,8 +217,7 @@ public class GridController : MonoBehaviour
 
     private static GridCellType[,] ImportGridAndProblem(string mapName)
     {
-        var path = Path.Combine("Assets", "Resources");
-        path = Path.Combine(path, mapName);
+        var path = Path.Combine(dataFolderPath, mapName);
 
         var reader = new StreamReader(path);
         var cellNumInX = int.Parse(reader.ReadLine());

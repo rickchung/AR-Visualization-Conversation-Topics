@@ -25,17 +25,34 @@ public class ScriptObject : IEnumerable
 
     override public string ToString()
     {
+        return ToString(richtext: true);
+    }
+
+    public string ToString(bool richtext)
+    {
         string rt = "";
 
-        int lineNumber = 1;
-        foreach (CodeObjectOneCommand c in mScript)
+        if (richtext)
         {
-            string codeString = c.ConvertCodetoString();
-
-            rt += "<color=#24A0FF>L" + lineNumber.ToString() + "</color>: " + codeString + "\n\n";
-            lineNumber += 1;
+            int lineNumber = 1;
+            foreach (CodeObjectOneCommand c in mScript)
+            {
+                string codeString = c.ConvertCodetoString();
+                rt += "<color=#24A0FF>L" + lineNumber.ToString() + "</color>: " + codeString + "\n";
+                lineNumber += 1;
+            }
         }
-
+        else
+        {
+            int lineNumber = 1;
+            foreach (CodeObjectOneCommand c in mScript)
+            {
+                string codeString = c.ConvertCodetoString();
+                rt += codeString + "\n";
+                lineNumber += 1;
+            }
+        }
         return rt;
+
     }
 }

@@ -1,4 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.IO;
+using System.Collections;
+using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -25,13 +28,31 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
 
     private bool isScriptRunning;
 
+    private static string dataFolderPath;
+
+
     void Start()
     {
         scriptVariables = new Dictionary<string, float>();
         CloseTopicViewAndBroadcast();
 
+        // Init the script scroller
         scriptScroller.Delegate = this;
         scriptScroller.ReloadData(scrollPositionFactor: 0.0f);
+
+        // Load predefined scripts to the data folder
+        dataFolderPath = Application.persistentDataPath;
+        string[] predefinedMaps = { "Default1.OgScript", "Default2.OgScript" };
+        foreach (var s in predefinedMaps)
+        {
+            var path = Path.Combine(dataFolderPath, s) + ".txt";
+            var txt = (TextAsset)Resources.Load(s, typeof(TextAsset));
+            using (var writer = new StreamWriter(path))
+            {
+                writer.Write(txt.text);
+            }
+            Debug.Log("Saving a predefined script to " + path);
+        }
     }
 
     public UnityAction GetTopicButtonEvent(string topic)
@@ -68,52 +89,13 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     /// <param name="scriptName">Script name.</param>
     public void LoadPredefinedScript(string scriptName, bool broadcast = false)
     {
-        ScriptObject script = null;
-        switch (scriptName)
+        ScriptObject script = ImportScriptObject(scriptName);
+        if ((loadedScript = script) != null)
         {
-            case "PROGRAM CONTROL FLOW":
-            case "THE WHILE LOOP":
-            case "THE FOR LOOP":
-            case "THE FOREACH LOOP":
-            case "THE DO...WHILE LOOP":
-                script = new ScriptObject(new List<CodeObjectOneCommand>() {
-                    new CodeObjectOneCommand("MOVE", new string[] {"EAST"}),
-                    new CodeObjectLoop(
-                        "LOOP",
-                        new string[] {"3"},
-                        new List<CodeObjectOneCommand>() {
-                            new CodeObjectOneCommand("MOVE", new string[] {"SOUTH"}),
-                            new CodeObjectOneCommand("MOVE", new string[] {"EAST"}),
-                        }
-                    ),
-                    new CodeObjectLoop(
-                        "LOOP",
-                        new string[] {"2"},
-                        new List<CodeObjectOneCommand>() {
-                            new CodeObjectOneCommand("MOVE", new string[] {"WEST"}),
-                        }
-                    ),
-                    new CodeObjectLoop(
-                        "LOOP",
-                        new string[] {"3"},
-                        new List<CodeObjectOneCommand>() {
-                            new CodeObjectOneCommand("MOVE", new string[] {"NORTH"}),
-                            new CodeObjectOneCommand("MOVE", new string[] {"EAST"}),
-                        }
-                    ),
-                });
-                break;
-            default:
-                Debug.LogError("The script " + scriptName + " does not exist.");
-                break;
-        }
+            Debug.Log("SCRIPT, " + scriptName + " is imported,\n" + loadedScript.ToString());
 
-        loadedScript = script;
-        if (loadedScript != null)
-        {
             // Display the script
             UpdateCodeViewer();
-
             // Enable the viewer
             SetActiveTopicView(true, broadcast: false);
             // Enable the viewer on the remote device
@@ -121,7 +103,86 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         }
     }
 
-    // ==================== Internal code compiler ====================
+    // ==================== File IO for Interpreter ====================
+
+    private static void ExportScriptObject(ScriptObject script, string scriptName)
+    {
+        var scriptString = script.ToString(richtext: false);
+        var path = Path.Combine(dataFolderPath, scriptName);
+        using (var writer = new StreamWriter(path, false))
+        {
+            writer.WriteLine(scriptString);
+            writer.Close();
+        }
+    }
+
+    private static ScriptObject ImportScriptObject(string scriptName)
+    {
+        var path = Path.Combine(dataFolderPath, scriptName);
+        ScriptObject rt = null;
+        using (var reader = new StreamReader(path))
+        {
+            rt = ProcessCode(reader);
+        }
+        return rt;
+    }
+
+    private static ScriptObject ProcessCode(StreamReader reader)
+    {
+        var codeList = new List<CodeObjectOneCommand>();
+        while (reader.Peek() > 0)
+        {
+            var line = reader.ReadLine();
+            var code = _ProcessOneLine(line, reader);
+            if (code != null)
+                codeList.Add(code);
+        }
+        return new ScriptObject(codeList); ;
+    }
+
+    private static Regex regexMove = new Regex(@"MOVE \((?<param>\w+)\);");
+    private static Regex regexLoopStart = new Regex(@"LOOP REPEAT {");
+    private static Regex regexLoopEnd = new Regex(@"} (?<times>\d) Times;");
+    private static CodeObjectOneCommand _ProcessOneLine(string oneLine, StreamReader reader)
+    {
+        // Try to match a move command
+        var matchMove = regexMove.Matches(oneLine);
+        if (matchMove.Count > 0)
+        {
+            return new CodeObjectOneCommand(
+                "MOVE", new string[] { matchMove[0].Groups["param"].Value }
+            );
+        }
+        // Try to match a loop command
+        var matchLoopStart = regexLoopStart.Matches(oneLine);
+        if (matchLoopStart.Count > 0)
+        {
+            var loopNestedCode = new List<CodeObjectOneCommand>();
+            while (reader.Peek() > 0)
+            {
+                var aNestedLine = reader.ReadLine();
+                var nestedCode = _ProcessOneLine(aNestedLine, reader);
+                if (nestedCode != null)
+                {
+                    loopNestedCode.Add(nestedCode);
+                }
+
+                var matchLoopEnd = regexLoopEnd.Matches(aNestedLine);
+                if (matchLoopEnd.Count > 0)
+                {
+                    return new CodeObjectLoop(
+                        "LOOP",
+                        new string[] { matchLoopEnd[0].Groups["times"].Value },
+                        loopNestedCode
+                    ); ;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    // ==================== Code Interpreter ====================
 
     /// <summary>
     /// Run the loaded script.
@@ -355,10 +416,9 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
 
     // ====================
 
-    public void _TestLoadingScript()
+    public void _TestLoadingScript(string scriptName)
     {
-        LoadPredefinedScript("PROGRAM CONTROL FLOW", false);
-        // LoadPredefinedScript("SEQUENTIAL", false);
+        LoadPredefinedScript(scriptName, broadcast: false);
     }
 
     public void _TestAnything(int dir)

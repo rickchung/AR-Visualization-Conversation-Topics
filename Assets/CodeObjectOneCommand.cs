@@ -46,7 +46,7 @@
     virtual public string ConvertCodetoString()
     {
         string argstr = GetArgString();
-        return command + " " + argstr;
+        return command + " " + argstr + ";";
     }
 
     virtual public string GetArgString()

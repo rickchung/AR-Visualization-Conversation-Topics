@@ -43,7 +43,7 @@ public class CodeObjectLoop : CodeObjectOneCommand
 
     override public string ConvertCodetoString()
     {
-        return "LOOP " + GetArgString();
+        return "LOOP " + GetArgString() + ";";
     }
 
     override public string GetArgString()
