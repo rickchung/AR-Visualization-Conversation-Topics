@@ -13,12 +13,25 @@ public class CodeObjectCellView : EnhancedScrollerCellView
     public TMPro.TextMeshProUGUI argumentsText;
     private CodeModifyingDelegate codeModifyingDelegate;
 
-
     public void SetData(CodeObjectOneCommand codeObject)
     {
         this.codeObject = codeObject;
-        commandText.text = codeObject.GetCommand();
-        argumentsText.text = codeObject.GetArgString();
+        if (!codeObject.IsDisabled())
+        {
+            commandText.text = codeObject.GetCommand();
+            argumentsText.text = codeObject.GetArgString();
+        }
+        else
+        {
+            commandText.text = string.Format(
+                "<alpha=#44><s>{0}</s>",
+                codeObject.GetCommand()
+            );
+            argumentsText.text = string.Format(
+                "<alpha=#44><s>{0}</s>",
+                codeObject.GetArgString()
+            );
+        }
     }
 
     public void SetCodeModifyingDelegate(CodeModifyingDelegate cmDelegate)

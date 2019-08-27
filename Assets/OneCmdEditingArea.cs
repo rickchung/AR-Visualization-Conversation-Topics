@@ -11,18 +11,20 @@ public class OneCmdEditingArea : MonoBehaviour, EditingArea
     public TextMeshProUGUI oneCmdLabel;
     public TMP_Dropdown oneCmdDropdown;
     public Button oneCmdSubmitBtn;
-
+    public Toggle codeToggle;
     private CodeObjectOneCommand attachedCodeObject;
-
     public CodeViewUpdateDelegate codeViewUpdateDelegate;
 
 
+    // ========== Temp ==========
     public static List<string> availableMoveDirections = new List<string>() {
         GridController.Direction.NORTH.ToString(),
         GridController.Direction.SOUTH.ToString(),
         GridController.Direction.EAST.ToString(),
         GridController.Direction.WEST.ToString()
     };
+    // ==========
+
 
     public void AttachCodeObject(CodeObjectOneCommand codeObject, bool showSubmitBtn = true)
     {
@@ -36,14 +38,21 @@ public class OneCmdEditingArea : MonoBehaviour, EditingArea
         oneCmdDropdown.AddOptions(availableMoveDirections);
         oneCmdDropdown.value = (int)Enum.Parse(typeof(GridController.Direction), args[0]);
 
+        codeToggle.isOn = !attachedCodeObject.IsDisabled();
+
         oneCmdSubmitBtn.gameObject.SetActive(showSubmitBtn);
     }
 
+    /// <summary>
+    /// A callback used by dropdown UI (set in the Unity inspector).
+    /// </summary>
+    /// <param name="value"></param>
     public void OnArgChange(int value)
     {
         string newCommand = oneCmdLabel.text;
         int newArg = value;
-        string newArgStr = Enum.ToObject(typeof(GridController.Direction), newArg).ToString();
+        string newArgStr = Enum.ToObject(
+            typeof(GridController.Direction), newArg).ToString();
 
         Debug.Log(string.Format(
             "Code Modified, {0}, {1}",
@@ -53,6 +62,23 @@ public class OneCmdEditingArea : MonoBehaviour, EditingArea
 
         attachedCodeObject.SetCommand(newCommand);
         attachedCodeObject.SetArgs(new string[] { newArgStr });
+
+        if (codeViewUpdateDelegate != null)
+            codeViewUpdateDelegate();
+    }
+
+    /// <summary>
+    /// A callback used by a toggle UI (set in the Unity inspector).
+    /// </summary>
+    /// <param name="value"></param>
+    public void OnToggleChange(bool value)
+    {
+        string newCommand = oneCmdLabel.text;
+        attachedCodeObject.SetDisabled(!value);
+
+        Debug.Log(string.Format(
+           "Code Disabled, {0}, {1}", newCommand, value
+        ));
 
         if (codeViewUpdateDelegate != null)
             codeViewUpdateDelegate();

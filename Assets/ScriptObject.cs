@@ -19,7 +19,8 @@ public class ScriptObject : IEnumerable
     {
         foreach (CodeObjectOneCommand c in mScript)
         {
-            yield return c;
+            if (!c.IsDisabled())
+                yield return c;
         }
     }
 

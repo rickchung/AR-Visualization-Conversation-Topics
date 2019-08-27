@@ -2,11 +2,13 @@
 {
     private string command;
     private string[] args;
+    private bool disabled;
 
     public CodeObjectOneCommand(string command, string[] args)
     {
         this.command = command;
         this.args = args;
+        this.disabled = false;
     }
 
     // ====================
@@ -29,6 +31,16 @@
     public void SetArgs(string[] args)
     {
         this.args = args;
+    }
+
+    public void SetDisabled(bool disabled)
+    {
+        this.disabled = disabled;
+    }
+
+    public bool IsDisabled()
+    {
+        return this.disabled;
     }
 
     virtual public int GetLength()

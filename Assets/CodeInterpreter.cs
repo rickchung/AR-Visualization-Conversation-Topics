@@ -396,7 +396,6 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         // View
         CodeObjectCellView cellView = scroller.GetCellView(codeObjectCellViewPrefab) as CodeObjectCellView;
         cellView.SetData(codeObject);
-
         // Onclick event
         cellView.SetCodeModifyingDelegate(ModifyCodeObject);
 
