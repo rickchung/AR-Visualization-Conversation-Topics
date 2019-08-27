@@ -61,8 +61,11 @@ public class LoopEditingArea : MonoBehaviour, EditingArea, IEnhancedScrollerDele
         if (newLoopTimes < 0)
             newLoopTimes = 0;
 
-        Debug.Log(string.Format(
-            "Code Modified, loopTimes {0}, loopTimes {1}", newLoopTimes, loopTimes));
+
+        DataLogger.Log(
+            this.gameObject, LogTag.CODING,
+            string.Format("Code Modified, loopTimes {0}, loopTimes {1}", newLoopTimes, loopTimes)
+        );
 
         loopTimes = newLoopTimes;
         loopTimesLabel.text = "} " + loopTimes + " Times";

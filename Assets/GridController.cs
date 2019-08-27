@@ -33,13 +33,13 @@ public class GridController : MonoBehaviour
             {
                 writer.Write(txt.text);
             }
-            Debug.Log("Saving a predefined map to " + path);
+            DataLogger.Log(this.gameObject, LogTag.SYSTEM, "A predefined map is saved to at " + path);
         }
     }
 
     private void GenerateDefaultMap()
     {
-        Debug.Log("GRID, Loading a default map");
+        DataLogger.Log(this.gameObject, LogTag.MAP, "Loading a default map.");
 
         Vector3 startingPoint = gridStart.localPosition;
         Vector3 endPoint = gridEnd.localPosition;
@@ -52,8 +52,14 @@ public class GridController : MonoBehaviour
         numInX = Mathf.CeilToInt(distX / (stepSize + padding)) + 1;
         numInZ = Mathf.CeilToInt(distZ / (stepSize + padding)) + 1;
 
-        Debug.Log("Grid Step Size: " + stepSize);
-        Debug.Log("Grid: numInX=" + numInX + ", numInZ=" + numInZ);
+        DataLogger.Log(
+            this.gameObject, LogTag.SYSTEM,
+            "Grid Step Size: " + stepSize
+        );
+        DataLogger.Log(
+            this.gameObject, LogTag.SYSTEM,
+            "Grid: numInX=" + numInX + ", numInZ=" + numInZ
+        );
 
         cellVectorMap = new Vector3[numInX, numInZ];
         cellObjectsMap = new Transform[numInX, numInZ];
@@ -185,11 +191,11 @@ public class GridController : MonoBehaviour
         switch (cellType)
         {
             case GridCellType.TRAP:
-                Debug.Log("GRID, A trap called back");
+                DataLogger.Log(this.gameObject, LogTag.MAP, "A trap is triggered.");
                 codeInterpreter.StopRunningScript();
                 break;
             case GridCellType.REWARD:
-                Debug.Log("GRID, A reward called back");
+                DataLogger.Log(this.gameObject, LogTag.MAP, "A reward is collected.");
                 break;
             case GridCellType.BASE:
                 break;
@@ -217,7 +223,7 @@ public class GridController : MonoBehaviour
             writer.Close();
         }
 
-        Debug.Log(string.Format("FILE, Export a map as {0}", path));
+        DataLogger.Log(LogTag.SYSTEM, string.Format("SYSTEM, Export a map as {0}", path));
     }
 
     private static GridCellType[,] ImportGridAndProblem(string mapName)
@@ -240,9 +246,7 @@ public class GridController : MonoBehaviour
                 }
             }
 
-            Debug.Log(string.Format(
-                "GRID, Loading a map from {0}", path
-            ));
+            DataLogger.Log(LogTag.SYSTEM, string.Format("MAP, A map is loaded: {0}", path));
 
             return importedCellMap;
         }

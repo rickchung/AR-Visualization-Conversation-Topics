@@ -17,7 +17,10 @@ public class CodeEditor : MonoBehaviour
 
     public void DispatchEditor(CodeObjectOneCommand codeObject)
     {
-        Debug.Log("Open code editor for: " + codeObject.ToString());
+        DataLogger.Log(
+          this.gameObject, LogTag.CODING,
+          "The code editor is open for : " + codeObject.ToString()
+        );
 
         switch (codeObject.GetCommand())
         {

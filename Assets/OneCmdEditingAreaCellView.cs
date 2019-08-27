@@ -47,8 +47,9 @@ public class OneCmdEditingAreaCellView : EnhancedScrollerCellView
             int newArg = value;
             string newArgStr = Enum.ToObject(typeof(GridController.Direction), newArg).ToString();
 
-            Debug.Log(
-                string.Format("Code Modified, {0}, {1}", newArgStr, attachedCodeObject.GetArgString())
+            DataLogger.Log(
+                this.gameObject, LogTag.CODING,
+                string.Format("ArgChanged, {0}, {1}", newArgStr, attachedCodeObject.GetArgString())
             );
 
             attachedCodeObject.SetArgs(new string[] { newArgStr });
@@ -67,10 +68,10 @@ public class OneCmdEditingAreaCellView : EnhancedScrollerCellView
         string newCommand = oneCmdLabel.text;
         attachedCodeObject.SetDisabled(!value);
 
-        Debug.Log(string.Format(
-           "Code Disabled in Loop, {0}, {1}",
-           attachedCodeObject.ToString(), value
-        ));
+        DataLogger.Log(
+            this.gameObject, LogTag.CODING,
+            "SetDisabled, " + attachedCodeObject.ToString() + ", " + value)
+        ;
 
         if (codeViewUpdateDelegate != null)
             codeViewUpdateDelegate();

@@ -51,7 +51,10 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
             {
                 writer.Write(txt.text);
             }
-            Debug.Log("Saving a predefined script to " + path);
+            DataLogger.Log(
+                this.gameObject, LogTag.SYSTEM,
+                "A predefined script is saved as " + path
+            );
         }
     }
 
@@ -92,7 +95,10 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         ScriptObject script = ImportScriptObject(scriptName);
         if ((loadedScript = script) != null)
         {
-            Debug.Log("SCRIPT, " + scriptName + " is imported,\n" + loadedScript.ToString());
+            DataLogger.Log(
+                this.gameObject, LogTag.SYSTEM,
+                "A predefined script is imported " + scriptName
+            );
         }
 
         // Display the script
@@ -129,7 +135,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         }
         catch (FileNotFoundException)
         {
-            Debug.Log("SCRIPT, File to import is not found., " + scriptName);
+            DataLogger.Log(LogTag.SCRIPT_ERROR, "File to import is not found: " + scriptName);
         }
         return rt;
     }
@@ -200,18 +206,28 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         {
             if (isScriptRunning == false)
             {
-                Debug.Log("SCRIPT, Start running the loaded script");
+                DataLogger.Log(
+                    this.gameObject, LogTag.SCRIPT,
+                    "Start running the loaded script"
+                );
+
                 ResetAvatars();
                 _RunScript(loadedScript);
             }
             else
             {
-                Debug.Log("WARNING, A script is running but trying to re-run it");
+                DataLogger.Log(
+                    this.gameObject, LogTag.SCRIPT_WARNING,
+                    "A script is running but trying to re-run it"
+                );
             }
         }
         else
         {
-            Debug.Log("ERROR, No loaded script found.");
+            DataLogger.Log(
+                this.gameObject, LogTag.SCRIPT_ERROR,
+                "No loaded script found."
+            );
         }
     }
 
@@ -275,7 +291,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     private void _ParseLoop(CodeObjectLoop codeObject, List<CodeObjectOneCommand> procScript)
     {
         var repeat = codeObject.GetLoopTimes();
-        var codeToRepeat = codeObject.GetNestedCommands();
+        var codeToRepeat = codeObject.GetNestedCommands(ignoreDisabled: true);
         for (int _ = 0; _ < repeat; _++)
         {
             procScript.AddRange(codeToRepeat);
@@ -298,7 +314,10 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         }
         isScriptRunning = false;
 
-        Debug.Log("SCRIPT, The execution of a script has finished");
+        DataLogger.Log(
+            this.gameObject, LogTag.SCRIPT,
+            "The execution of a script has finished."
+        );
     }
 
     private void RunCodeObject(CodeObjectOneCommand co)
@@ -316,7 +335,10 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     {
         AvatarController runner = (!forRival) ? avatar : rivalAvatar;
 
-        Debug.Log(string.Format("SCRIPT, Running Cmd, {0}, {1}", forRival, codeObject));
+        DataLogger.Log(
+            this.gameObject, LogTag.SCRIPT,
+            string.Format("Running Cmd, {0}, {1}", forRival, codeObject)
+        );
 
         string command = codeObject.GetCommand();
         string[] args = codeObject.GetArgs();
@@ -341,7 +363,10 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
             StopCoroutine("_RunScriptCoroutine");
             isScriptRunning = false;
 
-            Debug.Log("SCRIPT, Script is Interrupted");
+            DataLogger.Log(
+                this.gameObject, LogTag.SCRIPT,
+                "Script is interrupted."
+            );
         }
     }
 
@@ -355,7 +380,10 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
             CodeObjectOneCommand resetCmd = new CodeObjectOneCommand("RESET_POS", new string[] { });
             partnerSocket.BroadcastAvatarCtrl(resetCmd);
 
-            Debug.Log("SCRIPT, Reset Avater");
+            DataLogger.Log(
+                this.gameObject, LogTag.SCRIPT,
+                "The avater is reset."
+            );
         }
         else
         {

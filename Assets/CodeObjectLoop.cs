@@ -19,8 +19,13 @@ public class CodeObjectLoop : CodeObjectOneCommand
     /// Get the nested commands in this loop excluding disabled commands.
     /// </summary>
     /// <returns></returns>
-    public List<CodeObjectOneCommand> GetNestedCommands()
+    public List<CodeObjectOneCommand> GetNestedCommands(bool ignoreDisabled = false)
     {
+        if (!ignoreDisabled)
+        {
+            return nestedCommands;
+        }
+
         var rtList = new List<CodeObjectOneCommand>();
         foreach (var c in nestedCommands)
         {
