@@ -93,14 +93,14 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         if ((loadedScript = script) != null)
         {
             Debug.Log("SCRIPT, " + scriptName + " is imported,\n" + loadedScript.ToString());
-
-            // Display the script
-            UpdateCodeViewer();
-            // Enable the viewer
-            SetActiveTopicView(true, broadcast: false);
-            // Enable the viewer on the remote device
-            if (broadcast) partnerSocket.BroadcastTopicCtrl(scriptName);
         }
+
+        // Display the script
+        UpdateCodeViewer();
+        // Enable the viewer
+        SetActiveTopicView(true, broadcast: false);
+        // Enable the viewer on the remote device
+        if (broadcast) partnerSocket.BroadcastTopicCtrl(scriptName);
     }
 
     // ==================== File IO for Interpreter ====================
@@ -120,9 +120,16 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     {
         var path = Path.Combine(dataFolderPath, scriptName);
         ScriptObject rt = null;
-        using (var reader = new StreamReader(path))
+        try
         {
-            rt = ProcessCode(reader);
+            using (var reader = new StreamReader(path))
+            {
+                rt = ProcessCode(reader);
+            }
+        }
+        catch (FileNotFoundException)
+        {
+            Debug.Log("SCRIPT, File to import is not found., " + scriptName);
         }
         return rt;
     }
@@ -327,7 +334,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         scriptVariables.Clear();
     }
 
-    private void StopRunningScript()
+    public void StopRunningScript()
     {
         if (isScriptRunning)
         {
@@ -410,7 +417,8 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     public void UpdateCodeViewer()
     {
         // Display the script
-        scriptTextMesh.SetText(loadedScript.ToString());
+        if (loadedScript != null)
+            scriptTextMesh.SetText(loadedScript.ToString());
         scriptScroller.ReloadData(scrollPositionFactor: 0.0f);
     }
 

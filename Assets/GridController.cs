@@ -10,6 +10,8 @@ public class GridController : MonoBehaviour
     public Transform gridStart, gridEnd;
     public Transform gridCellPrefab, gridCellTargetPrefab, girdCellTrapPrefab;
     public AvatarController avatarController, rivalAvatarController;
+    public CodeInterpreter codeInterpreter;
+
     private Vector3[,] cellVectorMap;  // The real-world map of the game.
     private Transform[,] cellObjectsMap;  // The map of grid cells
     private GridCellType[,] cellTypeMap;
@@ -158,7 +160,7 @@ public class GridController : MonoBehaviour
     {
         RemoveGridMap();
 
-        if (mapName.Equals("default"))
+        if (mapName.Equals("Default"))
         {
             GenerateDefaultMap();
         }
@@ -184,6 +186,7 @@ public class GridController : MonoBehaviour
         {
             case GridCellType.TRAP:
                 Debug.Log("GRID, A trap called back");
+                codeInterpreter.StopRunningScript();
                 break;
             case GridCellType.REWARD:
                 Debug.Log("GRID, A reward called back");
@@ -208,9 +211,11 @@ public class GridController : MonoBehaviour
         }
 
         var path = Path.Combine(dataFolderPath, mapName);
-        var writer = new StreamWriter(path, false);
-        writer.WriteLine(mapStr);
-        writer.Close();
+        using (var writer = new StreamWriter(path, false))
+        {
+            writer.WriteLine(mapStr);
+            writer.Close();
+        }
 
         Debug.Log(string.Format("FILE, Export a map as {0}", path));
     }
@@ -219,26 +224,28 @@ public class GridController : MonoBehaviour
     {
         var path = Path.Combine(dataFolderPath, mapName);
 
-        var reader = new StreamReader(path);
-        var cellNumInX = int.Parse(reader.ReadLine());
-        var cellNumInZ = int.Parse(reader.ReadLine());
-        var importedCellMap = new GridCellType[cellNumInX, cellNumInZ];
-
-        for (int i = 0; i < cellNumInX; i++)
+        using (var reader = new StreamReader(path))
         {
-            var row = reader.ReadLine();
-            var rowCells = row.ToCharArray();
-            for (int j = 0; j < cellNumInZ; j++)
+            var cellNumInX = int.Parse(reader.ReadLine());
+            var cellNumInZ = int.Parse(reader.ReadLine());
+            var importedCellMap = new GridCellType[cellNumInX, cellNumInZ];
+
+            for (int i = 0; i < cellNumInX; i++)
             {
-                importedCellMap[i, j] = (GridCellType)Char.GetNumericValue(rowCells[j]);
+                var row = reader.ReadLine();
+                var rowCells = row.ToCharArray();
+                for (int j = 0; j < cellNumInZ; j++)
+                {
+                    importedCellMap[i, j] = (GridCellType)Char.GetNumericValue(rowCells[j]);
+                }
             }
+
+            Debug.Log(string.Format(
+                "GRID, Loading a map from {0}", path
+            ));
+
+            return importedCellMap;
         }
-
-        Debug.Log(string.Format(
-            "GRID, Loading a map from {0}", path
-        ));
-
-        return importedCellMap;
     }
 
     // ==================== Coordinate Transformation ====================
