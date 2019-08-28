@@ -13,9 +13,9 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     public TMPro.TextMeshProUGUI scriptTextMesh;
     public EnhancedScroller scriptScroller;
     public CodeObjectCellView codeObjectCellViewPrefab;
-
     public PartnerSocket partnerSocket;
     public CodeEditor codeEditor;
+    public GridController gridController;
 
     [HideInInspector] public GameObject ViewContainer;
     [HideInInspector] public GameObject codingPanel;
@@ -370,6 +370,10 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         }
     }
 
+    /// <summary>
+    /// Reset the positions of avaters. When the forRival flag is true, the method resets the position of the rival avater. This flag is reserved for the remote control from the connected device.
+    /// </summary>
+    /// <param name="forRival"></param>
     public void ResetAvatars(bool forRival = false)
     {
         if (!forRival)
@@ -389,6 +393,9 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         {
             rivalAvatar.ResetPosition();
         }
+
+        // Reset the map
+        gridController.ResetMap();
     }
 
     public void SwitchCodeView()

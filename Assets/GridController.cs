@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Collections.Generic;
 using UnityEngine;
 
 public enum GridCellType { BASE, TRAP, REWARD };
@@ -14,7 +15,9 @@ public class GridController : MonoBehaviour
 
     private Vector3[,] cellVectorMap;  // The real-world map of the game.
     private Transform[,] cellObjectsMap;  // The map of grid cells
-    private GridCellType[,] cellTypeMap;
+    private GridCellType[,] cellTypeMap;  // The map of grid cells with types
+    private List<GridCellTarget> flagCells;  // A list of flag cells
+    private int numFlagsCaptured;
     private int numInX, numInZ;
     private static string dataFolderPath;
 
@@ -37,6 +40,9 @@ public class GridController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Generating a map with only white default cells.
+    /// </summary>
     private void GenerateDefaultMap()
     {
         DataLogger.Log(this.gameObject, LogTag.MAP, "Loading a default map.");
@@ -112,6 +118,8 @@ public class GridController : MonoBehaviour
         // Init map objects
         cellVectorMap = new Vector3[numInX, numInZ];
         cellObjectsMap = new Transform[numInX, numInZ];
+        flagCells = new List<GridCellTarget>();
+        numFlagsCaptured = 0;
         cellTypeMap = cells;
 
         // Generate grid cells
@@ -128,6 +136,7 @@ public class GridController : MonoBehaviour
                         newCell.GetComponent<GridCellTarget>().SetUpdateDelegate(
                             GridCellUpdateCallback
                         );
+                        flagCells.Add(newCell.GetComponent<GridCellTarget>());
                         break;
                     case GridCellType.TRAP:
                         newCell = (Transform)Instantiate(girdCellTrapPrefab, transform, false);
@@ -182,6 +191,18 @@ public class GridController : MonoBehaviour
         foreach (Transform o in transform)
             if (o.name.Equals("CellClone"))
                 Destroy(o.gameObject);
+    }
+
+    public void ResetMap()
+    {
+        if (flagCells != null)
+        {
+            foreach (var c in flagCells)
+            {
+                c.Reset();
+            }
+            numFlagsCaptured = 0;
+        }
     }
 
     // ==================== Problem-Design Utilities ====================
