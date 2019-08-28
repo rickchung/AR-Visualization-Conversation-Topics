@@ -49,12 +49,12 @@ public class VoiceController : MonoBehaviour
     {
         if (!Microphone.IsRecording(micName))
         {
-            Debug.Log("[LOG] Start recording");
+            DataLogger.Log(this.gameObject, LogTag.AUDIO_CTRL, "Start recording.");
             StartMicInterval();
         }
         else
         {
-            Debug.Log("[LOG] Stop recording");
+            DataLogger.Log(this.gameObject, LogTag.AUDIO_CTRL, "Stop recording.");
             StopMicInterval();
         }
     }

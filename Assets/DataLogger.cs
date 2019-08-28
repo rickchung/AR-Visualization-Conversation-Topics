@@ -5,7 +5,8 @@ public enum LogTag
     CODING, SCRIPT, MAP,
     SCRIPT_ERROR, SCRIPT_WARNING,
     MAP_ERROR, MAP_WARNING,
-    SYSTEM, SYSTEM_ERROR, SYSTEM_WARNING
+    SYSTEM, SYSTEM_ERROR, SYSTEM_WARNING,
+    AUDIO_CTRL
 };
 
 public class DataLogger : MonoBehaviour

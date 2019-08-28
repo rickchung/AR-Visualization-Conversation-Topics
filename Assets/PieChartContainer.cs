@@ -21,7 +21,10 @@ public class PieChartContainer : MonoBehaviour
     public void RenderPieChart(float[] values)
     {
         float sum = 0f;
-        foreach (float v in values) sum += v;
+        foreach (float v in values)
+        {
+            sum += v;
+        }
         if (sum != 1) throw new System.Exception("The sum of values is not 1.0");
 
         float rotationAngle = 0f;

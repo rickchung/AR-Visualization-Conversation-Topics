@@ -36,7 +36,7 @@ public class SttNetworkManager : MonoBehaviour
 
         if (Application.internetReachability == NetworkReachability.NotReachable)
         {
-            Debug.LogWarning("[WARNING] No Internet Connection");
+            DataLogger.Log(this.gameObject, LogTag.SYSTEM_WARNING, "No Internet Connection.");
         }
         else
         {
@@ -53,7 +53,7 @@ public class SttNetworkManager : MonoBehaviour
     {
         // Append location message into the address
         string dest = string.Format(HOST_ADDR);
-        Debug.Log("[INFO] Sending Request to " + dest);
+        DataLogger.Log(this.gameObject, LogTag.SYSTEM, "Posting a request to " + dest);
 
         // Obtain CSRF token first
         UnityWebRequest csrfRequest = UnityWebRequest.Get(dest);
@@ -62,7 +62,11 @@ public class SttNetworkManager : MonoBehaviour
 
         if (csrfRequest.isNetworkError || csrfRequest.isHttpError)
         {
-            Debug.LogError("[ERR] Nework Failed: CSRF: " + csrfRequest.error);
+            DataLogger.Log(
+                this.gameObject, LogTag.SYSTEM_ERROR,
+                "Nework Failed: CSRF: " + csrfRequest.error
+            );
+
         }
         else
         {
@@ -77,7 +81,10 @@ public class SttNetworkManager : MonoBehaviour
                     csrfToken = kv[1].Trim();
             }
 
-            Debug.Log("[INFO] CSRF request is successful: " + csrfToken);
+            DataLogger.Log(
+                this.gameObject, LogTag.SYSTEM,
+                "CSRF request is successful: " + csrfToken
+            );
 
             // Add csrf token to the form
             formData.AddField("csrfmiddlewaretoken", csrfToken);
@@ -108,7 +115,10 @@ public class SttNetworkManager : MonoBehaviour
             }
             else
             {
-                Debug.LogError("Network error: " + request.error);
+                DataLogger.Log(
+                    this.gameObject, LogTag.SYSTEM_ERROR,
+                    "Network error: " + request.error
+                );
             }
         }
     }
@@ -121,9 +131,9 @@ public class SttNetworkManager : MonoBehaviour
     private void ProcessSpeechToTextResult(string result)
     {
         SpToTextResult stt = SpToTextResult.CreateFromJson(result);
-        Debug.Log("STT Raw Result: " + result);
+        DataLogger.Log(this.gameObject, LogTag.SYSTEM, "STT Raw Result, " + result);
 
-        if (sttController != null)
+        if (sttController != null && stt.keywords.Length > 0)
         {
             // Save the transcription locally
             sttController.SaveTransResponse(stt, isLocal: true);

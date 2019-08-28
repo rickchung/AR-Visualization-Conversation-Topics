@@ -92,7 +92,7 @@ public class PartnerSocket : MonoBehaviour
     /// </summary>
     public void SetupRemoteServer()
     {
-        Debug.Log("Trying to connect to the HOST server...");
+        DataLogger.Log(this.gameObject, LogTag.SYSTEM, "Trying to connect to the HOST server...");
         clientToPartner = InitNetworkClient();
         clientToPartner.Connect(HOST_SERVER, HOST_SERVER_PORT);
 
@@ -107,7 +107,11 @@ public class PartnerSocket : MonoBehaviour
     /// </summary>
     private void SetupLocalServer()
     {
-        Debug.Log("[SERVER] Setting up a local server listening at " + UDP_PORT);
+        DataLogger.Log(
+            this.gameObject, LogTag.SYSTEM,
+            "[SERVER] Setting up a local server listening at " + UDP_PORT
+        );
+
         NetworkServer.Listen(UDP_PORT);
         NetworkServer.RegisterHandler(MyMsgType.MSG_CLIENT_CONNECTED, OnConnectedClientReport);
 
@@ -150,7 +154,10 @@ public class PartnerSocket : MonoBehaviour
         if (_serverIpAddress == null)
         {
             _serverIpAddress = netMsg.conn.address;
-            Debug.Log("[SERVER] Received client report at " + _serverIpAddress);
+            DataLogger.Log(
+                this.gameObject, LogTag.SYSTEM,
+                "Received client report at " + _serverIpAddress
+            );
             NetworkServer.dontListen = true;
             partnerIPAddress.interactable = false;
             partnerIPAddress.text = _serverIpAddress;
@@ -229,7 +236,10 @@ public class PartnerSocket : MonoBehaviour
     /// <param name="partnerIP">Partner ip.</param>
     private void SetupClient(string partnerIP)
     {
-        Debug.Log("[CLIENT] Trying to connect to the partner at " + partnerIP);
+        DataLogger.Log(
+            this.gameObject, LogTag.SYSTEM,
+            "[CLIENT] Trying to connect to the partner at " + partnerIP
+        );
         clientToPartner = InitNetworkClient();
         clientToPartner.Connect(partnerIP, UDP_PORT);
     }
@@ -261,7 +271,11 @@ public class PartnerSocket : MonoBehaviour
         // Disable the IP input field
         partnerIPAddress.interactable = false;
 
-        Debug.Log("[CLIENT] Connected to the server at " + _serverIpAddress);
+        DataLogger.Log(
+            this.gameObject, LogTag.SYSTEM,
+            "[CLIENT] Connected to the server at " + _serverIpAddress
+        );
+
         serverMsgText.text = "Connected to " + _serverIpAddress + "\nM=" + IsMaster;
 
         // Tell the server you received the message.
@@ -281,7 +295,10 @@ public class PartnerSocket : MonoBehaviour
         if (netMsg != null)
         {
             var msg = netMsg.ReadMessage<StringMessage>();
-            Debug.Log("[CLIENT] Test message arrived: " + msg.value);
+            DataLogger.Log(
+                this.gameObject, LogTag.SYSTEM,
+                "[CLIENT] Testing message arrived: " + msg.value
+            );
             serverMsgText.text = msg.value;
         }
     }
