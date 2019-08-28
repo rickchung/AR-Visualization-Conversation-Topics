@@ -64,7 +64,7 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
     public void SaveTransResponse(SpToTextResult stt, bool isLocal)
     {
         string[] text = stt.transcript;
-        string[] topics = stt.topics;
+        // string[] topics = stt.topics;
         string[] keywords = stt.keywords;
         SaveTranscript(text, isLocal);
         SaveTopics(keywords, isLocal);

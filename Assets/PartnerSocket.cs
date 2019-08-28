@@ -37,6 +37,20 @@ public class PartnerSocket : MonoBehaviour
     private bool _broadcastByHost;
     private NetworkClient clientToPartner;
 
+    private bool isMaster;
+    public bool IsMaster
+    {
+        get
+        {
+            return isMaster;
+        }
+
+        set
+        {
+            isMaster = value;
+        }
+    }
+
     private static class MyMsgType
     {
         public static short MSG_TEST = MsgType.Highest + 1;
@@ -100,6 +114,10 @@ public class PartnerSocket : MonoBehaviour
         _broadcastByHost = false;
     }
 
+    public void SetMaster(bool value)
+    {
+        IsMaster = value;
+    }
 
     // ============================================================
     // NetworkServer: This section defines how and what to broadcast to
@@ -244,8 +262,7 @@ public class PartnerSocket : MonoBehaviour
         partnerIPAddress.interactable = false;
 
         Debug.Log("[CLIENT] Connected to the server at " + _serverIpAddress);
-        serverMsgText.text = "Connected to " + _serverIpAddress;
-        serverMsgText.text = "Connected to " + _serverIpAddress;
+        serverMsgText.text = "Connected to " + _serverIpAddress + "\nM=" + IsMaster;
 
         // Tell the server you received the message.
         clientToPartner.Send(MyMsgType.MSG_CLIENT_CONNECTED, new StringMessage

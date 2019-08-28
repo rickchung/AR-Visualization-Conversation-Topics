@@ -12,6 +12,7 @@ public class ConfManager : MonoBehaviour
     public InformationPanel informationPanel;
     public GridController gridController;
     public CodeInterpreter codeInterpreter;
+    public PartnerSocket partnerSocket;
     public GameObject arrowKeyPanel;
     public GameObject sttCtrlPanel;
     public GameObject developerPanel;
@@ -35,8 +36,8 @@ Welcome! This is the first tutorial stage of Ogmented. In this tutorial, you wil
 
 Your avater is a cube marked as blue on a grid. Please try to move your avatar around and collect the flag in the map.",
             map: "Default1.OgMap.txt",
-            localScript: null,
-            remoteScript: null,
+            masterScript: null,
+            slaveScript: null,
             isArrowKeyEnabled: true,
             isDeveloperPanelEnabled: false
         ));
@@ -54,8 +55,8 @@ A script is shown on the right hand side of screen. Please try to pree run and s
 
 Once you are familiar with the script, try to tap a command in the script and modify its content. Your goal is to correct the script and make your avatar collect all flags on the screen.",
             map: "Default2.OgMap.txt",
-            localScript: "Default1.OgScript.txt",
-            remoteScript: null,
+            masterScript: "Default1.OgScript.txt",
+            slaveScript: null,
             isArrowKeyEnabled: false,
             isDeveloperPanelEnabled: false
         ));
@@ -74,9 +75,16 @@ Once you are familiar with the script, try to tap a command in the script and mo
         DataLogger.Log(this.gameObject, LogTag.SYSTEM, "Loading a configuration, " + conf);
         informationPanel.ReplaceContent(conf.problem);
         gridController.LoadGridMap(conf.map);
-        if (conf.localScript != null)
-            codeInterpreter.LoadPredefinedScript(conf.localScript);
-        // TODO: Tell the remote to load a script
+        if (partnerSocket.IsMaster)
+        {
+            if (conf.masterScript != null)
+                codeInterpreter.LoadPredefinedScript(conf.masterScript);
+        }
+        else
+        {
+            if (conf.slaveScript != null)
+                codeInterpreter.LoadPredefinedScript(conf.slaveScript);
+        }
         arrowKeyPanel.SetActive(conf.isArrowKeyEnabled);
         sttCtrlPanel.SetActive(!conf.isArrowKeyEnabled);
         developerPanel.SetActive(conf.isDeveloperPanelEnabled);
@@ -98,19 +106,19 @@ Once you are familiar with the script, try to tap a command in the script and mo
         public string name;
         public string problem;
         public string map;
-        public string localScript, remoteScript;
+        public string masterScript, slaveScript;
         public bool isArrowKeyEnabled, isDeveloperPanelEnabled;
 
         public OgStageConf(
-            string name, string problem, string map, string localScript, string remoteScript,
+            string name, string problem, string map, string masterScript, string slaveScript,
             bool isArrowKeyEnabled, bool isDeveloperPanelEnabled
         )
         {
             this.name = name;
             this.problem = problem;
             this.map = map;
-            this.localScript = localScript;
-            this.remoteScript = remoteScript;
+            this.masterScript = masterScript;
+            this.slaveScript = slaveScript;
             this.isArrowKeyEnabled = isArrowKeyEnabled;
             this.isDeveloperPanelEnabled = isDeveloperPanelEnabled;
         }

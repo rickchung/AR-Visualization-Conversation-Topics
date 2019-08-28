@@ -34,7 +34,7 @@ public class LoopEditingArea : MonoBehaviour, EditingArea, IEnhancedScrollerDele
     {
         attachedCodeObject = (CodeObjectLoop)codeObject;
 
-        string command = attachedCodeObject.GetCommand();
+        // string command = attachedCodeObject.GetCommand();
         string[] args = attachedCodeObject.GetArgs();
         loopTimes = Int32.Parse(args[0]);
 

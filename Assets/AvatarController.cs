@@ -7,11 +7,24 @@ public class AvatarController : MonoBehaviour
     public Transform avatar;
     public GridController gridController;
     public bool isRival;
-    public bool isDead;
+    private bool isDead;
     private Transform startingCellInGrid;
-    private Vector3 startingCellInVec;
+    private Vector3? startingCellInVec = null;
     private Vector3 cellPos;
     private const float AVATAR_Y_POS = 0.05f;
+
+    public bool IsDead
+    {
+        get
+        {
+            return isDead;
+        }
+
+        set
+        {
+            isDead = value;
+        }
+    }
 
     /// <summary>
     /// Move the avatar one step in the given direction.
@@ -73,7 +86,7 @@ public class AvatarController : MonoBehaviour
         avatarPos.y = AVATAR_Y_POS;
         avatar.localPosition = avatarPos;
         avatar.localRotation = new Quaternion();
-        cellPos = startingCellInVec;
+        cellPos = (Vector3)startingCellInVec;
         // Reset the physics
         var rigidbody = avatar.GetComponent<Rigidbody>();
         rigidbody.velocity = Vector3.zero;

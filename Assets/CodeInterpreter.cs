@@ -333,7 +333,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     {
         AvatarController runner = (!forRival) ? avatar : rivalAvatar;
 
-        if (!runner.isDead)
+        if (!runner.IsDead)
         {
             DataLogger.Log(
                 this.gameObject, LogTag.SCRIPT,
@@ -403,8 +403,8 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         }
 
         // Reset avatars' states
-        avatar.isDead = false;
-        rivalAvatar.isDead = false;
+        avatar.IsDead = false;
+        rivalAvatar.IsDead = false;
         // Reset the map
         gridController.ResetMap();
     }

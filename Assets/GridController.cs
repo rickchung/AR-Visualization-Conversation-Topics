@@ -18,8 +18,37 @@ public class GridController : MonoBehaviour
     private GridCellType[,] cellTypeMap;  // The map of grid cells with types
     private List<GridCellTarget> flagCells;  // A list of flag cells
     private int numFlagsCaptured;
+    private int targetNumOfFlags;
     private int numInX, numInZ;
     private static string dataFolderPath;
+
+    public int NumFlagsCaptured
+    {
+        get
+        {
+            return numFlagsCaptured;
+        }
+
+        set
+        {
+            numFlagsCaptured = value;
+        }
+    }
+
+    public int TargetNumOfFlags
+    {
+        get
+        {
+            return targetNumOfFlags;
+        }
+
+        set
+        {
+            targetNumOfFlags = value;
+        }
+    }
+
+    // ==================== Unity Lifecycle ====================
 
     void Start()
     {
@@ -39,7 +68,6 @@ public class GridController : MonoBehaviour
             DataLogger.Log(this.gameObject, LogTag.SYSTEM, "A predefined map is saved to at " + path);
         }
     }
-
 
     // ==================== Map Utilities ====================
 
@@ -111,8 +139,8 @@ public class GridController : MonoBehaviour
         // Map geo info
         var startingPoint = gridStart.localPosition;
         var endPoint = gridEnd.localPosition;
-        var distX = Mathf.Abs(startingPoint.x - endPoint.x);
-        var distZ = Mathf.Abs(startingPoint.z - endPoint.z);
+        // var distX = Mathf.Abs(startingPoint.x - endPoint.x);
+        // var distZ = Mathf.Abs(startingPoint.z - endPoint.z);
         var stepSize = gridStart.localScale.x;
         var padding = stepSize * 0.10f;
         numInX = cells.GetLength(0);
@@ -122,7 +150,8 @@ public class GridController : MonoBehaviour
         cellVectorMap = new Vector3[numInX, numInZ];
         cellObjectsMap = new Transform[numInX, numInZ];
         flagCells = new List<GridCellTarget>();
-        numFlagsCaptured = 0;
+        NumFlagsCaptured = 0;
+        TargetNumOfFlags = 0;
         cellTypeMap = cells;
 
         // Generate grid cells
@@ -140,6 +169,7 @@ public class GridController : MonoBehaviour
                             GridCellUpdateCallback
                         );
                         flagCells.Add(newCell.GetComponent<GridCellTarget>());
+                        TargetNumOfFlags++;
                         break;
                     case GridCellType.TRAP:
                         newCell = (Transform)Instantiate(girdCellTrapPrefab, transform, false);
@@ -204,8 +234,13 @@ public class GridController : MonoBehaviour
             {
                 c.Reset();
             }
-            numFlagsCaptured = 0;
+            NumFlagsCaptured = 0;
         }
+    }
+
+    public bool IsStageClear()
+    {
+        return (numFlagsCaptured == targetNumOfFlags);
     }
 
     private void GridCellUpdateCallback(GridCellType cellType, Collider other)
@@ -218,11 +253,12 @@ public class GridController : MonoBehaviour
                 var ac = other.GetComponent<AvatarController>();
                 if (ac != null)
                 {
-                    ac.isDead = true;
+                    ac.IsDead = true;
                 }
                 break;
             case GridCellType.REWARD:
                 DataLogger.Log(this.gameObject, LogTag.MAP, "A reward is collected.");
+                NumFlagsCaptured++;
                 break;
             case GridCellType.BASE:
                 break;
