@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 public class ConfManager : MonoBehaviour
@@ -24,28 +25,51 @@ public class ConfManager : MonoBehaviour
 
     private void Start()
     {
+
+        // Load predefined maps/scripts to the data folder
+        var dataFolderPath = Application.persistentDataPath;
+        var filesToCopy = new string[] {
+            "OgMap-Tutorial1",
+            "OgMap-Tutorial2", "OgScript-Tutorial2-M", "OgScript-Tutorial2-S",
+        };
+        foreach (var s in filesToCopy)
+        {
+            var path = Path.Combine(dataFolderPath, s) + ".txt";
+            var txt = (TextAsset)Resources.Load(s, typeof(TextAsset));
+            using (var writer = new StreamWriter(path))
+            {
+                writer.Write(txt.text);
+            }
+            DataLogger.Log(
+                this.gameObject, LogTag.SYSTEM,
+                "A predefined map/script is saved to at " + path
+            );
+        }
+
+        // Open the welcome screen
         startScreen.SetActive(true);
 
+        // Init configurations of stages
+
         stages = new Dictionary<string, OgStageConf>();
-        stages.Add("Tutorial1", new OgStageConf(
-            name: "Tutorial1",
-            problem:
-@"Tutorial-1
+
+        var p1 = @"Tutorial-1
 
 Welcome! This is the first tutorial stage of Ogmented. In this tutorial, you will learn the interface of Ogmented including the layout of maps and how to navigate the avatar around.
 
-Your avater is a cube marked as blue on a grid. Please try to move your avatar around and collect the flag in the map.",
-            map: "Default1.OgMap.txt",
+Your avater is a cube marked as blue on a grid. Please try to move your avatar around and collect the flag in the map.";
+
+        stages.Add("Tutorial1", new OgStageConf(
+            name: "Tutorial1",
+            problem: p1,
+            map: "OgMap-Tutorial1.txt",
             masterScript: null,
             slaveScript: null,
             isArrowKeyEnabled: true,
             isDeveloperPanelEnabled: false
         ));
 
-        stages.Add("Tutorial2", new OgStageConf(
-            name: "Tutorial2",
-            problem:
-@"Tutorial-2
+        var p2 = @"Tutorial-2
 
 In the second tutorial, you will learn how to control the avatar by running a script.
 
@@ -53,10 +77,14 @@ Just like controlling by arrow keys, your avatar can follow a script of commands
 
 A script is shown on the right hand side of screen. Please try to pree run and see what your avatar will do.
 
-Once you are familiar with the script, try to tap a command in the script and modify its content. Your goal is to correct the script and make your avatar collect all flags on the screen.",
-            map: "Default2.OgMap.txt",
-            masterScript: "Default1.OgScript.txt",
-            slaveScript: null,
+Once you are familiar with the script, try to tap a command in the script and modify its content. Your goal is to correct the script and make your avatar collect all flags on the screen.";
+
+        stages.Add("Tutorial2", new OgStageConf(
+            name: "Tutorial2",
+            problem: p2,
+            map: "OgMap-Tutorial2.txt",
+            masterScript: "OgScript-Tutorial2-M.txt",
+            slaveScript: "OgScript-Tutorial2-S.txt",
             isArrowKeyEnabled: false,
             isDeveloperPanelEnabled: false
         ));

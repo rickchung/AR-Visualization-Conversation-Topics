@@ -3,13 +3,13 @@ using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum GridCellType { BASE, TRAP, REWARD };
+public enum GridCellType { BASE, TRAP, REWARD, REWARD_DUAL };
 public delegate void GridCellUpdateDelegate(GridCellType cellType, Collider other);
 
 public class GridController : MonoBehaviour
 {
     public Transform gridStart, gridEnd;
-    public Transform gridCellPrefab, gridCellTargetPrefab, girdCellTrapPrefab;
+    public Transform gridCellPrefab, gridCellTargetPrefab, girdCellTrapPrefab, gridCellTargetDuoPrefab;
     public AvatarController avatarController, rivalAvatarController;
     public CodeInterpreter codeInterpreter;
 
@@ -17,6 +17,7 @@ public class GridController : MonoBehaviour
     private Transform[,] cellObjectsMap;  // The map of grid cells
     private GridCellType[,] cellTypeMap;  // The map of grid cells with types
     private List<GridCellTarget> flagCells;  // A list of flag cells
+    private List<GridCellTargetDual> dualFlagCells;  // A list of flag cells
     private int numFlagsCaptured;
     private int targetNumOfFlags;
     private int numInX, numInZ;
@@ -52,21 +53,9 @@ public class GridController : MonoBehaviour
 
     void Start()
     {
-        GenerateDefaultMap();
-
-        // Load predefined maps to the data folder
         dataFolderPath = Application.persistentDataPath;
-        string[] predefinedMaps = { "Default1.OgMap", "Default2.OgMap" };
-        foreach (var s in predefinedMaps)
-        {
-            var path = Path.Combine(dataFolderPath, s) + ".txt";
-            var txt = (TextAsset)Resources.Load(s, typeof(TextAsset));
-            using (var writer = new StreamWriter(path))
-            {
-                writer.Write(txt.text);
-            }
-            DataLogger.Log(this.gameObject, LogTag.SYSTEM, "A predefined map is saved to at " + path);
-        }
+
+        GenerateDefaultMap();
     }
 
     // ==================== Map Utilities ====================
@@ -150,6 +139,7 @@ public class GridController : MonoBehaviour
         cellVectorMap = new Vector3[numInX, numInZ];
         cellObjectsMap = new Transform[numInX, numInZ];
         flagCells = new List<GridCellTarget>();
+        dualFlagCells = new List<GridCellTargetDual>();
         NumFlagsCaptured = 0;
         TargetNumOfFlags = 0;
         cellTypeMap = cells;
@@ -169,7 +159,15 @@ public class GridController : MonoBehaviour
                             GridCellUpdateCallback
                         );
                         flagCells.Add(newCell.GetComponent<GridCellTarget>());
-                        TargetNumOfFlags++;
+                        TargetNumOfFlags += 1;
+                        break;
+                    case GridCellType.REWARD_DUAL:
+                        newCell = (Transform)Instantiate(gridCellTargetDuoPrefab, transform, false);
+                        newCell.GetComponent<GridCellTargetDual>().SetUpdateDelegate(
+                            GridCellUpdateCallback
+                        );
+                        dualFlagCells.Add(newCell.GetComponent<GridCellTargetDual>());
+                        TargetNumOfFlags += 2;
                         break;
                     case GridCellType.TRAP:
                         newCell = (Transform)Instantiate(girdCellTrapPrefab, transform, false);
@@ -229,13 +227,14 @@ public class GridController : MonoBehaviour
     public void ResetMap()
     {
         if (flagCells != null)
-        {
             foreach (var c in flagCells)
-            {
                 c.Reset();
-            }
-            NumFlagsCaptured = 0;
-        }
+
+        if (dualFlagCells != null)
+            foreach (var c in dualFlagCells)
+                c.Reset();
+
+        NumFlagsCaptured = 0;
     }
 
     public bool IsStageClear()
@@ -258,7 +257,11 @@ public class GridController : MonoBehaviour
                 break;
             case GridCellType.REWARD:
                 DataLogger.Log(this.gameObject, LogTag.MAP, "A reward is collected.");
-                NumFlagsCaptured++;
+                NumFlagsCaptured += 1;
+                break;
+            case GridCellType.REWARD_DUAL:
+                DataLogger.Log(this.gameObject, LogTag.MAP, "A dual reward is collected.");
+                NumFlagsCaptured += 1;
                 break;
             case GridCellType.BASE:
                 break;

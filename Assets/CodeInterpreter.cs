@@ -31,29 +31,14 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
 
     void Start()
     {
+        dataFolderPath = Application.persistentDataPath;
+
         scriptVariables = new Dictionary<string, float>();
         CloseTopicViewAndBroadcast();
 
         // Init the script scroller
         scriptScroller.Delegate = this;
         scriptScroller.ReloadData(scrollPositionFactor: 0.0f);
-
-        // Load predefined scripts to the data folder
-        dataFolderPath = Application.persistentDataPath;
-        string[] predefinedMaps = { "Default1.OgScript", "Default2.OgScript" };
-        foreach (var s in predefinedMaps)
-        {
-            var path = Path.Combine(dataFolderPath, s) + ".txt";
-            var txt = (TextAsset)Resources.Load(s, typeof(TextAsset));
-            using (var writer = new StreamWriter(path))
-            {
-                writer.Write(txt.text);
-            }
-            DataLogger.Log(
-                this.gameObject, LogTag.SYSTEM,
-                "A predefined script is saved as " + path
-            );
-        }
     }
 
     public UnityAction GetTopicButtonEvent(string topic)
