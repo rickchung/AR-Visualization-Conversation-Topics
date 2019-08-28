@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public enum GridCellType { BASE, TRAP, REWARD };
-public delegate void GridCellUpdateDelegate(GridCellType cellType);
+public delegate void GridCellUpdateDelegate(GridCellType cellType, Collider other);
 
 public class GridController : MonoBehaviour
 {
@@ -39,6 +39,9 @@ public class GridController : MonoBehaviour
             DataLogger.Log(this.gameObject, LogTag.SYSTEM, "A predefined map is saved to at " + path);
         }
     }
+
+
+    // ==================== Map Utilities ====================
 
     /// <summary>
     /// Generating a map with only white default cells.
@@ -205,15 +208,18 @@ public class GridController : MonoBehaviour
         }
     }
 
-    // ==================== Problem-Design Utilities ====================
-
-    private void GridCellUpdateCallback(GridCellType cellType)
+    private void GridCellUpdateCallback(GridCellType cellType, Collider other)
     {
         switch (cellType)
         {
             case GridCellType.TRAP:
                 DataLogger.Log(this.gameObject, LogTag.MAP, "A trap is triggered.");
                 codeInterpreter.StopRunningScript();
+                var ac = other.GetComponent<AvatarController>();
+                if (ac != null)
+                {
+                    ac.isDead = true;
+                }
                 break;
             case GridCellType.REWARD:
                 DataLogger.Log(this.gameObject, LogTag.MAP, "A reward is collected.");

@@ -26,7 +26,7 @@ public class GridCellTarget : MonoBehaviour
             flagPole.gameObject.SetActive(false);
             if (updateDelegate != null)
             {
-                updateDelegate(this.cellType);
+                updateDelegate(this.cellType, other);
             }
         }
     }

@@ -24,7 +24,7 @@ public class GridCellTrap : MonoBehaviour
 
         if (updateDelegate != null)
         {
-            updateDelegate(this.cellType);
+            updateDelegate(this.cellType, other);
         }
     }
 }

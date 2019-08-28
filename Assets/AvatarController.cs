@@ -7,6 +7,7 @@ public class AvatarController : MonoBehaviour
     public Transform avatar;
     public GridController gridController;
     public bool isRival;
+    public bool isDead;
     private Transform startingCellInGrid;
     private Vector3 startingCellInVec;
     private Vector3 cellPos;

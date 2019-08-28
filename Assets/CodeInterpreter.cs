@@ -25,9 +25,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
 
     private ScriptObject loadedScript;
     private Dictionary<string, float> scriptVariables;
-
     private bool isScriptRunning;
-
     private static string dataFolderPath;
 
 
@@ -335,19 +333,29 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     {
         AvatarController runner = (!forRival) ? avatar : rivalAvatar;
 
-        DataLogger.Log(
-            this.gameObject, LogTag.SCRIPT,
-            string.Format("Running Cmd, {0}, {1}", forRival, codeObject)
-        );
-
-        string command = codeObject.GetCommand();
-        string[] args = codeObject.GetArgs();
-
-        switch (command)
+        if (!runner.isDead)
         {
-            case "MOVE":
-                runner.Move(args[0]);
-                break;
+            DataLogger.Log(
+                this.gameObject, LogTag.SCRIPT,
+                string.Format("Running Cmd, {0}, {1}", forRival, codeObject)
+            );
+
+            string command = codeObject.GetCommand();
+            string[] args = codeObject.GetArgs();
+
+            switch (command)
+            {
+                case "MOVE":
+                    runner.Move(args[0]);
+                    break;
+            }
+        }
+        else
+        {
+            DataLogger.Log(
+                this.gameObject, LogTag.SCRIPT,
+                string.Format("Avatar is dead., {0}, {1}", forRival, codeObject)
+            );
         }
     }
 
@@ -394,6 +402,9 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
             rivalAvatar.ResetPosition();
         }
 
+        // Reset avatars' states
+        avatar.isDead = false;
+        rivalAvatar.isDead = false;
         // Reset the map
         gridController.ResetMap();
     }
@@ -456,7 +467,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         scriptScroller.ReloadData(scrollPositionFactor: 0.0f);
     }
 
-    // ====================
+    // ==================== Testing Functions
 
     public void _TestLoadingScript(string scriptName)
     {
