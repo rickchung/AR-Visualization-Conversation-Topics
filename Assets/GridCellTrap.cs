@@ -16,7 +16,10 @@ public class GridCellTrap : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log(string.Format("GRID, {0}, Trap Triggered", other.name));
+        DataLogger.Log(
+            this.gameObject, LogTag.MAP,
+            string.Format("Trap triggered by {0}", other.name)
+        );
         var rigidbody = other.GetComponent<Rigidbody>();
         rigidbody.constraints = RigidbodyConstraints.None;
         rigidbody.AddForce(Vector3.up * trapPower, ForceMode.Impulse);

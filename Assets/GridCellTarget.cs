@@ -22,7 +22,10 @@ public class GridCellTarget : MonoBehaviour
     {
         if (flagPole.gameObject.activeSelf)
         {
-            Debug.Log(string.Format("GRID, {0}, Target Collected", other.name));
+            DataLogger.Log(
+                this.gameObject, LogTag.MAP,
+                string.Format("Target Collected by {0}", other.name)
+            );
             flagPole.gameObject.SetActive(false);
             if (updateDelegate != null)
             {

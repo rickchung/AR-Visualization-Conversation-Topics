@@ -137,8 +137,8 @@ public class SttNetworkManager : MonoBehaviour
             // Broadcast the new transcript extracted from the user's speech
             if (enableSttBroadcastRemote)
             {
-                partnerSocket.BroadcastNewTranscript(stt.transcript);
-                partnerSocket.BroadcasetNewKeywords(stt.topics);
+                // partnerSocket.BroadcastNewTranscript(stt.transcript);
+                partnerSocket.BroadcasetNewKeywords(stt.keywords);
             }
         }
     }

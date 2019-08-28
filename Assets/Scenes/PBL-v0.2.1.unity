@@ -202,7 +202,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 154.695, y: -23.2}
+  m_AnchoredPosition: {x: 154.695, y: -23.199951}
   m_SizeDelta: {x: 309.39, y: 46.4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &35863014
@@ -2985,18 +2985,6 @@ Prefab:
         type: 2}
       propertyPath: m_isInputParsingRequired
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1889725059432994, guid: e0f2347e3fbea455f92a7876acd85661, type: 2}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 1677954417427966, guid: e0f2347e3fbea455f92a7876acd85661, type: 2}
-      propertyPath: m_Layer
-      value: 9
-      objectReference: {fileID: 0}
-    - target: {fileID: 1083680347575338, guid: e0f2347e3fbea455f92a7876acd85661, type: 2}
-      propertyPath: m_Layer
-      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e0f2347e3fbea455f92a7876acd85661, type: 2}
@@ -7947,7 +7935,7 @@ MonoBehaviour:
   sttController: {fileID: 747354411}
   partnerSocket: {fileID: 1014079040}
   enableSttEchoLocal: 1
-  enableSttBroadcastRemote: 0
+  enableSttBroadcastRemote: 1
 --- !u!114 &747354411
 MonoBehaviour:
   m_ObjectHideFlags: 0

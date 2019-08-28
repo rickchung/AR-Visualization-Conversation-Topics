@@ -67,7 +67,7 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
         // string[] topics = stt.topics;
         string[] keywords = stt.keywords;
         SaveTranscript(text, isLocal);
-        SaveTopics(keywords, isLocal);
+        SaveTopics(keywords, isLocal);  // Use keywords as topics
     }
 
     /// <summary>
@@ -115,6 +115,7 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
             var typestamp = ",TOPIC," + speaker + ",";
 
             SaveToFile(timestamp + typestamp + string.Join(";", topics) + "\n");
+
             topicHistoryScroller.AddTopic(joinedTopics, speaker);
         }
     }

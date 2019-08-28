@@ -29,7 +29,7 @@ public class PartnerSocket : MonoBehaviour
     public GameObject serverMsgPanel;
     public SpeechToTextController speechToTextController;
     public CodeInterpreter mCodeInterpreter;
-    public bool useLocalServer;
+    [HideInInspector] public bool useLocalServer;
 
     private Button hostConnBtn;
     private Text serverMsgText;

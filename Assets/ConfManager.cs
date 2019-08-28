@@ -28,6 +28,9 @@ public class ConfManager : MonoBehaviour
 
     private void Start()
     {
+        // Prevent the screen from sleeping
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
+
         // Load predefined maps/scripts to the data folder
         var dataFolderPath = Application.persistentDataPath;
         var filesToCopy = new string[] {

@@ -21,8 +21,9 @@ public class DataLogger : MonoBehaviour
     {
         if (dataLogger != null)
         {
+            var timestamp = System.DateTime.Now.ToString("MM/dd/HH:mm:ss");
             Debug.Log(string.Format(
-                "{0}, {1}, {2}", self.name, tag.ToString(), msg
+                "{3}, {0}, {1}, {2}", self.name, tag.ToString(), msg, timestamp.ToString()
             ));
         }
         else
@@ -35,8 +36,9 @@ public class DataLogger : MonoBehaviour
     {
         if (dataLogger != null)
         {
+            var timestamp = System.DateTime.Now.ToString("MM/dd/HH:mm:ss");
             Debug.Log(string.Format(
-                "{0}, {1}, {2}", "Static", tag.ToString(), msg
+                "{3}, {0}, {1}, {2}", "Static", tag.ToString(), msg, timestamp.ToString()
             ));
         }
         else

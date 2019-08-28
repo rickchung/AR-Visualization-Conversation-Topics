@@ -322,7 +322,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         {
             DataLogger.Log(
                 this.gameObject, LogTag.SCRIPT,
-                string.Format("Running Cmd, {0}, {1}", forRival, codeObject)
+                string.Format("Running Cmd, isRival={0}, {1}", forRival, codeObject)
             );
 
             string command = codeObject.GetCommand();
