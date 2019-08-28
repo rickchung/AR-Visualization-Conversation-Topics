@@ -12,7 +12,7 @@ public class DataLogger : MonoBehaviour
 {
     public static DataLogger dataLogger;
 
-    private void Start()
+    private void Awake()
     {
         dataLogger = this;
     }
