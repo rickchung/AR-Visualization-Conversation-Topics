@@ -249,11 +249,15 @@ public class GridController : MonoBehaviour
         {
             case GridCellType.TRAP:
                 DataLogger.Log(this.gameObject, LogTag.MAP, "A trap is triggered.");
-                codeInterpreter.StopRunningScript();
+
                 var ac = other.GetComponent<AvatarController>();
                 if (ac != null)
                 {
                     ac.IsDead = true;
+                    if (!ac.isRival)
+                    {
+                        codeInterpreter.StopRunningScript();
+                    }
                 }
                 break;
             case GridCellType.REWARD:
