@@ -80,7 +80,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         {
             DataLogger.Log(
                 this.gameObject, LogTag.SYSTEM,
-                "A predefined script is imported " + scriptName
+                "A predefined script is imported " + scriptName + ": " + script
             );
         }
 
@@ -141,6 +141,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     private static Regex regexLoopEnd = new Regex(@"} (?<times>\d) Times;");
     private static CodeObjectOneCommand _ProcessOneLine(string oneLine, StreamReader reader)
     {
+        Debug.Log("Read: " + oneLine);
         // Try to match a move command
         var matchMove = regexMove.Matches(oneLine);
         if (matchMove.Count > 0)

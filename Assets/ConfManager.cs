@@ -22,7 +22,7 @@ public class ConfManager : MonoBehaviour
     public Button[] stageButtons;
     private int currentStageIndex;
 
-    public bool isSlave;
+    [HideInInspector] public bool isSlave;
 
     private Dictionary<string, OgStageConf> stages;
 
@@ -36,6 +36,8 @@ public class ConfManager : MonoBehaviour
         var filesToCopy = new string[] {
             "OgMap-Tutorial1",
             "OgMap-Tutorial2", "OgScript-Tutorial2-M", "OgScript-Tutorial2-S",
+            "OgMap-Puzzle1", "OgScript-Puzzle1-M", "OgScript-Puzzle1-S",
+            "OgMap-Puzzle2", "OgScript-Puzzle2-M", "OgScript-Puzzle2-S",
         };
         foreach (var s in filesToCopy)
         {
@@ -58,7 +60,7 @@ public class ConfManager : MonoBehaviour
 
         stages = new Dictionary<string, OgStageConf>();
 
-        var p1 = @"Tutorial-1
+        var p1 = @"Tutorial
 
 Welcome! This is the first tutorial stage of Ogmented. In this tutorial, you will learn the interface of Ogmented including the layout of maps and how to navigate the avatar around.
 
@@ -74,25 +76,36 @@ Your avater is a cube marked as blue on a grid. Please try to move your avatar a
             isDeveloperPanelEnabled: false
         ));
 
-        var p2 = @"Tutorial-2
-
-In the second tutorial, you will learn how to control the avatar by running a script.
-
-Just like controlling by arrow keys, your avatar can follow a script of commands which tell it how to move around.
-
-A script is shown on the right hand side of screen. Please try to pree run and see what your avatar will do.
-
-Once you are familiar with the script, try to tap a command in the script and modify its content. Your goal is to correct the script and make your avatar collect all flags on the screen.";
-
-        stages.Add("Tutorial2", new OgStageConf(
-            name: "Tutorial2",
-            problem: p2,
+        stages.Add("Puzzle1", new OgStageConf(
+            name: "Puzzle1",
+            problem: @"Puzzle 1",
             map: "OgMap-Tutorial2.txt",
             masterScript: "OgScript-Tutorial2-M.txt",
             slaveScript: "OgScript-Tutorial2-S.txt",
             isArrowKeyEnabled: false,
             isDeveloperPanelEnabled: false
         ));
+
+        stages.Add("Puzzle2", new OgStageConf(
+            name: "Puzzle2",
+            problem: @"Puzzle 2",
+            map: "OgMap-Puzzle1.txt",
+            masterScript: "OgScript-Puzzle1-M.txt",
+            slaveScript: "OgScript-Puzzle1-S.txt",
+            isArrowKeyEnabled: false,
+            isDeveloperPanelEnabled: false
+        ));
+
+        stages.Add("Puzzle3", new OgStageConf(
+            name: "Puzzle3",
+            problem: @"Puzzle 3",
+            map: "OgMap-Puzzle2.txt",
+            masterScript: "OgScript-Puzzle2-M.txt",
+            slaveScript: "OgScript-Puzzle2-S.txt",
+            isArrowKeyEnabled: false,
+            isDeveloperPanelEnabled: false
+        ));
+
 
         // Init stage buttons
         if (stageButtons != null)

@@ -1,0 +1,13 @@
+LOOP REPEAT {
+    MOVE (SOUTH);
+} 3 Times;
+
+MOVE (NORTH);
+MOVE (EAST);
+
+LOOP REPEAT {
+    MOVE (EAST);
+} 2 Times;
+
+MOVE (EAST);
+MOVE (EAST);
