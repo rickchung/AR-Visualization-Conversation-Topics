@@ -12,6 +12,7 @@ public class GridController : MonoBehaviour
     public Transform gridCellPrefab, gridCellTargetPrefab, girdCellTrapPrefab, gridCellTargetDuoPrefab;
     public AvatarController avatarController, rivalAvatarController;
     public CodeInterpreter codeInterpreter;
+    public ConfManager confManager;
 
     private Vector3[,] cellVectorMap;  // The real-world map of the game.
     private Transform[,] cellObjectsMap;  // The map of grid cells
@@ -265,6 +266,12 @@ public class GridController : MonoBehaviour
                 break;
             case GridCellType.BASE:
                 break;
+        }
+
+        if (IsStageClear())
+        {
+            DataLogger.Log(this.gameObject, LogTag.SYSTEM, "Stage Clear!");
+            confManager.EnableNextStage();
         }
     }
 

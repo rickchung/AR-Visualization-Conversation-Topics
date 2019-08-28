@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ConfManager : MonoBehaviour
 {
@@ -18,6 +19,8 @@ public class ConfManager : MonoBehaviour
     public GameObject sttCtrlPanel;
     public GameObject developerPanel;
     public GameObject startScreen;
+    public Button[] stageButtons;
+    private int currentStageIndex;
 
     public bool isSlave;
 
@@ -25,7 +28,6 @@ public class ConfManager : MonoBehaviour
 
     private void Start()
     {
-
         // Load predefined maps/scripts to the data folder
         var dataFolderPath = Application.persistentDataPath;
         var filesToCopy = new string[] {
@@ -88,6 +90,16 @@ Once you are familiar with the script, try to tap a command in the script and mo
             isArrowKeyEnabled: false,
             isDeveloperPanelEnabled: false
         ));
+
+        // Init stage buttons
+        if (stageButtons != null)
+        {
+            foreach (var b in stageButtons)
+            {
+                b.interactable = false;
+            }
+            stageButtons[0].interactable = true;
+        }
     }
 
     public void ApplyConfiguration(string confName)
@@ -120,14 +132,20 @@ Once you are familiar with the script, try to tap a command in the script and mo
         informationPanel.ShowInfoPanel(true);
     }
 
-
-
     public void StartGame()
     {
         ApplyConfiguration("Tutorial1");
         startScreen.SetActive(false);
     }
 
+    public void EnableNextStage()
+    {
+        currentStageIndex++;
+        if (stageButtons != null && currentStageIndex < stageButtons.Length)
+        {
+            stageButtons[currentStageIndex].interactable = true;
+        }
+    }
 
     public class OgStageConf
     {
