@@ -91,9 +91,6 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
                     SaveToFile(timestamp + typestamp + ts + "\n");
                     _sttHistory.Add(ts);
                 }
-
-                // Statistics for charts
-                statChartController.UpdateStat(1, ts.Split(' ').Length, isLocal);
             }
             if (transHistoryScroller != null)
                 transHistoryScroller.ReloadData();
@@ -116,6 +113,8 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
 
             SaveToFile(timestamp + typestamp + string.Join(";", topics) + "\n");
 
+            // Statistics for charts
+            statChartController.UpdateStat(1, topics.Length, isLocal);
             topicHistoryScroller.AddTopic(joinedTopics, speaker);
         }
     }
@@ -193,6 +192,11 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
             statChartController.UpdateNumPhaseChart(useSocialVis: enableSocialVis);
             statChartController.UpdateNumWordChart(useSocialVis: enableSocialVis);
         }
+    }
+
+    public void EnableSocialVis(bool value)
+    {
+        enableSocialVis = value;
     }
 
     // ======================================================================

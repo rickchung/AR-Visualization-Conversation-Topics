@@ -319,8 +319,12 @@ public class PartnerSocket : MonoBehaviour
     {
         // Add to the panel
         var newKeywordsMsg = netMsg.ReadMessage<StringMessage>().value;
-        speechToTextController.SaveTopics(newKeywordsMsg.Split(','), isLocal: false);
-        speechToTextController.UpdateVis();
+        var keywords = newKeywordsMsg.Split(',');
+        if (keywords.Length > 0)
+        {
+            speechToTextController.SaveTopics(keywords, isLocal: false);
+            speechToTextController.UpdateVis();
+        }
     }
 
     /// <summary>

@@ -68,7 +68,12 @@ public class StatChartController : MonoBehaviour
             chartNumPhases.ClearPieChart();
             float localRatio = numOfPhases / (numOfPhases + numOfRemotePhases);
             float remoteRatio = numOfRemotePhases / (numOfPhases + numOfRemotePhases);
-            chartNumPhases.RenderPieChart(new float[] { localRatio, remoteRatio });
+            // Debug.Log(numOfPhases + ", " + numOfRemotePhases);
+
+            if (localRatio != float.NaN && remoteRatio != float.NaN)
+            {
+                chartNumPhases.RenderPieChart(new float[] { localRatio, remoteRatio });
+            }
         }
     }
 
