@@ -7,7 +7,9 @@ public class AvatarController : MonoBehaviour
     public Transform avatar;
     public GridController gridController;
     public PartnerSocket partnerSocket;
+    public CodeInterpreter codeInterpreter;
     public bool isRival;
+
     private bool isDead;
     private Transform startingCellInGrid;
     private Vector3? startingCellInVec = null;
@@ -59,6 +61,18 @@ public class AvatarController : MonoBehaviour
             _newPos.y = AVATAR_Y_POS;
             avatar.localPosition = _newPos;
             cellPos = cellCoor;
+        }
+        // If running out of the boundary
+        else
+        {
+            DataLogger.Log(
+                this.gameObject, LogTag.MAP,
+                "The avatar exceeded the boundary (isRival = " + isRival + ")"
+            );
+            GridCellTrap.TriggerTrapEffect(avatar.GetComponent<Collider>());
+            IsDead = true;
+            if (!isRival)
+                codeInterpreter.StopRunningScript();
         }
     }
 
