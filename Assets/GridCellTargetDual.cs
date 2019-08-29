@@ -45,7 +45,9 @@ public class GridCellTargetDual : MonoBehaviour
 
     public void Reset()
     {
-        flagPoleLocal.gameObject.SetActive(true);
-        flagPoleRemote.gameObject.SetActive(true);
+        if (flagPoleLocal != null)
+            flagPoleLocal.gameObject.SetActive(true);
+        if (flagPoleRemote != null)
+            flagPoleRemote.gameObject.SetActive(true);
     }
 }
