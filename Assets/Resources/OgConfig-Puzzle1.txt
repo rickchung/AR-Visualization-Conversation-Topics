@@ -5,6 +5,8 @@ Puzzle1
 
 A. Fixing bugs in a script
 B. Collecting all the flags with your partner.
+
+Hint: There are 2 bugs in your script.
 #
 OgMap-Puzzle1.txt
 OgScript-Puzzle1-M.txt

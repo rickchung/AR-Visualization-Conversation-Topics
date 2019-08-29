@@ -1,10 +1,12 @@
 Puzzle3
-<size=115%><smallcaps>>Puzzle3: Two Loops, Three Bugs, Two Dual Flags</smallcaps></size>
+<size=115%><smallcaps>>Puzzle3: Two Loop Puzzle</smallcaps></size>
 
 <size=115%><smallcaps>>Your Goal in This Stage</smallcaps></size>
 
 A. Fixing bugs in a script
 B. Collecting all the flags with your partner.
+
+Hint: There are 3 (2+1) bugs in your script.
 #
 OgMap-Puzzle3.txt
 OgScript-Puzzle3-M.txt

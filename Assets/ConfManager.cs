@@ -126,7 +126,7 @@ public class ConfManager : MonoBehaviour
     public void StartGame()
     {
         partnerSocket.SetupRemoteServer();
-        ApplyConfiguration("Puzzle2");
+        ApplyConfiguration("Tutorial");
         startScreen.SetActive(false);
         codeInterpreter.ResetAvatars();
     }
