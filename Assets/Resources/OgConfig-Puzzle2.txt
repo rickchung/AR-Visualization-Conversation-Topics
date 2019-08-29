@@ -1,0 +1,13 @@
+Puzzle2
+<size=115%><smallcaps>>Puzzle2: One Loop, Two Bugs, and a Dual Flag</smallcaps></size>
+
+<size=115%><smallcaps>>Your Goal in This Stage</smallcaps></size>
+
+A. Fixing bugs in a script
+B. Collecting all the flags with your partner.
+#
+OgMap-Puzzle2.txt
+OgScript-Puzzle2-M.txt
+OgScript-Puzzle2-S.txt
+false
+false

@@ -1,0 +1,13 @@
+Puzzle3
+<size=115%><smallcaps>>Puzzle3: Two Loops, Three Bugs, Two Dual Flags</smallcaps></size>
+
+<size=115%><smallcaps>>Your Goal in This Stage</smallcaps></size>
+
+A. Fixing bugs in a script
+B. Collecting all the flags with your partner.
+#
+OgMap-Puzzle3.txt
+OgScript-Puzzle3-M.txt
+OgScript-Puzzle3-S.txt
+false
+false

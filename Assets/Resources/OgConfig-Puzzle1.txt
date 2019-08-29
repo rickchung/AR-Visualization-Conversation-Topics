@@ -1,0 +1,13 @@
+Puzzle1
+<size=115%><smallcaps>>Puzzle1: Fix One Bug in the Script</smallcaps></size>
+
+<size=115%><smallcaps>>Your Goal in This Stage</smallcaps></size>
+
+A. Fixing bugs in a script
+B. Collecting all the flags with your partner.
+#
+OgMap-Puzzle1.txt
+OgScript-Puzzle1-M.txt
+OgScript-Puzzle1-S.txt
+false
+false

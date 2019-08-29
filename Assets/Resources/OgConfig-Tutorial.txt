@@ -1,0 +1,22 @@
+Tutorial
+<size=115%><smallcaps>>Tutorial: Interface, Audio and Script Control</smallcaps></size>
+
+Welcome! This is the tutorial of Ogmented.
+
+<size=115%><smallcaps>>Your Goal in This Stage</smallcaps></size>
+
+A. Getting familiar with the control of script, including
+<indent=4%>
+- Running a script
+- Modifying commands in a script
+- Resetting the avatar and map <mark=#ffff00aa>asynchronously</mark>
+</indent>
+B. Understanding the geometry and components in a map
+C. Collecting all the flags with your partner.
+
+#
+OgMap-Tutorial1.txt
+OgScript-Tutorial1-M.txt
+OgScript-Tutorial1-S.txt
+false
+false
