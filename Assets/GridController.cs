@@ -55,8 +55,6 @@ public class GridController : MonoBehaviour
     void Start()
     {
         dataFolderPath = Application.persistentDataPath;
-
-        GenerateDefaultMap();
     }
 
     // ==================== Map Utilities ====================
@@ -216,6 +214,11 @@ public class GridController : MonoBehaviour
             var map = ImportGridAndProblem(mapName);
             GenerateMapFromCells(map);
         }
+
+        // TODO: When a grid map is loaded, should it reset the positions of two avatars?
+        // Now the reset funciton is controlled asynchronously. It means a player can
+        // only reset his/her own avatar. When a map is loaded, this function does not
+        // reset the rival avatar and may result in a weird position of the rival avatar.
     }
 
     private void RemoveGridMap()

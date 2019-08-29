@@ -141,7 +141,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     private static Regex regexLoopEnd = new Regex(@"} (?<times>\d) Times;");
     private static CodeObjectOneCommand _ProcessOneLine(string oneLine, StreamReader reader)
     {
-        Debug.Log("Read: " + oneLine);
+        // Debug.Log("Read: " + oneLine);
         // Try to match a move command
         var matchMove = regexMove.Matches(oneLine);
         if (matchMove.Count > 0)
@@ -365,7 +365,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     }
 
     /// <summary>
-    /// Reset the positions of avaters. When the forRival flag is true, the method resets the position of the rival avater. This flag is reserved for the remote control from the connected device.
+    /// Reset the positions of avaters. When the forRival flag is true, the method resets the position of the rival avater. This flag is also designed for the remote control from the connected device.
     /// </summary>
     /// <param name="forRival"></param>
     public void ResetAvatars(bool forRival = false)

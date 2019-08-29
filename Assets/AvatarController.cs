@@ -6,6 +6,7 @@ public class AvatarController : MonoBehaviour
 {
     public Transform avatar;
     public GridController gridController;
+    public PartnerSocket partnerSocket;
     public bool isRival;
     private bool isDead;
     private Transform startingCellInGrid;
@@ -32,7 +33,7 @@ public class AvatarController : MonoBehaviour
     /// <param name="dir"></param>
     public void Move(string dir)
     {
-        MoveInDir(gridController.GetDirFromString(dir, mirror: isRival));
+        MoveInDir(gridController.GetDirFromString(dir, mirror: false));
     }
 
     /// <summary>
@@ -66,19 +67,48 @@ public class AvatarController : MonoBehaviour
     /// </summary>
     public void ResetPosition()
     {
+        // These two variables are updated here to ensure this procedure is taken
+        // after the grid map is generated
         if (startingCellInGrid == null || startingCellInVec == null)
         {
-            if (!isRival)
+            Transform sc = null;
+            Vector3? vc = null;
+
+            // If you are a master device,
+            // - Player1's avatar is at (0, 0, 0)
+            // - Rival's avatar is at (last, 0, last)
+            // If you are a slave device, the positions are exchanged.
+            if (partnerSocket.IsMaster)
             {
-                startingCellInGrid = gridController.GetTheFirstCellInGrid();
-                startingCellInVec = new Vector3(0, 0, 0);
+                if (!isRival)
+                {
+                    sc = gridController.GetTheFirstCellInGrid();
+                    vc = new Vector3(0, 0, 0);
+                }
+                else
+                {
+                    sc = gridController.GetTheLastCellInGrid();
+                    var tmp = gridController.GetSizeOfCoor();
+                    vc = new Vector3(tmp.x - 1, 0, tmp.z - 1);
+                }
             }
             else
             {
-                startingCellInGrid = gridController.GetTheLastCellInGrid();
-                var tmp = gridController.GetSizeOfCoor();
-                startingCellInVec = new Vector3(tmp.x - 1, 0, tmp.z - 1);
+                if (!isRival)
+                {
+                    sc = gridController.GetTheLastCellInGrid();
+                    var tmp = gridController.GetSizeOfCoor();
+                    vc = new Vector3(tmp.x - 1, 0, tmp.z - 1);
+                }
+                else
+                {
+                    sc = gridController.GetTheFirstCellInGrid();
+                    vc = new Vector3(0, 0, 0);
+                }
             }
+
+            startingCellInGrid = sc;
+            startingCellInVec = vc;
         }
 
         // Reset the position

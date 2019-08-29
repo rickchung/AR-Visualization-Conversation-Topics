@@ -1,5 +1,5 @@
 Puzzle2
-<size=115%><smallcaps>>Puzzle2: One Loop, Two Bugs, and a Dual Flag</smallcaps></size>
+<size=115%><smallcaps>>Puzzle2: One Loop and One Dual Flag</smallcaps></size>
 
 <size=115%><smallcaps>>Your Goal in This Stage</smallcaps></size>
 

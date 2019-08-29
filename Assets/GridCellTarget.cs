@@ -36,6 +36,7 @@ public class GridCellTarget : MonoBehaviour
 
     public void Reset()
     {
-        flagPole.gameObject.SetActive(true);
+        if (flagPole != null)
+            flagPole.gameObject.SetActive(true);
     }
 }

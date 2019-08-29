@@ -125,8 +125,10 @@ public class ConfManager : MonoBehaviour
 
     public void StartGame()
     {
+        partnerSocket.SetupRemoteServer();
         ApplyConfiguration("Tutorial");
         startScreen.SetActive(false);
+        codeInterpreter.ResetAvatars();
     }
 
     public void StopGame()
