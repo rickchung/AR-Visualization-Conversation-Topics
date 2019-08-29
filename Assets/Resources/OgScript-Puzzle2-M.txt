@@ -1,9 +1,10 @@
 MOVE (SOUTH);
-MOVE (SOUTH);
+MOVE (EAST);
 
 LOOP REPEAT {
     MOVE (SOUTH);
     MOVE (WEST);
 } 2 Times;
 
+MOVE (EAST);
 MOVE (EAST);
