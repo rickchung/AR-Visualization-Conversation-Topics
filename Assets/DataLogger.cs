@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.IO;
+using System;
+using UnityEngine;
 
 public enum LogTag
 {
@@ -12,10 +14,15 @@ public enum LogTag
 public class DataLogger : MonoBehaviour
 {
     public static DataLogger dataLogger;
+    private static string logFilePath;
 
     private void Awake()
     {
         dataLogger = this;
+        var tnow = DateTime.Now.ToString().Replace('/', '-').Replace(':', '-').Replace(' ', '-');
+        logFilePath = Path.Combine(Application.persistentDataPath, tnow) + "-Log.txt";
+
+        Debug.Log("Log data will be saved to " + logFilePath);
     }
 
     public static void Log(GameObject self, LogTag tag, string msg)
@@ -23,9 +30,15 @@ public class DataLogger : MonoBehaviour
         if (dataLogger != null)
         {
             var timestamp = System.DateTime.Now.ToString("MM/dd/HH:mm:ss");
-            Debug.Log(string.Format(
+            var logOutput = string.Format(
                 "{3}, {0}, {1}, {2}", self.name, tag.ToString(), msg, timestamp.ToString()
-            ));
+            );
+            Debug.Log(logOutput);
+
+            using (var writer = new StreamWriter(logFilePath, append: true))
+            {
+                writer.Write(logOutput + "\n");
+            }
         }
         else
         {
@@ -38,9 +51,15 @@ public class DataLogger : MonoBehaviour
         if (dataLogger != null)
         {
             var timestamp = System.DateTime.Now.ToString("MM/dd/HH:mm:ss");
-            Debug.Log(string.Format(
+            var logOutput = string.Format(
                 "{3}, {0}, {1}, {2}", "Static", tag.ToString(), msg, timestamp.ToString()
-            ));
+            );
+            Debug.Log(logOutput);
+
+            using (var writer = new StreamWriter(logFilePath, append: true))
+            {
+                writer.Write(logOutput + "\n");
+            }
         }
         else
         {
