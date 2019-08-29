@@ -5,3 +5,5 @@ LOOP REPEAT {
     MOVE (SOUTH);
     MOVE (WEST);
 } 2 Times;
+
+MOVE (EAST);

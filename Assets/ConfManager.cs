@@ -60,7 +60,7 @@ public class ConfManager : MonoBehaviour
             }
             DataLogger.Log(
                 this.gameObject, LogTag.SYSTEM,
-                "A predefined map/script is saved to at " + path
+                "A predefined map/script is COPIED to " + path
             );
         }
 
@@ -126,7 +126,7 @@ public class ConfManager : MonoBehaviour
     public void StartGame()
     {
         partnerSocket.SetupRemoteServer();
-        ApplyConfiguration("Tutorial");
+        ApplyConfiguration("Puzzle2");
         startScreen.SetActive(false);
         codeInterpreter.ResetAvatars();
     }
