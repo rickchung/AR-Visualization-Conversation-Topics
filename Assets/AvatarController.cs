@@ -71,44 +71,7 @@ public class AvatarController : MonoBehaviour
         // after the grid map is generated
         if (startingCellInGrid == null || startingCellInVec == null)
         {
-            Transform sc = null;
-            Vector3? vc = null;
-
-            // If you are a master device,
-            // - Player1's avatar is at (0, 0, 0)
-            // - Rival's avatar is at (last, 0, last)
-            // If you are a slave device, the positions are exchanged.
-            if (partnerSocket.IsMaster)
-            {
-                if (!isRival)
-                {
-                    sc = gridController.GetTheFirstCellInGrid();
-                    vc = new Vector3(0, 0, 0);
-                }
-                else
-                {
-                    sc = gridController.GetTheLastCellInGrid();
-                    var tmp = gridController.GetSizeOfCoor();
-                    vc = new Vector3(tmp.x - 1, 0, tmp.z - 1);
-                }
-            }
-            else
-            {
-                if (!isRival)
-                {
-                    sc = gridController.GetTheLastCellInGrid();
-                    var tmp = gridController.GetSizeOfCoor();
-                    vc = new Vector3(tmp.x - 1, 0, tmp.z - 1);
-                }
-                else
-                {
-                    sc = gridController.GetTheFirstCellInGrid();
-                    vc = new Vector3(0, 0, 0);
-                }
-            }
-
-            startingCellInGrid = sc;
-            startingCellInVec = vc;
+            UpdateStartingCells();
         }
 
         // Reset the position
@@ -126,6 +89,48 @@ public class AvatarController : MonoBehaviour
             RigidbodyConstraints.FreezePositionZ |
             RigidbodyConstraints.FreezeRotation)
         ;
+    }
+
+    public void UpdateStartingCells()
+    {
+        Transform sc = null;
+        Vector3? vc = null;
+
+        // If you are a master device,
+        // - Player1's avatar is at (0, 0, 0)
+        // - Rival's avatar is at (last, 0, last)
+        // If you are a slave device, the positions are exchanged.
+        if (partnerSocket.IsMaster)
+        {
+            if (!isRival)
+            {
+                sc = gridController.GetTheFirstCellInGrid();
+                vc = new Vector3(0, 0, 0);
+            }
+            else
+            {
+                sc = gridController.GetTheLastCellInGrid();
+                var tmp = gridController.GetSizeOfCoor();
+                vc = new Vector3(tmp.x - 1, 0, tmp.z - 1);
+            }
+        }
+        else
+        {
+            if (!isRival)
+            {
+                sc = gridController.GetTheLastCellInGrid();
+                var tmp = gridController.GetSizeOfCoor();
+                vc = new Vector3(tmp.x - 1, 0, tmp.z - 1);
+            }
+            else
+            {
+                sc = gridController.GetTheFirstCellInGrid();
+                vc = new Vector3(0, 0, 0);
+            }
+        }
+
+        startingCellInGrid = sc;
+        startingCellInVec = vc;
     }
 
     // ====================

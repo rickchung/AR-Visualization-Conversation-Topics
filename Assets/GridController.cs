@@ -197,7 +197,9 @@ public class GridController : MonoBehaviour
         gridStart.gameObject.SetActive(false);
         gridEnd.gameObject.SetActive(false);
         // When the grid is ready, reset the positions of avatars
+        avatarController.UpdateStartingCells();
         avatarController.ResetPosition();
+        rivalAvatarController.UpdateStartingCells();
         rivalAvatarController.ResetPosition();
     }
 

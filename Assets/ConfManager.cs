@@ -127,6 +127,7 @@ public class ConfManager : MonoBehaviour
     {
         partnerSocket.SetupRemoteServer();
         ApplyConfiguration("Tutorial");
+        currentStageIndex = 0;
         startScreen.SetActive(false);
         codeInterpreter.ResetAvatars();
     }
@@ -138,15 +139,84 @@ public class ConfManager : MonoBehaviour
 
     public void RestartGame()
     {
+        DataLogger.Log(
+            this.gameObject, LogTag.SYSTEM_WARNING,
+            "[Admin] Trying to restart the scene..."
+        );
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     public void EnableNextStage()
     {
+        stageButtons[currentStageIndex].interactable = false;
         currentStageIndex++;
         if (stageButtons != null && currentStageIndex < stageButtons.Count)
         {
             stageButtons[currentStageIndex].interactable = true;
+        }
+        if (currentStageIndex == stageButtons.Count)
+        {
+            StopGame();
+        }
+    }
+
+    public void JumpToStage(string name)
+    {
+        DataLogger.Log(
+            this.gameObject, LogTag.SYSTEM_WARNING,
+            "[Admin] Trying to jump to the stage: " + name
+        );
+
+        bool successful = false;
+        switch (name)
+        {
+            case "Tutorial":
+                ApplyConfiguration("Tutorial");
+                currentStageIndex = 0;
+                successful = true;
+                break;
+            case "Puzzle1":
+                ApplyConfiguration("Puzzle1");
+                currentStageIndex = 1;
+                successful = true;
+                break;
+            case "Puzzle2":
+                ApplyConfiguration("Puzzle2");
+                currentStageIndex = 2;
+                successful = true;
+                break;
+            case "Puzzle3":
+                ApplyConfiguration("Puzzle3");
+                currentStageIndex = 3;
+                successful = true;
+                break;
+        }
+
+        if (successful)
+        {
+            foreach (var b in stageButtons)
+                b.interactable = false;
+            stageButtons[currentStageIndex].interactable = true;
+        }
+    }
+
+    public void CloseDeveloperPanel()
+    {
+        developerPanel.SetActive(false);
+    }
+
+    private int _developerMagicCount = 0;
+    public void OpenDeveloperPanel()
+    {
+        _developerMagicCount++;
+        if (_developerMagicCount >= 5)
+        {
+            developerPanel.SetActive(true);
+            _developerMagicCount = 0;
+            DataLogger.Log(
+                this.gameObject, LogTag.SYSTEM_WARNING,
+                "[Admin] The developer panel is open."
+            );
         }
     }
 

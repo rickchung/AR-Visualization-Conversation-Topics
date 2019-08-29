@@ -1,18 +1,24 @@
 Tutorial
-<size=115%><smallcaps>>Tutorial: Interface, Audio and Script Control</smallcaps></size>
+<size=115%><smallcaps>> Tutorial: Interface, Audio and Script Control</smallcaps></size>
 
 Welcome! This is the tutorial of Ogmented.
 
-<size=115%><smallcaps>>Your Goal in This Stage</smallcaps></size>
+<size=115%><smallcaps>> Your Goal in This Stage</smallcaps></size>
 
 A. Getting familiar with the control of script, including
 <indent=4%>
 - Running a script
 - Modifying commands in a script
-- Resetting the avatar and map <mark=#ffff00aa>asynchronously</mark>
+- Resetting the avatar and map
 </indent>
 B. Understanding the geometry and components in a map
 C. Collecting all the flags with your partner.
+
+<size=115%><smallcaps>> NOTE</smallcaps></size>
+1. The map is SHARED between you and your partner.
+2. Whenever you press the reset button, only YOUR avatar will be put back to its origin.
+3. The "run" button resets the map before executing the script.
+4. When a stage is clear, both your partner and you should open the next stage together.
 
 #
 OgMap-Tutorial1.txt
