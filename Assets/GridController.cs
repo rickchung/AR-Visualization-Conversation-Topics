@@ -205,6 +205,7 @@ public class GridController : MonoBehaviour
 
     public void LoadGridMap(string mapName)
     {
+        isThisStageClear = false;
         RemoveGridMap();
 
         if (mapName.Equals("Default"))
@@ -248,6 +249,7 @@ public class GridController : MonoBehaviour
         return (numFlagsCaptured == targetNumOfFlags);
     }
 
+    private bool isThisStageClear;
     private void GridCellUpdateCallback(GridCellType cellType, Collider other)
     {
         switch (cellType)
@@ -279,8 +281,12 @@ public class GridController : MonoBehaviour
 
         if (IsStageClear())
         {
-            DataLogger.Log(this.gameObject, LogTag.SYSTEM, "Stage Clear!");
-            confManager.EnableNextStage();
+            if (!isThisStageClear)
+            {
+                DataLogger.Log(this.gameObject, LogTag.SYSTEM, "Stage Clear!");
+                confManager.EnableNextStage();
+                isThisStageClear = true;
+            }
         }
     }
 
