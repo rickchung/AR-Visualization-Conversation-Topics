@@ -75,8 +75,19 @@ public class VoiceController : MonoBehaviour
     }
 
     private AudioClip mergedClip;
+    private int mergedClipCount;
+    private const int MERGED_CLIP_LIMIT = 10;
     private List<float> mergedClipData;
     private string mergedClipName;
+
+    private void RenewMergedClip()
+    {
+        mergedClip = null;
+        mergedClipData = new List<float>();
+        mergedClipName = "MergedMicAudio-" + (DateTime.Now.ToString()
+            .Replace('/', '-').Replace(':', '-').Replace(' ', '-'));
+        mergedClipCount = 0;
+    }
     private IEnumerator CheckMic()
     {
         // Start the microphone
@@ -88,12 +99,7 @@ public class VoiceController : MonoBehaviour
         while (!(Microphone.GetPosition(micName) > latency)) { }
         audioSource.Play();
 
-        // For the merged audio file
-        mergedClip = null;
-        mergedClipData = new List<float>();
-        mergedClipName = "MergedMicAudio-" + (DateTime.Now.ToString()
-            .Replace('/', '-').Replace(':', '-').Replace(' ', '-'));
-
+        RenewMergedClip();
         while (Microphone.IsRecording(micName))
         {
             yield return new WaitForSeconds(CLIP_SIZE);
@@ -154,6 +160,13 @@ public class VoiceController : MonoBehaviour
             if (sendCumulativeClip)
             {
                 networkManager.RequestSpeechToText(mergedFilePath);
+            }
+
+            // To prevent using too much memory
+            mergedClipCount++;
+            if (mergedClipCount >= MERGED_CLIP_LIMIT)
+            {
+                RenewMergedClip();
             }
         }
         yield return null;
