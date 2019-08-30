@@ -137,9 +137,24 @@ public class PartnerSocket : MonoBehaviour
     private void BroadcastToConnected(short msgType, MessageBase msg)
     {
         if (!_broadcastByHost)
+        {
             NetworkServer.SendToAll(msgType, msg);
+        }
         else
-            clientToPartner.Send(msgType, msg);
+        {
+            if (!clientToPartner.isConnected)
+            {
+                DataLogger.Log(
+                    this.gameObject, LogTag.SYSTEM_WARNING,
+                    "The device is disconnected for some reasons. Try to reconnect to the sever...");
+                SetupRemoteServer();
+                // TODO: Some message will be discarded during reconnection.
+            }
+            else
+            {
+                clientToPartner.Send(msgType, msg);
+            }
+        }
 
     }
 
