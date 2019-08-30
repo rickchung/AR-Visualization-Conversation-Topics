@@ -17,8 +17,9 @@ public class ConfManager : MonoBehaviour
     public GridController gridController;
     public CodeInterpreter codeInterpreter;
     public PartnerSocket partnerSocket;
+    public VoiceController voiceController;
     public GameObject arrowKeyPanel;
-    public GameObject sttCtrlPanel;
+    public GameObject sttCtrlPanel, sttCtrlPanelAlwaysOn;
     public GameObject developerPanel;
     public GameObject startScreen, endScreen;
     public Transform stageProgressView;
@@ -37,6 +38,10 @@ public class ConfManager : MonoBehaviour
         // Open the welcome screen
         startScreen.SetActive(true);
         endScreen.SetActive(false);
+
+        // Default layout
+        sttCtrlPanel.SetActive(true);
+        sttCtrlPanelAlwaysOn.SetActive(false);
 
         // Load predefined maps/scripts to the data folder
         var dataFolderPath = Application.persistentDataPath;
@@ -200,6 +205,17 @@ public class ConfManager : MonoBehaviour
                 b.interactable = false;
             stageButtons[currentStageIndex].interactable = true;
         }
+    }
+
+    public void ToggleAlwaysOnRecording(bool value)
+    {
+        // When mic is always on, do not send the final clip but every clip
+        voiceController.ToggleMicrophone(value);
+        voiceController.sendEveryClip = value;
+        voiceController.sendFinalClip = !value;
+
+        sttCtrlPanelAlwaysOn.SetActive(value);
+        sttCtrlPanel.SetActive(!value);
     }
 
     public void CloseDeveloperPanel()

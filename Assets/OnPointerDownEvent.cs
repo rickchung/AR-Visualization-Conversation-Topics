@@ -8,10 +8,6 @@ public class OnPointerDownEvent : MonoBehaviour, IPointerDownHandler, IPointerUp
 {
     public UnityEvent onPointerDownEvent;
 
-    void Start()
-    {
-    }
-
     public void OnPointerDown(PointerEventData eventData)
     {
         if (onPointerDownEvent != null)

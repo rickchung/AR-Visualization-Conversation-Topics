@@ -11,9 +11,8 @@ public class ClickColorEvent : MonoBehaviour, IPointerClickHandler, IPointerDown
     public Color clickedColor;
     public bool useClick;
     public bool usePointerUpDown;
-
-    private Color originalColor;
     private bool isClicked;
+    private Color originalColor;
 
     void Start()
     {
