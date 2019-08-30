@@ -3436,21 +3436,6 @@ Prefab:
       propertyPath: m_isInputParsingRequired
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 114723514324681576, guid: e0f2347e3fbea455f92a7876acd85661,
-        type: 2}
-      propertyPath: m_fontSize
-      value: 14
-      objectReference: {fileID: 0}
-    - target: {fileID: 114723514324681576, guid: e0f2347e3fbea455f92a7876acd85661,
-        type: 2}
-      propertyPath: m_fontSizeBase
-      value: 14
-      objectReference: {fileID: 0}
-    - target: {fileID: 114723514324681576, guid: e0f2347e3fbea455f92a7876acd85661,
-        type: 2}
-      propertyPath: m_textAlignment
-      value: 257
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e0f2347e3fbea455f92a7876acd85661, type: 2}
   m_IsPrefabAsset: 0
@@ -8709,7 +8694,7 @@ MonoBehaviour:
   sendFinalClip: 1
   CLIP_SIZE: 5
   SAMPLING_RATE: 16000
-  micSensitivity: 0.9
+  micSensitivity: 0.7
 --- !u!114 &747354410
 MonoBehaviour:
   m_ObjectHideFlags: 0

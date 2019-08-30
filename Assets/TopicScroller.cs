@@ -13,7 +13,6 @@ public class TopicScroller : MonoBehaviour, IEnhancedScrollerDelegate
     public bool enableCellOnClickEvent;
     private List<string> topicList;
     private List<string> speakerList;
-    private float cellviewSize = 90f;
 
     public EnhancedScroller scroller;
     public TopicCellView cellview;
@@ -70,7 +69,7 @@ public class TopicScroller : MonoBehaviour, IEnhancedScrollerDelegate
 
     float IEnhancedScrollerDelegate.GetCellViewSize(EnhancedScroller scroller, int dataIndex)
     {
-        return cellviewSize;
+        return topicList[dataIndex].Length / 20f * 32;
     }
 
     EnhancedScrollerCellView IEnhancedScrollerDelegate.GetCellView(
