@@ -145,7 +145,8 @@ public class VoiceController : MonoBehaviour
         // Send one STT request for a final cumulative clip
         if (sendFinalClip)
         {
-            networkManager.RequestSpeechToText(mergedFilePath);
+            if (mergedFilePath != null)
+                networkManager.RequestSpeechToText(mergedFilePath);
         }
     }
 

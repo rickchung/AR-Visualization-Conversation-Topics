@@ -148,7 +148,8 @@ public class SttNetworkManager : MonoBehaviour
             if (enableSttBroadcastRemote)
             {
                 // partnerSocket.BroadcastNewTranscript(stt.transcript);
-                partnerSocket.BroadcasetNewKeywords(stt.keywords);
+                // partnerSocket.BroadcasetNewKeywords(stt.keywords);
+                partnerSocket.BroadcasetNewKeywords(stt.transcript);  // transcripts as keywords
             }
         }
     }
