@@ -7,11 +7,17 @@ using TMPro;
 public class InformationPanel : MonoBehaviour
 {
     public GameObject infoPanel;
+    public GameObject instructionScreen;
     public TextMeshProUGUI textContent;
 
     public void ShowInfoPanel(bool show)
     {
         infoPanel.SetActive(show);
+    }
+
+    public void ShowInstructionScreen(bool value)
+    {
+        instructionScreen.SetActive(value);
     }
 
     public void ReplaceContent(string content)

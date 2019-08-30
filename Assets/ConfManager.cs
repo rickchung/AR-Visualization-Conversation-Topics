@@ -130,6 +130,8 @@ public class ConfManager : MonoBehaviour
         currentStageIndex = 0;
         startScreen.SetActive(false);
         codeInterpreter.ResetAvatars();
+
+        informationPanel.ShowInstructionScreen(true);
     }
 
     public void StopGame()
