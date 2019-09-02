@@ -48,10 +48,6 @@ public class ConfManager : MonoBehaviour
         var filesToCopy = new string[] {
             "OgConfig-Tutorial",
                 "OgMap-Tutorial1", "OgScript-Tutorial1-M", "OgScript-Tutorial1-S",
-            "OgConfig-Puzzle1",
-                "OgMap-Puzzle1", "OgScript-Puzzle1-M", "OgScript-Puzzle1-S",
-            "OgConfig-Puzzle2",
-                "OgMap-Puzzle2", "OgScript-Puzzle2-M", "OgScript-Puzzle2-S",
             "OgConfig-Puzzle3",
                 "OgMap-Puzzle3", "OgScript-Puzzle3-M", "OgScript-Puzzle3-S",
         };
@@ -72,9 +68,7 @@ public class ConfManager : MonoBehaviour
         // Init configurations of stages
         stages = new Dictionary<string, OgStageConfig>();
         stages.Add("Tutorial", OgStageConfig.ImportConfigFile("OgConfig-Tutorial"));
-        stages.Add("Puzzle1", OgStageConfig.ImportConfigFile("OgConfig-Puzzle1"));
-        stages.Add("Puzzle2", OgStageConfig.ImportConfigFile("OgConfig-Puzzle2"));
-        stages.Add("Puzzle3", OgStageConfig.ImportConfigFile("OgConfig-Puzzle3"));
+        stages.Add("S1-Algorithm", OgStageConfig.ImportConfigFile("OgConfig-Puzzle3"));
 
         // Init stage buttons
         stageButtons = new List<Button>();
