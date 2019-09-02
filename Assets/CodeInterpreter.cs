@@ -24,7 +24,6 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     public const string CTRL_CLOSE = "close";
 
     private ScriptObject loadedScript;
-    private Dictionary<string, float> scriptVariables;
     private bool isScriptRunning;
     private static string dataFolderPath;
 
@@ -33,7 +32,6 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     {
         dataFolderPath = Application.persistentDataPath;
 
-        scriptVariables = new Dictionary<string, float>();
         CloseTopicViewAndBroadcast();
 
         // Init the script scroller
@@ -186,6 +184,8 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     /// </summary>
     public void RunLoadedScript()
     {
+        // TODO: Make this function synchronized between local and remote devices.
+
         if (loadedScript != null)
         {
             if (isScriptRunning == false)
@@ -236,8 +236,6 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
             }
         }
 
-        // Run the script
-        ResetVariableList();
         StartCoroutine("_RunScriptCoroutine", procScript);
         isScriptRunning = true;
 
@@ -325,16 +323,9 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
                 this.gameObject, LogTag.SCRIPT,
                 string.Format("Running Cmd, isRival={0}, {1}", forRival, codeObject)
             );
-
             string command = codeObject.GetCommand();
             string[] args = codeObject.GetArgs();
-
-            switch (command)
-            {
-                case "MOVE":
-                    runner.Move(args[0]);
-                    break;
-            }
+            runner.ParseCommand(command, args);
         }
         else
         {
@@ -343,11 +334,6 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
                 string.Format("Avatar is dead., {0}, {1}", forRival, codeObject)
             );
         }
-    }
-
-    private void ResetVariableList()
-    {
-        scriptVariables.Clear();
     }
 
     public void StopRunningScript()

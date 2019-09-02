@@ -30,10 +30,43 @@ public class AvatarController : MonoBehaviour
     }
 
     /// <summary>
+    /// This method accepts a command and args parsed by a CodeInterpreter and decide how to enact. Returns true when a command is accepted.
+    /// </summary>
+    /// <param name="command"></param>
+    /// <param name="args"></param>
+    /// <returns></returns>
+    public virtual bool ParseCommand(string command, string[] args)
+    {
+        bool isSuccessful = false;
+
+        if (!IsDead)
+        {
+            switch (command)
+            {
+                case "MOVE":
+                    this.Move(args[0]);
+                    isSuccessful = true;
+                    break;
+                default:
+                    DataLogger.Log(
+                        this.gameObject, LogTag.SYSTEM_WARNING,
+                        "Command is rejected by the avatar, " + command
+                    );
+                    isSuccessful = false;
+                    break;
+            }
+        }
+
+        return isSuccessful;
+    }
+
+    // ==================== Available Behaviors of an Avatar ====================
+
+    /// <summary>
     /// Move the avatar one step in the given direction.
     /// </summary>
     /// <param name="dir"></param>
-    public void Move(string dir)
+    private void Move(string dir)
     {
         MoveInDir(gridController.GetDirFromString(dir, mirror: false));
     }
@@ -75,6 +108,8 @@ public class AvatarController : MonoBehaviour
                 codeInterpreter.StopRunningScript();
         }
     }
+
+    // ==================== General Behavior of an Avatar ====================
 
     /// <summary>
     /// Reset the position of the avatar to the origin.
@@ -147,7 +182,7 @@ public class AvatarController : MonoBehaviour
         startingCellInVec = vc;
     }
 
-    // ====================
+    // ==================== Testing Functions ====================
 
     public void _TestAnything(int dir)
     {
