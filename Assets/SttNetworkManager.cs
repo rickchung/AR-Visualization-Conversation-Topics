@@ -18,9 +18,9 @@ public class SttNetworkManager : MonoBehaviour
     public PartnerSocket partnerSocket;
 
     [Tooltip("Whether to echo the user's transcription")]
-    public bool enableSttEchoLocal;
+    public bool showSttResultLocal;
     [Tooltip("Whether to broadcast the user's transcription by server")]
-    public bool enableSttBroadcastRemote;
+    public bool showSttResultRemote;
 
     /// <summary>
     /// A wrapper function which requests the speech file to text.
@@ -138,14 +138,13 @@ public class SttNetworkManager : MonoBehaviour
             // Save the transcription locally
             sttController.SaveTransResponse(stt, isLocal: true);
 
-            // Update the local UI if the option "echo" is enabled
-            if (enableSttEchoLocal)
+            // Show the STT result at the local device
+            if (showSttResultLocal)
             {
                 sttController.UpdateVis();
             }
-
-            // Broadcast the new transcript extracted from the user's speech
-            if (enableSttBroadcastRemote)
+            // Show the STT result at the remote device
+            if (showSttResultRemote)
             {
                 // partnerSocket.BroadcastNewTranscript(stt.transcript);
                 // partnerSocket.BroadcasetNewKeywords(stt.keywords);
@@ -156,7 +155,7 @@ public class SttNetworkManager : MonoBehaviour
 
     public void ToggleSttEchoLocal(bool activated)
     {
-        enableSttEchoLocal = activated;
+        showSttResultLocal = activated;
     }
 
     // ==========

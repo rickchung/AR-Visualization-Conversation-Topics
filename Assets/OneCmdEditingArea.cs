@@ -16,7 +16,7 @@ public class OneCmdEditingArea : MonoBehaviour, EditingArea
     public CodeViewUpdateDelegate codeViewUpdateDelegate;
 
 
-    // ========== Temp ==========
+    // ========== TODO: Find a way to list available options of parameters ==========
     public static List<string> availableMoveDirections = new List<string>() {
         GridController.Direction.NORTH.ToString(),
         GridController.Direction.SOUTH.ToString(),

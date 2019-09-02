@@ -67,7 +67,6 @@ public class SpeechToTextController : MonoBehaviour, IEnhancedScrollerDelegate
         // string[] topics = stt.topics;
         string[] keywords = stt.keywords;
         SaveTranscript(text, isLocal);
-
         // SaveTopics(keywords, isLocal);  // Use keywords as topics
         SaveTopics(text, isLocal);  // Use text as topics
     }
