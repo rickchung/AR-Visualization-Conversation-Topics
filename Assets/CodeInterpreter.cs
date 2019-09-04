@@ -37,6 +37,11 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         // Init the script scroller
         scriptScroller.Delegate = this;
         scriptScroller.ReloadData(scrollPositionFactor: 0.0f);
+
+        if (avatar != rivalAvatar)
+        {
+            rivalAvatar.IsRival = true;
+        }
     }
 
     public UnityAction GetTopicButtonEvent(string topic)
@@ -134,20 +139,59 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         return new ScriptObject(codeList); ;
     }
 
-    private static Regex regexMove = new Regex(@"MOVE \((?<param>\w+)\);");
-    private static Regex regexLoopStart = new Regex(@"LOOP REPEAT {");
-    private static Regex regexLoopEnd = new Regex(@"} (?<times>\d) Times;");
+    private static
+        Regex regexLoopStart = new Regex(@"LOOP REPEAT {"),
+        regexLoopEnd = new Regex(@"} (?<times>\d) Times;");
+    private static Regex[] regexSingleCmdNoParam = {
+        new Regex(@"(?<cmd>START_ENGINE) \(\)"),
+        new Regex(@"(?<cmd>STOP_ENGINE) \(\)"),
+        new Regex(@"(?<cmd>CLIMB_UP) \(\)"),
+        new Regex(@"(?<cmd>FALL_DOWN) \(\)"),
+        new Regex(@"(?<cmd>HOVERING_RIGHTTURN) \(\)"),
+        new Regex(@"(?<cmd>HOVERING_LEFTTURN) \(\)"),
+    };
+    private static Regex[] regexSingleCmdOneParam = {
+        new Regex(@"(?<cmd>MOVE) \((?<param>\w+)\);"),
+        new Regex(@"(?<cmd>SET_POWER_OUTPUT_TOPROTOR) \((?<param>[\d\.])\)"),
+        new Regex(@"(?<cmd>SET_POWER_OUTPUT_TAILROTOR) \((?<param>[\d\.])\)"),
+        new Regex(@"(?<cmd>SET_BRAKE_OUTPUT_TOPROTOR) \((?<param>[\d\.])\)"),
+        new Regex(@"(?<cmd>SET_BRAKE_OUTPUT_TAILROTO) \((?<param>[\d\.])\)")
+    };
+
+    private static CodeObjectOneCommand _MatchRegexSingleCommand(string line)
+    {
+        // No param
+        foreach (var r in regexSingleCmdNoParam)
+        {
+            var matched = r.Matches(line);
+            if (matched != null && matched.Count > 0)
+            {
+                return new CodeObjectOneCommand(
+                    matched[0].Groups["cmd"].Value, new string[] { }
+                );
+            }
+        }
+
+        // One param
+        foreach (var r in regexSingleCmdOneParam)
+        {
+            var matched = r.Matches(line);
+            if (matched != null && matched.Count > 0)
+            {
+                return new CodeObjectOneCommand(
+                    matched[0].Groups["cmd"].Value,
+                    new string[] { matched[0].Groups["param"].Value }
+                );
+            }
+        }
+        return null;
+    }
     private static CodeObjectOneCommand _ProcessOneLine(string oneLine, StreamReader reader)
     {
-        // Debug.Log("Read: " + oneLine);
-        // Try to match a move command
-        var matchMove = regexMove.Matches(oneLine);
-        if (matchMove.Count > 0)
-        {
-            return new CodeObjectOneCommand(
-                "MOVE", new string[] { matchMove[0].Groups["param"].Value }
-            );
-        }
+        // Try to match a command
+        var singleCmd = _MatchRegexSingleCommand(oneLine);
+        if (singleCmd != null) return singleCmd;
+
         // Try to match a loop command
         var matchLoopStart = regexLoopStart.Matches(oneLine);
         if (matchLoopStart.Count > 0)
@@ -376,11 +420,12 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
                 rivalAvatar.ResetPosition();
         }
 
-        // Reset avatars' states
+        // TODO: Reset avatars' states (this code does not make sense)
         if (avatar)
             avatar.IsDead = false;
         if (rivalAvatar)
             rivalAvatar.IsDead = false;
+
         // Reset the map
         gridController.ResetMap();
     }

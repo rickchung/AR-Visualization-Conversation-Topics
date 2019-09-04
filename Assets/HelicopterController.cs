@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -18,17 +19,83 @@ public class HelicopterController : AvatarController
         rbTailRotor = tailRotor.GetComponent<Rigidbody>();
     }
 
-    // ==================== Pilot Control System ====================
+    override public bool ParseCommand(string command, string[] args)
+    {
+        bool isSuccessful = false;
 
-    // This system is defined by functions in the ECU.
+        if (!IsDead)
+        {
+            float value;
+            switch (command)
+            {
+                case "START_ENGINE":
+                    StartEngine();
+                    break;
+                case "STOP_ENGINE":
+                    StopEngine();
+                    break;
+                case "CLIMB_UP":
+                    ClimbUp();
+                    break;
+                case "FALL_DOWN":
+                    FallDown();
+                    break;
+                case "HOVERING_RIGHTTURN":
+                    HoveringTurnRight();
+                    break;
+                case "HOVERING_LEFTTURN":
+                    HoveringTurnLeft();
+                    break;
+                case "SET_POWER_OUTPUT_TOPROTOR":
+                    value = float.Parse(args[0]);
+                    SetPowerOutputTopRotor(value);
+                    break;
+                case "SET_POWER_OUTPUT_TAILROTOR":
+                    value = float.Parse(args[0]);
+                    SetPowerOutputTailRotor(value);
+                    break;
+                case "SET_BRAKE_OUTPUT_TOPROTOR":
+                    value = float.Parse(args[0]);
+                    SetBrakeOutputTopRotor(value);
+                    break;
+                case "SET_BRAKE_OUTPUT_TAILROTOR":
+                    value = float.Parse(args[0]);
+                    SetBrakeOutputTailRotor(value);
+                    break;
+            }
+        }
+
+        return isSuccessful;
+    }
 
     // ==================== Engine Control Unit ====================
+
+    public void SetPowerOutputTopRotor(float value)
+    {
+        poutTopRotor = value;
+    }
+    public void SetPowerOutputTailRotor(float value)
+    {
+        poutTailRotor = value;
+    }
+
+    public void SetBrakeOutputTopRotor(float value)
+    {
+        boutTopRotor = value;
+    }
+
+    public void SetBrakeOutputTailRotor(float value)
+    {
+        boutTailRotor = value;
+    }
+
+    // ==================== Pilot Control System ====================
 
     private bool isEngineOn = false;
 
     private float
-        powerCoefTopRotor = 1.0f, powerCoefTailRotor = 1.0f,
-        brakeCoefTopRotor = 1.0f, brakeCoefTailRotor = 1.0f;
+        poutTopRotor = 1.0f, poutTailRotor = 1.0f,
+        boutTopRotor = 1.0f, boutTailRotor = 1.0f;
 
     public void StartEngine()
     {
@@ -48,23 +115,23 @@ public class HelicopterController : AvatarController
 
     public void ClimbUp()
     {
-        SpeedUpTopRotor(powerCoefTopRotor);
-        SpeedUpTailRotor(powerCoefTailRotor);
+        SpeedUpTopRotor(poutTopRotor);
+        SpeedUpTailRotor(poutTailRotor);
     }
 
     public void FallDown()
     {
-        SlowDownTopRotor(brakeCoefTopRotor);
-        SlowDownTailRotor(brakeCoefTailRotor);
+        SlowDownTopRotor(boutTopRotor);
+        SlowDownTailRotor(boutTailRotor);
     }
 
     private float scaleHoverTurn = 0.05f;
-    public void HovorTurnRight()
+    public void HoveringTurnRight()
     {
         SpeedUpTailRotor(scaleHoverTurn);
     }
 
-    public void HovorTurnLeft()
+    public void HoveringTurnLeft()
     {
         SpeedUpTailRotor(-scaleHoverTurn);
     }
