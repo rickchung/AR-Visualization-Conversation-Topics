@@ -15,23 +15,25 @@ public class OneCmdEditingArea : MonoBehaviour, EditingArea
     private CodeObjectOneCommand attachedCodeObject;
     public CodeViewUpdateDelegate codeViewUpdateDelegate;
 
-
-    // ========== TODO: Find a way to list available options of parameters ==========
-    public static List<string> availableMoveDirections = new List<string>() {
-        GridController.Direction.NORTH.ToString(),
-        GridController.Direction.SOUTH.ToString(),
-        GridController.Direction.EAST.ToString(),
-        GridController.Direction.WEST.ToString()
-    };
-    // ==========
-
-
-    public void AttachCodeObject(CodeObjectOneCommand codeObject, bool showSubmitBtn = true)
+    public CodeObjectOneCommand AttachedCodeObject
     {
-        attachedCodeObject = codeObject;
+        get
+        {
+            return attachedCodeObject;
+        }
 
-        string command = attachedCodeObject.GetCommand();
-        string[] args = attachedCodeObject.GetArgs();
+        set
+        {
+            attachedCodeObject = value;
+        }
+    }
+
+    virtual public void AttachCodeObject(CodeObjectOneCommand codeObject, bool showSubmitBtn = true)
+    {
+        AttachedCodeObject = codeObject;
+
+        string command = AttachedCodeObject.GetCommand();
+        string[] args = AttachedCodeObject.GetArgs();
 
         oneCmdLabel.text = command;
         oneCmdDropdown.ClearOptions();
@@ -40,7 +42,7 @@ public class OneCmdEditingArea : MonoBehaviour, EditingArea
             typeof(GridController.Direction), args[0]
         );
 
-        codeToggle.isOn = !attachedCodeObject.IsDisabled();
+        codeToggle.isOn = !AttachedCodeObject.IsDisabled();
 
         oneCmdSubmitBtn.gameObject.SetActive(showSubmitBtn);
     }
@@ -49,24 +51,25 @@ public class OneCmdEditingArea : MonoBehaviour, EditingArea
     /// A callback used by dropdown UI (set in the Unity inspector).
     /// </summary>
     /// <param name="value"></param>
-    public void OnArgChange(int value)
+    virtual public void OnArgChange(int value)
     {
         string newCommand = oneCmdLabel.text;
         int newArg = value;
         string newArgStr = Enum.ToObject(
-            typeof(GridController.Direction), newArg).ToString();
+            typeof(GridController.Direction), newArg
+        ).ToString();
 
         DataLogger.Log(
             this.gameObject, LogTag.CODING,
             string.Format(
                 "Code Modified, {0}, {1}",
                 newCommand + " " + newArgStr,
-                attachedCodeObject.GetCommand() + " " + attachedCodeObject.GetArgString()
+                AttachedCodeObject.GetCommand() + " " + AttachedCodeObject.GetArgString()
             )
         );
 
-        attachedCodeObject.SetCommand(newCommand);
-        attachedCodeObject.SetArgs(new string[] { newArgStr });
+        AttachedCodeObject.SetCommand(newCommand);
+        AttachedCodeObject.SetArgs(new string[] { newArgStr });
 
         if (codeViewUpdateDelegate != null)
             codeViewUpdateDelegate();
@@ -79,11 +82,11 @@ public class OneCmdEditingArea : MonoBehaviour, EditingArea
     public void OnToggleChange(bool value)
     {
         string newCommand = oneCmdLabel.text;
-        attachedCodeObject.SetDisabled(!value);
+        AttachedCodeObject.SetDisabled(!value);
 
         Debug.Log(string.Format(
            "Code Disabled, {0}, {1}",
-           attachedCodeObject.ToString(), value
+           AttachedCodeObject.ToString(), value
         ));
 
         if (codeViewUpdateDelegate != null)
@@ -92,11 +95,21 @@ public class OneCmdEditingArea : MonoBehaviour, EditingArea
 
     public void DismissEditor()
     {
-        if (attachedCodeObject != null)
+        if (AttachedCodeObject != null)
         {
             // Clean up
-            attachedCodeObject = null;
+            AttachedCodeObject = null;
             editorDispatcher.DismissEditor();
         }
     }
+
+    // ========== TODO: Find a way to list available options of parameters ==========
+    public static List<string> availableMoveDirections = new List<string>() {
+        GridController.Direction.NORTH.ToString(),
+        GridController.Direction.SOUTH.ToString(),
+        GridController.Direction.EAST.ToString(),
+        GridController.Direction.WEST.ToString()
+    };
+
+    // ==========
 }

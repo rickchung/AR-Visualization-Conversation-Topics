@@ -6,6 +6,7 @@ public class CodeEditor : MonoBehaviour
     public CodeInterpreter codeInterpreter;
     public OneCmdEditingArea oneCmdEditingArea;
     public LoopEditingArea loopEditingArea;
+    public CmdWithNumberEditingArea cmdWithNumberEditingArea;
     private GameObject openedEditorArea;
 
     private void Start()
@@ -13,6 +14,7 @@ public class CodeEditor : MonoBehaviour
         transform.gameObject.SetActive(false);
         oneCmdEditingArea.gameObject.SetActive(false);
         loopEditingArea.gameObject.SetActive(false);
+        cmdWithNumberEditingArea.gameObject.SetActive(false);
     }
 
     public void DispatchEditor(CodeObjectOneCommand codeObject)
@@ -33,6 +35,11 @@ public class CodeEditor : MonoBehaviour
                 loopEditingArea.AttachCodeObject(codeObject);
                 loopEditingArea.codeViewUpdateDelegate = UpdateCodeViewer;
                 DispatchRoutine(loopEditingArea.gameObject);
+                break;
+            default:
+                cmdWithNumberEditingArea.AttachCodeObject(codeObject);
+                cmdWithNumberEditingArea.codeViewUpdateDelegate = UpdateCodeViewer;
+                DispatchRoutine(cmdWithNumberEditingArea.gameObject);
                 break;
         }
     }
