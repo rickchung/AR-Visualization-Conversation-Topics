@@ -7,6 +7,8 @@ public class HelicopterController : AvatarController
 {
     private Transform topRotor, tailRotor, cockpit, helicopter;
     private Rigidbody rbTopRotor, rbTailRotor, rbHelicopter;
+    private Quaternion topOrgRot, tailOrgRot;
+    private Vector3 topOrgPos, tailOrgPos;
 
     private void Start()
     {
@@ -17,6 +19,11 @@ public class HelicopterController : AvatarController
         rbHelicopter = helicopter.GetComponent<Rigidbody>();
         rbTopRotor = topRotor.GetComponent<Rigidbody>();
         rbTailRotor = tailRotor.GetComponent<Rigidbody>();
+
+        topOrgRot = topRotor.localRotation;
+        tailOrgRot = tailRotor.localRotation;
+        topOrgPos = topRotor.localPosition;
+        tailOrgPos = tailRotor.localPosition;
 
         gameObject.SetActive(false);
     }
@@ -84,6 +91,11 @@ public class HelicopterController : AvatarController
         var pos = helicopter.localPosition;
         pos.y = 0.015f;
         helicopter.localPosition = pos;
+
+        topRotor.localRotation = topOrgRot;
+        tailRotor.localRotation = tailOrgRot;
+        topRotor.localPosition = topOrgPos;
+        tailRotor.localPosition = tailOrgPos;
 
         // Reset the physics
         StopEngine();
@@ -165,11 +177,13 @@ public class HelicopterController : AvatarController
 
     public void MoveForward()
     {
-        TiltTopRotor(helicopter.right, scaleTiltAngle);
+        if (forwardAcc <= 0)
+            TiltTopRotor(helicopter.right, scaleTiltAngle);
     }
     public void MoveBackward()
     {
-        TiltTopRotor(helicopter.right, -scaleTiltAngle);
+        if (forwardAcc >= 0)
+            TiltTopRotor(helicopter.right, -scaleTiltAngle);
     }
 
     // ==================== Internal Behavior ====================

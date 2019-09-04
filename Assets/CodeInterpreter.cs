@@ -27,7 +27,6 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     private bool isScriptRunning;
     private static string dataFolderPath;
 
-
     void Start()
     {
         dataFolderPath = Application.persistentDataPath;
