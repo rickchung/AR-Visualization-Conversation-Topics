@@ -169,15 +169,16 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         new Regex(@"(?<cmd>FALL_DOWN) \(\)"),
         new Regex(@"(?<cmd>MOVE_FORWARD) \(\);"),
         new Regex(@"(?<cmd>MOVE_BACKWARD) \(\);"),
-        new Regex(@"(?<cmd>HOVERING_TURN_RIGHT) \(\)"),
-        new Regex(@"(?<cmd>HOVERING_TURN_LEFT) \(\)"),
+        new Regex(@"(?<cmd>TURN_RIGHT) \(\)"),
+        new Regex(@"(?<cmd>TURN_LEFT) \(\)"),
     };
     private static Regex[] regexSingleCmdOneParam = {
+        new Regex(@"(?<cmd>WAIT) \((?<param>\d+)\);"),
         new Regex(@"(?<cmd>MOVE) \((?<param>\w+)\);"),
         new Regex(@"(?<cmd>SET_POWER_OUTPUT_TOP) \((?<param>[\d\.]+)\)"),
         new Regex(@"(?<cmd>SET_POWER_OUTPUT_TAIL) \((?<param>[\d\.]+)\)"),
         new Regex(@"(?<cmd>SET_BRAKE_OUTPUT_TOP) \((?<param>[\d\.]+)\)"),
-        new Regex(@"(?<cmd>SET_BRAKE_OUTPUT_TAIL) \((?<param>[\d\.]+)\)")
+        new Regex(@"(?<cmd>SET_BRAKE_OUTPUT_TAIL) \((?<param>[\d\.]+)\)"),
     };
 
     private static CodeObjectOneCommand _MatchRegexSingleCommand(string line)
@@ -295,6 +296,13 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
             if (codeObject.GetCommand().Equals("LOOP"))
             {
                 _ParseLoop((CodeObjectLoop)codeObject, procScript);
+            }
+            else if (codeObject.GetCommand().Equals("WAIT"))
+            {
+                for (int i = 0; i < 2 * int.Parse(codeObject.GetArgs()[0]); i++)
+                {
+                    procScript.Add(codeObject);
+                }
             }
             else
             {

@@ -55,10 +55,10 @@ public class HelicopterController : AvatarController
                 case "MOVE_BACKWARD":
                     MoveBackward();
                     break;
-                case "HOVERING_TURN_RIGHT":
+                case "TURN_RIGHT":
                     HoveringTurnRight();
                     break;
-                case "HOVERING_TURN_LEFT":
+                case "TURN_LEFT":
                     HoveringTurnLeft();
                     break;
                 case "SET_POWER_OUTPUT_TOP":
@@ -111,6 +111,7 @@ public class HelicopterController : AvatarController
     {
         poutTopRotor = value;
     }
+
     public void SetPowerOutputTailRotor(float value)
     {
         poutTailRotor = value;
@@ -134,7 +135,7 @@ public class HelicopterController : AvatarController
     private float poutTailRotor = 1.0f;
     private float boutTopRotor = 1.0f;
     private float boutTailRotor = 1.0f;
-    private float scaleHoverTurn = 0.2f;
+    private float scaleHoverTurn = 0.1f;
     private float scaleTiltAngle = 10.0f;
 
     public void StartEngine()
@@ -167,12 +168,12 @@ public class HelicopterController : AvatarController
 
     public void HoveringTurnRight()
     {
-        SpeedUpTailRotor(scaleHoverTurn);
+        SpeedUpTailRotor(-scaleHoverTurn);
     }
 
     public void HoveringTurnLeft()
     {
-        SpeedUpTailRotor(-scaleHoverTurn);
+        SpeedUpTailRotor(scaleHoverTurn);
     }
 
     public void MoveForward()
