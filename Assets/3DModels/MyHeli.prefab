@@ -38,6 +38,7 @@ GameObject:
   - component: {fileID: 4816919358185650}
   - component: {fileID: 33411198363751354}
   - component: {fileID: 23347685258654220}
+  - component: {fileID: 54136029814882838}
   m_Layer: 0
   m_Name: Tail_Rotor
   m_TagString: Untagged
@@ -55,6 +56,7 @@ GameObject:
   - component: {fileID: 4864266204363876}
   - component: {fileID: 33149354536683190}
   - component: {fileID: 23041529938242890}
+  - component: {fileID: 54329206333309250}
   m_Layer: 0
   m_Name: Top_rotor
   m_TagString: Untagged
@@ -89,7 +91,9 @@ GameObject:
   - component: {fileID: 4572076813281330}
   - component: {fileID: 33349737540795140}
   - component: {fileID: 23817924458754744}
+  - component: {fileID: 54702809194084982}
   - component: {fileID: 114984104332620834}
+  - component: {fileID: 65574829680601172}
   m_Layer: 0
   m_Name: MyHeli
   m_TagString: Untagged
@@ -148,7 +152,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1956340180132450}
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0, y: 0, z: 0}
+  m_LocalPosition: {x: -0.927, y: 0, z: -0.849}
   m_LocalScale: {x: 0.00038030808, y: 0.00038030808, z: 0.00038030808}
   m_Children:
   - {fileID: 4521875692690388}
@@ -449,6 +453,63 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1976809369729018}
   m_Mesh: {fileID: 4300010, guid: ff3e8c3aad864db4394551f29cc6f224, type: 3}
+--- !u!54 &54136029814882838
+Rigidbody:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1613775545380876}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 14
+  m_CollisionDetection: 0
+--- !u!54 &54329206333309250
+Rigidbody:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1636294116464976}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 14
+  m_CollisionDetection: 0
+--- !u!54 &54702809194084982
+Rigidbody:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1956340180132450}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 5
+  m_AngularDrag: 0
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!65 &65574829680601172
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1956340180132450}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 538.356, y: 491.383, z: 1097.725}
+  m_Center: {x: 0, y: 246.1265, z: -263.1855}
 --- !u!114 &114984104332620834
 MonoBehaviour:
   m_ObjectHideFlags: 1
