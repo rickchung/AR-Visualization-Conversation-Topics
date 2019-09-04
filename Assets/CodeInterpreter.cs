@@ -44,6 +44,27 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         }
     }
 
+    public void SetAvatarGameObjects(AvatarController player1, AvatarController rival)
+    {
+        // Disable the existing avatars if existing
+        if (avatar != null)
+            avatar.gameObject.SetActive(false);
+        if (rivalAvatar != null)
+            rivalAvatar.gameObject.SetActive(false);
+
+        // Replace the avatars
+        avatar = player1;
+        rivalAvatar = rival;
+        if (avatar != rivalAvatar)
+        {
+            rivalAvatar.IsRival = true;
+        }
+
+        // Enable avatars
+        avatar.gameObject.SetActive(true);
+        rivalAvatar.gameObject.SetActive(true);
+    }
+
     public UnityAction GetTopicButtonEvent(string topic)
     {
         UnityAction action = () =>

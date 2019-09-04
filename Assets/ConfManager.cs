@@ -24,6 +24,9 @@ public class ConfManager : MonoBehaviour
     public GameObject startScreen, endScreen;
     public Transform stageProgressView;
     public Button stageButtonPrefab;
+
+    public AvatarController[] defaultAvatars, helicopterAvatars;
+
     private List<Button> stageButtons;
     private int currentStageIndex;
 
@@ -50,6 +53,8 @@ public class ConfManager : MonoBehaviour
                 "OgMap-Tutorial1", "OgScript-Tutorial1-M", "OgScript-Tutorial1-S",
             "OgConfig-Puzzle3",
                 "OgMap-Puzzle3", "OgScript-Puzzle3-M", "OgScript-Puzzle3-S",
+            "OgConfig-FlyingHelicopter",
+                "OgMap-FlyingHelicopter"
         };
         foreach (var s in filesToCopy)
         {
@@ -69,6 +74,7 @@ public class ConfManager : MonoBehaviour
         stages = new Dictionary<string, OgStageConfig>();
         stages.Add("Tutorial", OgStageConfig.ImportConfigFile("OgConfig-Tutorial"));
         stages.Add("S1-Algorithm", OgStageConfig.ImportConfigFile("OgConfig-Puzzle3"));
+        stages.Add("S2-FlyingHelicopter", OgStageConfig.ImportConfigFile("OgConfig-FlyingHelicopter"));
 
         // Init stage buttons
         stageButtons = new List<Button>();
@@ -96,7 +102,7 @@ public class ConfManager : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("Configuration is not found: " + confName);
+            Debug.LogError("Configuration is not found: " + confName);
         }
     }
 
@@ -119,13 +125,28 @@ public class ConfManager : MonoBehaviour
         sttCtrlPanel.SetActive(!conf.isArrowKeyEnabled);
         developerPanel.SetActive(conf.isDeveloperPanelEnabled);
 
+        // Set avatars
+        if (conf.avatarSetName.Equals("Avatar-Helicopter"))
+        {
+            codeInterpreter.SetAvatarGameObjects(helicopterAvatars[0], helicopterAvatars[1]);
+            // A ghost avatar serves as placeholder
+            if (partnerSocket.IsMaster)
+                helicopterAvatars[1].gameObject.SetActive(false);
+            else
+                helicopterAvatars[0].gameObject.SetActive(false);
+        }
+        else
+        {
+            codeInterpreter.SetAvatarGameObjects(defaultAvatars[0], defaultAvatars[1]);
+        }
+
         informationPanel.ShowInfoPanel(true);
     }
 
-    public void StartGame()
+    public void StartGame(string startingStage)
     {
         partnerSocket.SetupRemoteServer();
-        ApplyConfiguration("Tutorial");
+        ApplyConfiguration(startingStage);
         currentStageIndex = 0;
         startScreen.SetActive(false);
         codeInterpreter.ResetAvatars();
@@ -239,10 +260,11 @@ public class ConfManager : MonoBehaviour
         public string map;
         public string masterScript, slaveScript;
         public bool isArrowKeyEnabled, isDeveloperPanelEnabled;
+        public string avatarSetName;
 
         public OgStageConfig(
             string name, string problem, string map, string masterScript, string slaveScript,
-            bool isArrowKeyEnabled, bool isDeveloperPanelEnabled)
+            bool isArrowKeyEnabled, bool isDeveloperPanelEnabled, string avatarSetName)
         {
             this.name = name;
             this.problem = problem;
@@ -251,6 +273,7 @@ public class ConfManager : MonoBehaviour
             this.slaveScript = slaveScript.Equals("null") ? null : slaveScript;
             this.isArrowKeyEnabled = isArrowKeyEnabled;
             this.isDeveloperPanelEnabled = isDeveloperPanelEnabled;
+            this.avatarSetName = avatarSetName;
         }
 
         public static OgStageConfig ImportConfigFile(string filename)
@@ -282,11 +305,15 @@ public class ConfManager : MonoBehaviour
                 var isArrowKeyEnabled = Boolean.Parse(reader.ReadLine());
                 // L7: Will the developer panel be enabled?
                 var isDeveloperPanelEnabled = Boolean.Parse(reader.ReadLine());
+                // L8: The set name of avaters to use
+                var avatarSetName = reader.ReadLine();
+                if (avatarSetName == null) avatarSetName = "Avatar-Default";
 
                 rt = new OgStageConfig(
                     name, problem, map,
                     masterScript, slaveScript,
-                    isArrowKeyEnabled, isDeveloperPanelEnabled
+                    isArrowKeyEnabled, isDeveloperPanelEnabled,
+                    avatarSetName
                 );
             }
 

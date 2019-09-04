@@ -3,13 +3,13 @@ using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum GridCellType { BASE, TRAP, REWARD, REWARD_DUAL };
+public enum GridCellType { BASE, TRAP, REWARD, REWARD_DUAL, WALL, WALL_2, WALL_3 };
 public delegate void GridCellUpdateDelegate(GridCellType cellType, Collider other);
 
 public class GridController : MonoBehaviour
 {
     public Transform gridStart, gridEnd;
-    public Transform gridCellPrefab, gridCellTargetPrefab, girdCellTrapPrefab, gridCellTargetDuoPrefab;
+    public Transform gridCellPrefab, gridCellTargetPrefab, girdCellTrapPrefab, gridCellTargetDuoPrefab, gridCellWallPrefab;
     public AvatarController avatarController, rivalAvatarController;
     public CodeInterpreter codeInterpreter;
     public ConfManager confManager;
@@ -173,6 +173,12 @@ public class GridController : MonoBehaviour
                         newCell.GetComponent<GridCellTrap>().SetUpdateDelegate(
                             GridCellUpdateCallback
                         );
+                        break;
+                    case GridCellType.WALL:
+                    case GridCellType.WALL_2:
+                    case GridCellType.WALL_3:
+                        newCell = (Transform)Instantiate(gridCellWallPrefab, transform, false);
+                        newCell.GetComponent<GridCellWall>().SetHeight((int)cellType - 3);
                         break;
                     default:
                         newCell = (Transform)Instantiate(gridCellPrefab, transform, false);

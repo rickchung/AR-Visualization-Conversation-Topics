@@ -1,0 +1,20 @@
+Flying a Helicopter
+<size=115%><smallcaps>> Simulation: Flying a Helicopter by Programming</smallcaps></size>
+
+In this stage, you will simulate the flying process of helicopters by programming.
+
+<size=115%><smallcaps>> Your Goal in This Stage</smallcaps></size>
+
+A. ...
+<indent=4%>
+- ...
+</indent>
+B. Collecting all the flags with your partner.
+
+#
+OgMap-FlyingHelicopter.txt
+OgScript-Tutorial1-M.txt
+OgScript-Tutorial1-S.txt
+false
+false
+Avatar-Helicopter
