@@ -34,8 +34,8 @@ public class HelicopterController : AvatarController
     public void StartEngine()
     {
         isEngineOn = true;
-        rbTopRotor.AddRelativeTorque(10f * helicopter.up, ForceMode.Impulse);
-        rbTailRotor.AddRelativeTorque(10f * -helicopter.right, ForceMode.Impulse);
+        rbTopRotor.AddTorque(10f * helicopter.up, ForceMode.Impulse);
+        rbTailRotor.AddTorque(10f * -helicopter.right, ForceMode.Impulse);
     }
 
     public void StopEngine()
@@ -76,11 +76,11 @@ public class HelicopterController : AvatarController
     private float scaleTiltAngle = 10.0f;
     public void MoveForward()
     {
-        TiltTopRotor(helicopter.right * scaleTiltAngle);
+        TiltTopRotor(helicopter.right, scaleTiltAngle);
     }
     public void MoveBackward()
     {
-        TiltTopRotor(helicopter.right * -scaleTiltAngle);
+        TiltTopRotor(helicopter.right, -scaleTiltAngle);
     }
 
     // ==================== Internal Behavior ====================
@@ -97,11 +97,11 @@ public class HelicopterController : AvatarController
         var effectiveUpAcc = (
             upAcc * Mathf.Exp(COEF_ATTITUDE * (helicopter.localPosition.y / SCALE_ALTITUDE_MAX)
         ));
-        rbHelicopter.AddRelativeForce(effectiveUpAcc * helicopter.up, ForceMode.Acceleration);
-        rbHelicopter.AddRelativeTorque(torqueAcc * helicopter.up, ForceMode.Acceleration);
+        rbHelicopter.AddForce(effectiveUpAcc * helicopter.up, ForceMode.Acceleration);
+        rbHelicopter.AddTorque(torqueAcc * helicopter.up, ForceMode.Acceleration);
         // Hack forward acceleration
-        rbHelicopter.AddRelativeForce(forwardAcc * cockpit.forward, ForceMode.Acceleration);
-        Debug.Log(cockpit.forward);
+        rbHelicopter.AddForce(forwardAcc * cockpit.forward, ForceMode.Acceleration);
+        Debug.Log(forwardAcc + ", " + cockpit.forward + ", " + forwardAcc * cockpit.forward);
     }
 
     private void SpeedUpTopRotor(float amount)
@@ -140,28 +140,33 @@ public class HelicopterController : AvatarController
     }
 
     private const float SCALE_FORWARD_ACC = 10f;
-    private void TiltTopRotor(Vector3 angles)
+    private void TiltTopRotor(Vector3 axis, float angle)
     {
         if (isEngineOn)
         {
+            var vectorAngle = axis * angle;
+
             // helicopter.Rotate(angles, Space.Self);
             var rot = helicopter.localRotation;
-            helicopter.localRotation = Quaternion.Euler(angles) * rot;
+            helicopter.localRotation = Quaternion.Euler(vectorAngle) * rot;
 
             // Correct rotation of the top rotor
             rbTopRotor.angularVelocity = Vector3.zero;
             rbTopRotor.AddTorque(10f * helicopter.up, ForceMode.Impulse);
 
             // Supply extra forward acceleration
-            var check = Vector3.Dot(angles, Vector3.one);
-            if (check > 0)
+            if (angle > 0)
             {
                 forwardAcc += SCALE_FORWARD_ACC * -Physics.gravity.y;
             }
-            else if (check < 0)
+            else if (angle < 0)
             {
                 forwardAcc -= SCALE_FORWARD_ACC * -Physics.gravity.y;
             }
+
+            // Stablize the value
+            if (forwardAcc < 10e-4 && forwardAcc > -10e-4)
+                forwardAcc = 0;
         }
     }
 
