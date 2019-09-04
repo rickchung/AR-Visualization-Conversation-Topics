@@ -126,7 +126,7 @@ public class AvatarController : MonoBehaviour
     /// <summary>
     /// Reset the position of the avatar to the origin.
     /// </summary>
-    public void ResetPosition()
+    public virtual void ResetPosition()
     {
         // These two variables are updated here to ensure this procedure is taken
         // after the grid map is generated

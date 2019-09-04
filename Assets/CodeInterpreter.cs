@@ -168,8 +168,10 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         new Regex(@"(?<cmd>STOP_ENGINE) \(\)"),
         new Regex(@"(?<cmd>CLIMB_UP) \(\)"),
         new Regex(@"(?<cmd>FALL_DOWN) \(\)"),
-        new Regex(@"(?<cmd>HOVERING_RIGHT_TURN) \(\)"),
-        new Regex(@"(?<cmd>HOVERING_LEFT_TURN) \(\)"),
+        new Regex(@"(?<cmd>MOVE_FORWARD) \(\);"),
+        new Regex(@"(?<cmd>MOVE_BACKWARD) \(\);"),
+        new Regex(@"(?<cmd>HOVERING_TURN_RIGHT) \(\)"),
+        new Regex(@"(?<cmd>HOVERING_TURN_LEFT) \(\)"),
     };
     private static Regex[] regexSingleCmdOneParam = {
         new Regex(@"(?<cmd>MOVE) \((?<param>\w+)\);"),

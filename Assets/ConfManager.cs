@@ -54,7 +54,7 @@ public class ConfManager : MonoBehaviour
             "OgConfig-Puzzle3",
                 "OgMap-Puzzle3", "OgScript-Puzzle3-M", "OgScript-Puzzle3-S",
             "OgConfig-FlyingHelicopter",
-                "OgMap-FlyingHelicopter"
+                "OgMap-FlyingHelicopter", "OgScript-FlyingHelicopter-M", "OgScript-FlyingHelicopter-S",
         };
         foreach (var s in filesToCopy)
         {
@@ -197,19 +197,14 @@ public class ConfManager : MonoBehaviour
                 currentStageIndex = 0;
                 successful = true;
                 break;
-            case "Puzzle1":
-                ApplyConfiguration("Puzzle1");
+            case "S1-Algorithm":
+                ApplyConfiguration("S1-Algorithm");
                 currentStageIndex = 1;
                 successful = true;
                 break;
-            case "Puzzle2":
-                ApplyConfiguration("Puzzle2");
+            case "S2-FlyingHelicopter":
+                ApplyConfiguration("S2-FlyingHelicopter");
                 currentStageIndex = 2;
-                successful = true;
-                break;
-            case "Puzzle3":
-                ApplyConfiguration("Puzzle3");
-                currentStageIndex = 3;
                 successful = true;
                 break;
         }
