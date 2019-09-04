@@ -4188,12 +4188,17 @@ Prefab:
     - target: {fileID: 54702809194084982, guid: 03661491cd4f64cb8ad3784d4ea6c532,
         type: 2}
       propertyPath: m_Drag
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 54702809194084982, guid: 03661491cd4f64cb8ad3784d4ea6c532,
         type: 2}
       propertyPath: m_Mass
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 54702809194084982, guid: 03661491cd4f64cb8ad3784d4ea6c532,
+        type: 2}
+      propertyPath: m_AngularDrag
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 03661491cd4f64cb8ad3784d4ea6c532, type: 2}
