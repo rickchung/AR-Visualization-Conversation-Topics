@@ -388,11 +388,11 @@ public class PartnerSocket : MonoBehaviour
     {
         if (co.GetCommand().Equals("RESET_POS"))
         {
-            mCodeInterpreter.ResetAvatars(forRival: true);
+            mCodeInterpreter.ResetAvatars(fromRemote: true);
         }
         else
         {
-            mCodeInterpreter.RunCommand(co, forRival: true);
+            mCodeInterpreter.RunCommand(co, fromRemote: true);
         }
     }
 }

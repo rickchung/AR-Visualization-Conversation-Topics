@@ -312,16 +312,17 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     /// <summary>
     /// Run a single command in the given codeObject. This is the place to define additional commands of avatar if needed.
     /// </summary>
-    /// <param name="codeObject">Code object.</param>
-    public void RunCommand(CodeObjectOneCommand codeObject, bool forRival = false)
+    /// <param name="codeObject">Code object to execute</param>
+    /// <param name="fromRemote">Whether the codeObjec is for my rival's avatar</param>
+    public void RunCommand(CodeObjectOneCommand codeObject, bool fromRemote = false)
     {
-        AvatarController runner = (!forRival) ? avatar : rivalAvatar;
+        AvatarController runner = (!fromRemote) ? avatar : rivalAvatar;
 
         if (!runner.IsDead)
         {
             DataLogger.Log(
                 this.gameObject, LogTag.SCRIPT,
-                string.Format("Running Cmd, isRival={0}, {1}", forRival, codeObject)
+                string.Format("Running Cmd, fromRemote={0}, {1}", fromRemote, codeObject)
             );
             string command = codeObject.GetCommand();
             string[] args = codeObject.GetArgs();
@@ -331,7 +332,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         {
             DataLogger.Log(
                 this.gameObject, LogTag.SCRIPT,
-                string.Format("Avatar is dead., {0}, {1}", forRival, codeObject)
+                string.Format("Avatar is dead., {0}, {1}", fromRemote, codeObject)
             );
         }
     }
@@ -351,12 +352,12 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     }
 
     /// <summary>
-    /// Reset the positions of avaters. When the forRival flag is true, the method resets the position of the rival avater. This flag is also designed for the remote control from the connected device.
+    /// Reset the positions of avaters. When the fromRemote flag is true, the method resets the position of the rival avater. This flag is also designed for the remote control from the connected device.
     /// </summary>
-    /// <param name="forRival"></param>
-    public void ResetAvatars(bool forRival = false)
+    /// <param name="fromRemote"></param>
+    public void ResetAvatars(bool fromRemote = false)
     {
-        if (!forRival)
+        if (!fromRemote)
         {
             StopRunningScript();
             avatar.ResetPosition();
@@ -371,12 +372,15 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         }
         else
         {
-            rivalAvatar.ResetPosition();
+            if (rivalAvatar)
+                rivalAvatar.ResetPosition();
         }
 
         // Reset avatars' states
-        avatar.IsDead = false;
-        rivalAvatar.IsDead = false;
+        if (avatar)
+            avatar.IsDead = false;
+        if (rivalAvatar)
+            rivalAvatar.IsDead = false;
         // Reset the map
         gridController.ResetMap();
     }

@@ -24,13 +24,13 @@ public class GridCellTargetDual : MonoBehaviour
         var otherAvatar = other.GetComponent<AvatarController>();
         if (otherAvatar != null)
         {
-            var flagToTrigger = otherAvatar.isRival ? flagPoleRemote : flagPoleLocal;
+            var flagToTrigger = otherAvatar.IsRival ? flagPoleRemote : flagPoleLocal;
             if (flagToTrigger.gameObject.activeSelf)
             {
                 DataLogger.Log(
                     this.gameObject, LogTag.MAP,
                     string.Format("{0}, A dual target is collected isRival={1}",
-                        other.name, otherAvatar.isRival
+                        other.name, otherAvatar.IsRival
                     )
                 );
 

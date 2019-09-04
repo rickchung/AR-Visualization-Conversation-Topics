@@ -8,8 +8,7 @@ public class AvatarController : MonoBehaviour
     public GridController gridController;
     public PartnerSocket partnerSocket;
     public CodeInterpreter codeInterpreter;
-    public bool isRival;
-
+    private bool isRival;
     private bool isDead;
     private Transform startingCellInGrid;
     private Vector3? startingCellInVec = null;
@@ -26,6 +25,19 @@ public class AvatarController : MonoBehaviour
         set
         {
             isDead = value;
+        }
+    }
+
+    public bool IsRival
+    {
+        get
+        {
+            return isRival;
+        }
+
+        set
+        {
+            isRival = value;
         }
     }
 
@@ -100,11 +112,11 @@ public class AvatarController : MonoBehaviour
         {
             DataLogger.Log(
                 this.gameObject, LogTag.MAP,
-                "The avatar exceeded the boundary (isRival = " + isRival + ")"
+                "The avatar exceeded the boundary (isRival = " + IsRival + ")"
             );
             GridCellTrap.TriggerTrapEffect(avatar.GetComponent<Collider>());
             IsDead = true;
-            if (!isRival)
+            if (!IsRival)
                 codeInterpreter.StopRunningScript();
         }
     }
@@ -151,7 +163,7 @@ public class AvatarController : MonoBehaviour
         // If you are a slave device, the positions are exchanged.
         if (partnerSocket.IsMaster)
         {
-            if (!isRival)
+            if (!IsRival)
             {
                 sc = gridController.GetTheFirstCellInGrid();
                 vc = new Vector3(0, 0, 0);
@@ -165,7 +177,7 @@ public class AvatarController : MonoBehaviour
         }
         else
         {
-            if (!isRival)
+            if (!IsRival)
             {
                 sc = gridController.GetTheLastCellInGrid();
                 var tmp = gridController.GetSizeOfCoor();

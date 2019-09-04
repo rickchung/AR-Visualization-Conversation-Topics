@@ -54,8 +54,8 @@ public class HelicopterController : AvatarController
 
     public void FallDown()
     {
-        SpeedDownTopRotor(brakeCoefTopRotor);
-        SpeedDownTailRotor(brakeCoefTailRotor);
+        SlowDownTopRotor(brakeCoefTopRotor);
+        SlowDownTailRotor(brakeCoefTailRotor);
     }
 
     private float scaleHoverTurn = 0.05f;
@@ -109,7 +109,7 @@ public class HelicopterController : AvatarController
             torqueAcc += SCALE_TORQUE * amount;
         }
     }
-    private void SpeedDownTopRotor(float amount)
+    private void SlowDownTopRotor(float amount)
     {
         if (isEngineOn)
         {
@@ -119,6 +119,10 @@ public class HelicopterController : AvatarController
         }
     }
 
+    /// <summary>
+    /// To simplify physics, speeding up the tail rotor only decreases torque of ther helicopter.
+    /// </summary>
+    /// <param name="amount"></param>
     private void SpeedUpTailRotor(float amount)
     {
         if (isEngineOn)
@@ -127,7 +131,11 @@ public class HelicopterController : AvatarController
         }
     }
 
-    private void SpeedDownTailRotor(float amount)
+    /// <summary>
+    /// To simplify physics, slowing down the tail rotor only increases torque of the helicopter.
+    /// </summary>
+    /// <param name="amount"></param>
+    private void SlowDownTailRotor(float amount)
     {
         if (isEngineOn)
         {
