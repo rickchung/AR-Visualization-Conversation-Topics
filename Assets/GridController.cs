@@ -179,6 +179,9 @@ public class GridController : MonoBehaviour
                     case GridCellType.WALL_3:
                         newCell = (Transform)Instantiate(gridCellWallPrefab, transform, false);
                         newCell.GetComponent<GridCellWall>().SetHeight((int)cellType - 3);
+                        newCell.GetComponent<GridCellWall>().SetUpdateDelegate(
+                            GridCellUpdateCallback
+                        );
                         break;
                     default:
                         newCell = (Transform)Instantiate(gridCellPrefab, transform, false);
@@ -195,7 +198,7 @@ public class GridController : MonoBehaviour
                 // Save for future references
                 cellVectorMap[x, z] = newPos;
                 cellObjectsMap[x, z] = newCell;
-                cellTypeMap[x, z] = GridCellType.BASE;
+                cellTypeMap[x, z] = cellType;
             }
         }
 
@@ -240,6 +243,9 @@ public class GridController : MonoBehaviour
 
     public void ResetMap()
     {
+        RemoveGridMap();
+        GenerateMapFromCells(cellTypeMap);
+
         if (flagCells != null)
             foreach (var c in flagCells)
                 c.Reset();
@@ -264,6 +270,9 @@ public class GridController : MonoBehaviour
         switch (cellType)
         {
             case GridCellType.TRAP:
+            case GridCellType.WALL:
+            case GridCellType.WALL_2:
+            case GridCellType.WALL_3:
                 DataLogger.Log(this.gameObject, LogTag.MAP, "A trap is triggered.");
 
                 var ac = other.GetComponent<AvatarController>();
@@ -271,9 +280,7 @@ public class GridController : MonoBehaviour
                 {
                     ac.IsDead = true;
                     if (!ac.IsRival)
-                    {
                         codeInterpreter.StopRunningScript();
-                    }
                 }
                 break;
             case GridCellType.REWARD:

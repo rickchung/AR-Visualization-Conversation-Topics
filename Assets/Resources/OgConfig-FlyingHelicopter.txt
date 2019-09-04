@@ -13,8 +13,8 @@ B. Collecting all the flags with your partner.
 
 #
 OgMap-FlyingHelicopter.txt
-OgScript-Tutorial1-M.txt
-OgScript-Tutorial1-S.txt
+OgScript-FlyingHelicopter-M.txt
+OgScript-FlyingHelicopter-S.txt
 false
 false
 Avatar-Helicopter

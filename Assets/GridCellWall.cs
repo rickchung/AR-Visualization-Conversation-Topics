@@ -14,6 +14,26 @@ public class GridCellWall : MonoBehaviour
         updateDelegate = d;
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        var heli = other.GetComponent<HelicopterController>();
+        if (heli != null)
+        {
+            if (!heli.IsDead)
+            {
+                DataLogger.Log(
+                    this.gameObject, LogTag.MAP,
+                    string.Format("Trap triggered by {0}", other.name)
+                );
+
+                heli.StopEngine();
+
+                if (updateDelegate != null)
+                    updateDelegate(this.cellType, other);
+            }
+        }
+    }
+
     public void SetHeight(int numCube)
     {
         for (int i = 0; i < numCube; i++)

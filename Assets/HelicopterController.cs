@@ -17,6 +17,8 @@ public class HelicopterController : AvatarController
         rbHelicopter = helicopter.GetComponent<Rigidbody>();
         rbTopRotor = topRotor.GetComponent<Rigidbody>();
         rbTailRotor = tailRotor.GetComponent<Rigidbody>();
+
+        gameObject.SetActive(false);
     }
 
     override public bool ParseCommand(string command, string[] args)
@@ -40,10 +42,16 @@ public class HelicopterController : AvatarController
                 case "FALL_DOWN":
                     FallDown();
                     break;
-                case "HOVERING_RIGHT_TURN":
+                case "MOVE_FORWARD":
+                    MoveForward();
+                    break;
+                case "MOVE_BACKWARD":
+                    MoveBackward();
+                    break;
+                case "HOVERING_TURN_RIGHT":
                     HoveringTurnRight();
                     break;
-                case "HOVERING_LEFT_TURN":
+                case "HOVERING_TURN_LEFT":
                     HoveringTurnLeft();
                     break;
                 case "SET_POWER_OUTPUT_TOP":
@@ -66,6 +74,23 @@ public class HelicopterController : AvatarController
         }
 
         return isSuccessful;
+    }
+
+    override public void ResetPosition()
+    {
+        base.ResetPosition();
+
+        helicopter.localRotation = Quaternion.Euler(0, 180, 0);
+        var pos = helicopter.localPosition;
+        pos.y = 0.015f;
+        helicopter.localPosition = pos;
+
+        // Reset the physics
+        StopEngine();
+        forwardAcc = upAcc = torqueAcc = 0;
+        rbHelicopter.velocity = Vector3.zero;
+        rbHelicopter.angularVelocity = Vector3.zero;
+        rbHelicopter.constraints = RigidbodyConstraints.None;
     }
 
     // ==================== Engine Control Unit ====================
@@ -93,9 +118,12 @@ public class HelicopterController : AvatarController
 
     private bool isEngineOn = false;
 
-    private float
-        poutTopRotor = 1.0f, poutTailRotor = 1.0f,
-        boutTopRotor = 1.0f, boutTailRotor = 1.0f;
+    private float poutTopRotor = 1.0f;
+    private float poutTailRotor = 1.0f;
+    private float boutTopRotor = 1.0f;
+    private float boutTailRotor = 1.0f;
+    private float scaleHoverTurn = 0.2f;
+    private float scaleTiltAngle = 10.0f;
 
     public void StartEngine()
     {
@@ -109,8 +137,8 @@ public class HelicopterController : AvatarController
         isEngineOn = false;
         rbTopRotor.angularVelocity = Vector3.zero;
         rbTailRotor.angularVelocity = Vector3.zero;
-        upAcc = 0;
-        rbHelicopter.velocity = 500 * SCALE_UPACC * -Vector3.up;
+        upAcc = forwardAcc = 0;
+        rbHelicopter.velocity = 10 * SCALE_UPACC * -Vector3.up;
     }
 
     public void ClimbUp()
@@ -125,7 +153,6 @@ public class HelicopterController : AvatarController
         SlowDownTailRotor(boutTailRotor);
     }
 
-    private float scaleHoverTurn = 0.05f;
     public void HoveringTurnRight()
     {
         SpeedUpTailRotor(scaleHoverTurn);
@@ -136,7 +163,6 @@ public class HelicopterController : AvatarController
         SpeedUpTailRotor(-scaleHoverTurn);
     }
 
-    private float scaleTiltAngle = 10.0f;
     public void MoveForward()
     {
         TiltTopRotor(helicopter.right, scaleTiltAngle);
@@ -150,16 +176,16 @@ public class HelicopterController : AvatarController
 
     private float upAcc, forwardAcc, torqueAcc;
     private const float SCALE_ALTITUDE_MAX = 0.6f, COEF_ATTITUDE = -10;
-    private const float
-        SCALE_TORQUE = 20f,
-        SCALE_UPACC = 100f,
-        SCALE_FORWARD_ACC = 10f;
+    private const float SCALE_TORQUE = 20f;
+    private const float SCALE_UPACC = 100f;
+    private const float SCALE_FORWARD_ACC = 30f;
 
     private void FixedUpdate()
     {
         var effectiveUpAcc = (
             upAcc * Mathf.Exp(COEF_ATTITUDE * (helicopter.localPosition.y / SCALE_ALTITUDE_MAX)
         ));
+
         rbHelicopter.AddForce(effectiveUpAcc * helicopter.up, ForceMode.Acceleration);
         rbHelicopter.AddTorque(torqueAcc * helicopter.up, ForceMode.Acceleration);
 
