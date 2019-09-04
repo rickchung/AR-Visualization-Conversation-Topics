@@ -10,17 +10,12 @@ public class HelicopterController : AvatarController
     private void Start()
     {
         helicopter = transform;
-        rbHelicopter = helicopter.GetComponent<Rigidbody>();
-
         topRotor = helicopter.Find("Top_rotor");
         tailRotor = helicopter.Find("Tail_Rotor");
+        cockpit = helicopter.Find("Cockpit");
+        rbHelicopter = helicopter.GetComponent<Rigidbody>();
         rbTopRotor = topRotor.GetComponent<Rigidbody>();
         rbTailRotor = tailRotor.GetComponent<Rigidbody>();
-
-        cockpit = helicopter.Find("Cockpit");
-
-        StartEngine();
-        ClimbUp();
     }
 
     // ==================== Pilot Control System ====================
@@ -30,6 +25,10 @@ public class HelicopterController : AvatarController
     // ==================== Engine Control Unit ====================
 
     private bool isEngineOn = false;
+
+    private float
+        powerCoefTopRotor = 1.0f, powerCoefTailRotor = 1.0f,
+        brakeCoefTopRotor = 1.0f, brakeCoefTailRotor = 1.0f;
 
     public void StartEngine()
     {
@@ -47,9 +46,6 @@ public class HelicopterController : AvatarController
         rbHelicopter.velocity = 500 * SCALE_UPACC * -Vector3.up;
     }
 
-    private float
-    powerCoefTopRotor = 1.0f, powerCoefTailRotor = 1.0f,
-    brakeCoefTopRotor = 1.0f, brakeCoefTailRotor = 1.0f;
     public void ClimbUp()
     {
         SpeedUpTopRotor(powerCoefTopRotor);
@@ -85,12 +81,12 @@ public class HelicopterController : AvatarController
 
     // ==================== Internal Behavior ====================
 
-
     private float upAcc, forwardAcc, torqueAcc;
-    private const float SCALE_TORQUE = 20f;
-    private const float SCALE_UPACC = 100f;
     private const float SCALE_ALTITUDE_MAX = 0.6f, COEF_ATTITUDE = -10;
-
+    private const float
+        SCALE_TORQUE = 20f,
+        SCALE_UPACC = 100f,
+        SCALE_FORWARD_ACC = 10f;
 
     private void FixedUpdate()
     {
@@ -99,9 +95,9 @@ public class HelicopterController : AvatarController
         ));
         rbHelicopter.AddForce(effectiveUpAcc * helicopter.up, ForceMode.Acceleration);
         rbHelicopter.AddTorque(torqueAcc * helicopter.up, ForceMode.Acceleration);
+
         // Hack forward acceleration
         rbHelicopter.AddForce(forwardAcc * cockpit.forward, ForceMode.Acceleration);
-        Debug.Log(forwardAcc + ", " + cockpit.forward + ", " + forwardAcc * cockpit.forward);
     }
 
     private void SpeedUpTopRotor(float amount)
@@ -139,7 +135,6 @@ public class HelicopterController : AvatarController
         }
     }
 
-    private const float SCALE_FORWARD_ACC = 10f;
     private void TiltTopRotor(Vector3 axis, float angle)
     {
         if (isEngineOn)
