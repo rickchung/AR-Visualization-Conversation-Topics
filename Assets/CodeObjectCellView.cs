@@ -20,8 +20,14 @@ public class CodeObjectCellView : EnhancedScrollerCellView
     public void SetData(CodeObjectOneCommand codeObject)
     {
         this.codeObject = codeObject;
-        commandText.text = codeObject.GetCommand(richtext: true);
-        argumentsText.text = codeObject.GetArgString(richtext: true);
+        // Separate cmd and args
+        // commandText.text = codeObject.GetCommand(richtext: true);
+        // argumentsText.text = codeObject.GetArgString(richtext: true);
+        // Combine cmd and args
+        commandText.text = (
+            codeObject.GetCommand(richtext: true) + " " +
+            codeObject.GetArgString(richtext: true)
+        );
     }
 
     public void SetCodeModifyingDelegate(CodeModifyingDelegate cmDelegate)

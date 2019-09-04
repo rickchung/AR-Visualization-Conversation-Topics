@@ -40,25 +40,25 @@ public class HelicopterController : AvatarController
                 case "FALL_DOWN":
                     FallDown();
                     break;
-                case "HOVERING_RIGHTTURN":
+                case "HOVERING_RIGHT_TURN":
                     HoveringTurnRight();
                     break;
-                case "HOVERING_LEFTTURN":
+                case "HOVERING_LEFT_TURN":
                     HoveringTurnLeft();
                     break;
-                case "SET_POWER_OUTPUT_TOPROTOR":
+                case "SET_POWER_OUTPUT_TOP":
                     value = float.Parse(args[0]);
                     SetPowerOutputTopRotor(value);
                     break;
-                case "SET_POWER_OUTPUT_TAILROTOR":
+                case "SET_POWER_OUTPUT_TAIL":
                     value = float.Parse(args[0]);
                     SetPowerOutputTailRotor(value);
                     break;
-                case "SET_BRAKE_OUTPUT_TOPROTOR":
+                case "SET_BRAKE_OUTPUT_TOP":
                     value = float.Parse(args[0]);
                     SetBrakeOutputTopRotor(value);
                     break;
-                case "SET_BRAKE_OUTPUT_TAILROTOR":
+                case "SET_BRAKE_OUTPUT_TAIL":
                     value = float.Parse(args[0]);
                     SetBrakeOutputTailRotor(value);
                     break;

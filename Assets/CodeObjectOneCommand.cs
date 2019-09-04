@@ -58,7 +58,7 @@
 
     virtual public int GetLength()
     {
-        return GetArgs().Length;
+        return GetCommand().Length;
     }
 
     public void SetCommand(string command)

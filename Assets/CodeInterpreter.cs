@@ -147,15 +147,15 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         new Regex(@"(?<cmd>STOP_ENGINE) \(\)"),
         new Regex(@"(?<cmd>CLIMB_UP) \(\)"),
         new Regex(@"(?<cmd>FALL_DOWN) \(\)"),
-        new Regex(@"(?<cmd>HOVERING_RIGHTTURN) \(\)"),
-        new Regex(@"(?<cmd>HOVERING_LEFTTURN) \(\)"),
+        new Regex(@"(?<cmd>HOVERING_RIGHT_TURN) \(\)"),
+        new Regex(@"(?<cmd>HOVERING_LEFT_TURN) \(\)"),
     };
     private static Regex[] regexSingleCmdOneParam = {
         new Regex(@"(?<cmd>MOVE) \((?<param>\w+)\);"),
-        new Regex(@"(?<cmd>SET_POWER_OUTPUT_TOPROTOR) \((?<param>[\d\.])\)"),
-        new Regex(@"(?<cmd>SET_POWER_OUTPUT_TAILROTOR) \((?<param>[\d\.])\)"),
-        new Regex(@"(?<cmd>SET_BRAKE_OUTPUT_TOPROTOR) \((?<param>[\d\.])\)"),
-        new Regex(@"(?<cmd>SET_BRAKE_OUTPUT_TAILROTO) \((?<param>[\d\.])\)")
+        new Regex(@"(?<cmd>SET_POWER_OUTPUT_TOP) \((?<param>[\d\.]+)\)"),
+        new Regex(@"(?<cmd>SET_POWER_OUTPUT_TAIL) \((?<param>[\d\.]+)\)"),
+        new Regex(@"(?<cmd>SET_BRAKE_OUTPUT_TOP) \((?<param>[\d\.]+)\)"),
+        new Regex(@"(?<cmd>SET_BRAKE_OUTPUT_TAIL) \((?<param>[\d\.]+)\)")
     };
 
     private static CodeObjectOneCommand _MatchRegexSingleCommand(string line)
@@ -452,7 +452,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     {
         // Model
         CodeObjectOneCommand codeObject = loadedScript.GetScript()[dataIndex];
-        return codeObject.GetLength() * 45f;
+        return 45f;
     }
 
     public EnhancedScrollerCellView GetCellView(EnhancedScroller scroller, int dataIndex, int cellIndex)
