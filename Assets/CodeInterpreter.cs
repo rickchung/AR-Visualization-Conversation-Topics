@@ -289,84 +289,53 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     /// <param name="script">Script.</param>
     private void _RunScript(ScriptObject script)
     {
-        // Preprocess the script
-        var procScript = new List<CodeObjectOneCommand>();
-        foreach (CodeObjectOneCommand codeObject in script)
-        {
-            if (codeObject.GetCommand().Equals("LOOP"))
-            {
-                _ParseLoop((CodeObjectLoop)codeObject, procScript);
-            }
-            else if (codeObject.GetCommand().Equals("WAIT"))
-            {
-                for (int i = 0; i < 2 * int.Parse(codeObject.GetArgs()[0]); i++)
-                {
-                    procScript.Add(codeObject);
-                }
-            }
-            else
-            {
-                procScript.Add(codeObject);
-            }
-        }
-
-        StartCoroutine("_RunScriptCoroutine", procScript);
+        StartCoroutine("_RunScriptCoroutine", script);
         isScriptRunning = true;
-
     }
 
     /// <summary>
-    /// Parse a loop command. A loop command will be simply rolled out as a sequence of commands.
+    /// Execute a ScripObject
     /// </summary>
-    /// <param name="codeObject">Code object.</param>
-    /// <param name="procScript">Proc script.</param>
-    private void _ParseLoop(CodeObjectOneCommand codeObject, List<CodeObjectOneCommand> procScript)
+    /// <param name="scriptObject"></param>
+    /// <returns></returns>
+    private IEnumerator _RunScriptCoroutine(ScriptObject scriptObject)
     {
-        int repeat = int.Parse(codeObject.GetArgs()[0]);
+        var script = scriptObject.GetScript();
 
-        var codeToRepeat = new List<CodeObjectOneCommand>();
-        for (int i = 1; i < codeObject.GetArgs().Length; i++)
-        {
-            string s = codeObject.GetArgs()[i];
-            // Extract command and args
-            string[] subCode = s.Split('(');
-            string subCommand = subCode[0];
-            string[] subArgs = subCode[1].Replace(")", "").Split(',');
-            codeToRepeat.Add(new CodeObjectOneCommand(subCommand, subArgs));
-        }
-
-        for (int _ = 0; _ < repeat; _++)
-            procScript.AddRange(codeToRepeat);
-    }
-
-    /// <summary>
-    /// Parse a loop command made by the new loop object.
-    /// </summary>
-    /// <param name="codeObject"></param>
-    /// <param name="procScript"></param>
-    private void _ParseLoop(CodeObjectLoop codeObject, List<CodeObjectOneCommand> procScript)
-    {
-        var repeat = codeObject.GetLoopTimes();
-        var codeToRepeat = codeObject.GetNestedCommands(ignoreDisabled: true);
-        for (int _ = 0; _ < repeat; _++)
-        {
-            procScript.AddRange(codeToRepeat);
-        }
-    }
-
-    /// <summary>
-    /// The coroutine for the script to run in the background.
-    /// </summary>
-    /// <returns>The script.</returns>
-    /// <param name="script">Script.</param>
-    private IEnumerator _RunScriptCoroutine(List<CodeObjectOneCommand> script)
-    {
         int counter = 0;
         while (counter < script.Count)
         {
             CodeObjectOneCommand nextCodeObject = script[counter++];
-            RunCodeObject(nextCodeObject);
-            yield return new WaitForSeconds(CMD_RUNNING_DELAY);
+            nextCodeObject.IsRunning = true;
+
+            if (nextCodeObject.GetCommand().Equals("LOOP"))
+            {
+                var numRepeats = ((CodeObjectLoop)nextCodeObject).GetLoopTimes();
+                var codeToRepeat = ((CodeObjectLoop)nextCodeObject).GetNestedCommands(ignoreDisabled: true);
+                for (int _ = 0; _ < numRepeats; _++)
+                {
+                    foreach (var c in codeToRepeat)
+                    {
+                        RunCommand(c);
+                        yield return new WaitForSeconds(CMD_RUNNING_DELAY);
+                    }
+                }
+            }
+            else if (nextCodeObject.GetCommand().Equals("WAIT"))
+            {
+                for (int i = 0; i < 2 * int.Parse(nextCodeObject.GetArgs()[0]); i++)
+                {
+                    RunCommand(nextCodeObject);
+                    yield return new WaitForSeconds(CMD_RUNNING_DELAY);
+                }
+            }
+            else
+            {
+                RunCommand(nextCodeObject);
+                yield return new WaitForSeconds(CMD_RUNNING_DELAY);
+            }
+
+            nextCodeObject.IsRunning = false;
         }
         isScriptRunning = false;
 
@@ -376,20 +345,14 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         );
     }
 
-    private void RunCodeObject(CodeObjectOneCommand co)
-    {
-        RunCommand(co);
-        // Send the current command to the remote clients
-        partnerSocket.BroadcastAvatarCtrl(co);
-    }
-
     /// <summary>
-    /// Run a single command in the given codeObject. This is the place to define additional commands of avatar if needed.
+    /// Invoke the parser on avatars to run the passed code object. This method will also be invoked through the network.
     /// </summary>
     /// <param name="codeObject">Code object to execute</param>
     /// <param name="fromRemote">Whether the codeObjec is for my rival's avatar</param>
     public void RunCommand(CodeObjectOneCommand codeObject, bool fromRemote = false)
     {
+        // Choose the runner according to the source of input commands
         AvatarController runner = (!fromRemote) ? avatar : rivalAvatar;
 
         if (!runner.IsDead)
@@ -408,6 +371,12 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
                 this.gameObject, LogTag.SCRIPT,
                 string.Format("Avatar is dead., {0}, {1}", fromRemote, codeObject)
             );
+        }
+
+        // If this method is invoked locally, it will broadcast the command to remote devices. Note: When a message arrives at the remote device, it will also invoke this method but with the flag fromRemote = true, to prevent a broadcast storm.
+        if (fromRemote == false)
+        {
+            partnerSocket.BroadcastAvatarCtrl(codeObject);
         }
     }
 
@@ -527,32 +496,5 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         if (scrollToTop)
             scrollPos = 0.0f;
         scriptScroller.ReloadData(scrollPositionFactor: scrollPos);
-    }
-
-    // ==================== Testing Functions
-
-    public void _TestLoadingScript(string scriptName)
-    {
-        LoadPredefinedScript(scriptName, broadcast: false);
-    }
-
-    public void _TestAnything(int dir)
-    {
-        switch ((GridController.Direction)dir)
-        {
-            case GridController.Direction.NORTH:
-                RunCodeObject(new CodeObjectOneCommand("MOVE", new string[] { "NORTH" }));
-                break;
-            case GridController.Direction.SOUTH:
-                RunCodeObject(new CodeObjectOneCommand("MOVE", new string[] { "SOUTH" }));
-                break;
-            case GridController.Direction.EAST:
-                RunCodeObject(new CodeObjectOneCommand("MOVE", new string[] { "EAST" }));
-                break;
-            case GridController.Direction.WEST:
-                RunCodeObject(new CodeObjectOneCommand("MOVE", new string[] { "WEST" }));
-                break;
-
-        }
     }
 }
