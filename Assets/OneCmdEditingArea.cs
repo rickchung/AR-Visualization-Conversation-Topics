@@ -12,7 +12,7 @@ public class OneCmdEditingArea : MonoBehaviour, EditingArea
     public TMP_Dropdown oneCmdDropdown;
     public Button oneCmdSubmitBtn;
     public Toggle codeToggle;
-    private CodeObjectOneCommand attachedCodeObject;
+
     public CodeViewUpdateDelegate codeViewUpdateDelegate;
 
     public CodeObjectOneCommand AttachedCodeObject
@@ -28,9 +28,26 @@ public class OneCmdEditingArea : MonoBehaviour, EditingArea
         }
     }
 
+    public bool JustAwakenedFromInactive
+    {
+        get
+        {
+            return justAwakenedFromInactive;
+        }
+
+        set
+        {
+            justAwakenedFromInactive = value;
+        }
+    }
+
+    private CodeObjectOneCommand attachedCodeObject;
+    private bool justAwakenedFromInactive = false;
+
     virtual public void AttachCodeObject(CodeObjectOneCommand codeObject, bool showSubmitBtn = true)
     {
         AttachedCodeObject = codeObject;
+        JustAwakenedFromInactive = true;
 
         string command = AttachedCodeObject.GetCommand();
         string[] args = AttachedCodeObject.GetArgs();
@@ -53,26 +70,33 @@ public class OneCmdEditingArea : MonoBehaviour, EditingArea
     /// <param name="value"></param>
     virtual public void OnArgChange(int value)
     {
-        string newCommand = oneCmdLabel.text;
-        int newArg = value;
-        string newArgStr = Enum.ToObject(
-            typeof(GridController.Direction), newArg
-        ).ToString();
+        if (JustAwakenedFromInactive)
+        {
+            JustAwakenedFromInactive = false;
+        }
+        else
+        {
+            string newCommand = oneCmdLabel.text;
+            int newArg = value;
+            string newArgStr = Enum.ToObject(
+                typeof(GridController.Direction), newArg
+            ).ToString();
 
-        DataLogger.Log(
-            this.gameObject, LogTag.CODING,
-            string.Format(
-                "Code Modified, {0}, {1}",
-                newCommand + " " + newArgStr,
-                AttachedCodeObject.GetCommand() + " " + AttachedCodeObject.GetArgString()
-            )
-        );
+            DataLogger.Log(
+                this.gameObject, LogTag.CODING,
+                string.Format(
+                    "Code Modified, {0}, {1}",
+                    newCommand + " " + newArgStr,
+                    AttachedCodeObject.GetCommand() + " " + AttachedCodeObject.GetArgString()
+                )
+            );
 
-        AttachedCodeObject.SetCommand(newCommand);
-        AttachedCodeObject.SetArgs(new string[] { newArgStr });
+            AttachedCodeObject.SetCommand(newCommand);
+            AttachedCodeObject.SetArgs(new string[] { newArgStr });
 
-        if (codeViewUpdateDelegate != null)
-            codeViewUpdateDelegate();
+            if (codeViewUpdateDelegate != null)
+                codeViewUpdateDelegate();
+        }
     }
 
     /// <summary>

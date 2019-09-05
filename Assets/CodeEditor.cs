@@ -64,6 +64,7 @@ public class CodeEditor : MonoBehaviour
         openedEditorArea = null;
         loopEditingArea.gameObject.SetActive(false);
         oneCmdEditingArea.gameObject.SetActive(false);
+        cmdWithNumberEditingArea.gameObject.SetActive(false);
         transform.gameObject.SetActive(false);
         UpdateCodeViewer();
     }

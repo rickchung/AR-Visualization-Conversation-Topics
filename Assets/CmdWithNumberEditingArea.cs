@@ -8,13 +8,12 @@ public class CmdWithNumberEditingArea : OneCmdEditingArea
 {
     public Slider argSlider;
     public TextMeshProUGUI sliderLabel;
-    private bool justAwakenedFromInactive = false;
 
     override public void AttachCodeObject(
         CodeObjectOneCommand codeObject, bool showSubmitBtn = true)
     {
         AttachedCodeObject = codeObject;
-        justAwakenedFromInactive = true;
+        JustAwakenedFromInactive = true;
 
         var command = codeObject.GetCommand();
         var args = codeObject.GetArgs();
@@ -53,9 +52,9 @@ public class CmdWithNumberEditingArea : OneCmdEditingArea
 
     public void OnCmdChange(int value)
     {
-        if (justAwakenedFromInactive)
+        if (JustAwakenedFromInactive)
         {
-            justAwakenedFromInactive = false;
+            JustAwakenedFromInactive = false;
         }
         else
         {
@@ -97,6 +96,7 @@ public class CmdWithNumberEditingArea : OneCmdEditingArea
             }
         }
     }
+
     public void OnArgChange(float value)
     {
         // Update the slider label

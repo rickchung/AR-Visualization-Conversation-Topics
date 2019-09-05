@@ -482,7 +482,14 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     {
         // Model
         CodeObjectOneCommand codeObject = loadedScript.GetScript()[dataIndex];
-        return 45f;
+        var size = 45f + (codeObject.GetLength() / 25) * 30f;
+
+        if (codeObject.GetCommand().Equals("LOOP"))
+        {
+            size = (codeObject.GetArgs().Length + 2) * 45f;
+        }
+
+        return size;
     }
 
     public EnhancedScrollerCellView GetCellView(EnhancedScroller scroller, int dataIndex, int cellIndex)
