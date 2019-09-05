@@ -278,39 +278,37 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
                         foreach (var c in codeToRepeat)
                         {
                             do
-                            {
                                 yield return _CoroutineCtrlPreCmd(c);
-                            }
                             while (IsScriptPaused);
                             RunCommand(c);
+                            _CoroutineCtrlPostCmd();
+
                         }
                     }
                 }
-                else if (nextCodeObject.GetCommand().Equals("WAIT"))
+                else if (nextCodeObject.GetCommand().Equals("Wait"))
                 {
                     for (int i = 0; i < 2 * int.Parse(nextCodeObject.GetArgs()[0]); i++)
                     {
                         do
-                        {
                             yield return _CoroutineCtrlPreCmd(nextCodeObject);
-                        }
                         while (IsScriptPaused);
                         RunCommand(nextCodeObject);
+                        _CoroutineCtrlPostCmd();
+
                     }
                 }
                 else
                 {
                     do
-                    {
                         yield return _CoroutineCtrlPreCmd(nextCodeObject);
-                    }
                     while (IsScriptPaused);
                     RunCommand(nextCodeObject);
+                    _CoroutineCtrlPostCmd();
                 }
             }
 
             nextCodeObject.IsRunning = false;
-            _CoroutineCtrlPostCmd();
         }
 
         IsScriptRunning = false;
@@ -349,7 +347,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
                         );
                         IsScriptPaused = false;
                         semTimeElapsed = 0;
-                        ctrlSignal = new WaitForSeconds(CMD_RUNNING_DELAY);
+                        ctrlSignal = new WaitForSeconds(0);
                     }
                 }
                 else
