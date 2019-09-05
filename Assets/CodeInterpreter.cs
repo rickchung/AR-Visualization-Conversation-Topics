@@ -26,6 +26,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     private ScriptExecMode execMode;
     private bool isScriptRunning;
     private bool isScriptPaused;
+    private bool _coroutineLock;
     public bool isRemoteFinished;
     private static string dataFolderPath;
     public enum ScriptExecMode { ASYNC, SYNC_STEP_SWITCHING, SYNC_CMD_SWITCHING };
@@ -279,7 +280,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
                         {
                             do
                                 yield return _CoroutineCtrlPreCmd(c);
-                            while (IsScriptPaused);
+                            while (_coroutineLock);
                             RunCommand(c);
                             _CoroutineCtrlPostCmd();
 
@@ -292,7 +293,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
                     {
                         do
                             yield return _CoroutineCtrlPreCmd(nextCodeObject);
-                        while (IsScriptPaused);
+                        while (_coroutineLock);
                         RunCommand(nextCodeObject);
                         _CoroutineCtrlPostCmd();
 
@@ -302,7 +303,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
                 {
                     do
                         yield return _CoroutineCtrlPreCmd(nextCodeObject);
-                    while (IsScriptPaused);
+                    while (_coroutineLock);
                     RunCommand(nextCodeObject);
                     _CoroutineCtrlPostCmd();
                 }
@@ -337,7 +338,8 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
                 // Set the lock, wait until the remote responses
                 if (IsScriptPaused)
                 {
-                    // Debug.Log("Local script is paused. Waiting for the remote...");
+                    // Debug.Log("Locked!");
+                    _coroutineLock = true;
                     ctrlSignal = null;
                     semTimeElapsed += Time.deltaTime;
                     if (semTimeElapsed >= CTRL_MAX_WAIT_TIME)
@@ -352,7 +354,16 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
                 }
                 else
                 {
-                    ctrlSignal = new WaitForSeconds(CMD_RUNNING_DELAY);
+                    // Debug.Log("Unlocked!");
+                    _coroutineLock = false;
+                    // After you get an unlocking signal, you will be here.
+                    var leftWaitingTime = Mathf.Max(
+                        0, CMD_RUNNING_DELAY - semTimeElapsed
+                    );
+
+                    // Debug.Log("Left waiting time: " + leftWaitingTime);
+
+                    ctrlSignal = new WaitForSeconds(leftWaitingTime);
                     semTimeElapsed = 0;
                 }
                 break;
@@ -360,7 +371,6 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
                 ctrlSignal = null;
                 break;
         }
-
         return ctrlSignal;
     }
 
@@ -372,7 +382,6 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
                 // Do nothing
                 break;
             case ScriptExecMode.SYNC_STEP_SWITCHING:
-                IsScriptPaused = true;
                 // If the remote hasn't finished, lock self and send unlock message
                 if (isRemoteFinished == false)
                 {
