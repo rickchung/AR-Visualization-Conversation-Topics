@@ -202,7 +202,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
                 );
 
                 runButton.interactable = false;
-                _RunScript(loadedScript);
+                _PreExecProcess(loadedScript);
             }
             else
             {
@@ -225,7 +225,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     /// Run the given ScriptObject by starting a coroutine.
     /// </summary>
     /// <param name="script">Script.</param>
-    private void _RunScript(ScriptObject script)
+    private void _PreExecProcess(ScriptObject script)
     {
         // Init sync control
         switch (execMode)
@@ -253,6 +253,9 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     /// <returns></returns>
     private IEnumerator _RunScriptCoroutine(ScriptObject scriptObject)
     {
+        // Dump the script
+        DataLogger.DumpWholeScript(scriptObject);
+
         var script = scriptObject.GetScript();
         isRemoteFinished = false;
         IsScriptRunning = true;
