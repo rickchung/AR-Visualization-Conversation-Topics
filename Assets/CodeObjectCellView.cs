@@ -35,6 +35,11 @@ public class CodeObjectCellView : EnhancedScrollerCellView
         {
             commandText.text = "<mark=#ffff00aa>" + commandText.text;
         }
+
+        if (codeObject.IsRunning)
+        {
+            commandText.text = "<mark=#ffffff88>" + commandText.text;
+        }
     }
 
     public void SetCodeModifyingDelegate(CodeModifyingDelegate cmDelegate)

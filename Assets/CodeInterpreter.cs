@@ -175,7 +175,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     }
 
     /// <summary>
-    /// Execute a ScripObject
+    /// A coroutine for executing ScripObject
     /// </summary>
     /// <param name="scriptObject"></param>
     /// <returns></returns>
@@ -188,6 +188,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         {
             CodeObjectOneCommand nextCodeObject = script[counter++];
             nextCodeObject.IsRunning = true;
+            UpdateCodeViewer(scrollToTop: false);
 
             if (nextCodeObject.GetCommand().Equals("LOOP"))
             {
@@ -197,8 +198,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
                 {
                     foreach (var c in codeToRepeat)
                     {
-                        RunCommand(c);
-                        yield return new WaitForSeconds(CMD_RUNNING_DELAY);
+                        yield return _CoroutineRunCommandHelper(c);
                     }
                 }
             }
@@ -206,24 +206,29 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
             {
                 for (int i = 0; i < 2 * int.Parse(nextCodeObject.GetArgs()[0]); i++)
                 {
-                    RunCommand(nextCodeObject);
-                    yield return new WaitForSeconds(CMD_RUNNING_DELAY);
+                    yield return _CoroutineRunCommandHelper(nextCodeObject);
                 }
             }
             else
             {
-                RunCommand(nextCodeObject);
-                yield return new WaitForSeconds(CMD_RUNNING_DELAY);
+                yield return _CoroutineRunCommandHelper(nextCodeObject);
             }
 
             nextCodeObject.IsRunning = false;
         }
         isScriptRunning = false;
+        UpdateCodeViewer();
 
         DataLogger.Log(
             this.gameObject, LogTag.SCRIPT,
             "The execution of a script has finished."
         );
+    }
+
+    private WaitForSeconds _CoroutineRunCommandHelper(CodeObjectOneCommand c)
+    {
+        RunCommand(c);
+        return new WaitForSeconds(CMD_RUNNING_DELAY);
     }
 
     /// <summary>
@@ -371,7 +376,6 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
             scrollPos = 0.0f;
         scriptScroller.ReloadData(scrollPositionFactor: scrollPos);
     }
-
 
     // ========== File IO for Interpreter ==========
 
