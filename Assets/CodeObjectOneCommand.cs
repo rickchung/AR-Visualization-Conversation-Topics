@@ -89,8 +89,7 @@
         return command + " " + argstr + ";";
     }
 
-
-    // ====================
+    // ==================== Networking
 
     public string ToNetMessage()
     {

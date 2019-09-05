@@ -1437,7 +1437,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.0000022842387, y: 0}
+  m_AnchoredPosition: {x: 0.000013421653, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &160336697
@@ -5661,7 +5661,7 @@ GameObject:
   - component: {fileID: 425962190}
   - component: {fileID: 425962191}
   m_Layer: 5
-  m_Name: Slider
+  m_Name: ArgSlider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6267,8 +6267,8 @@ MonoBehaviour:
   m_outlineColor:
     serializedVersion: 2
     rgba: 4278190080
-  m_fontSize: 24
-  m_fontSizeBase: 24
+  m_fontSize: 18
+  m_fontSizeBase: 18
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -10565,7 +10565,7 @@ MonoBehaviour:
   onValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1444062031}
         m_MethodName: OnToggleChange
         m_Mode: 0
         m_Arguments:
@@ -18002,6 +18002,7 @@ MonoBehaviour:
   oneCmdDropdown: {fileID: 927205358}
   oneCmdSubmitBtn: {fileID: 1744758270}
   codeToggle: {fileID: 823091207}
+  argSlider: {fileID: 425962191}
   sliderLabel: {fileID: 1913694626}
 --- !u!114 &1444062032
 MonoBehaviour:
@@ -22229,7 +22230,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1444062031}
         m_MethodName: DismissEditor
         m_Mode: 1
         m_Arguments:
