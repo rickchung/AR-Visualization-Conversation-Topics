@@ -43,6 +43,9 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         }
     }
 
+
+    // ========== Misc Methods ==========
+
     public void SetAvatarGameObjects(AvatarController player1, AvatarController rival)
     {
         // Disable the existing avatars if existing
@@ -90,7 +93,16 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         SetActiveTopicView(false, true);
     }
 
-    // ==================== Interfaces of script operations ====================
+    public void SwitchCodeView()
+    {
+        // var tmp1 = scriptTextMesh.transform.parent.gameObject;
+        // tmp1.SetActive(!tmp1.activeSelf);
+        var tmp2 = scriptScroller.gameObject;
+        tmp2.SetActive(!tmp2.activeSelf);
+    }
+
+
+    // ========== Script Interpreter ==========
 
     /// <summary>
     /// Load the predefined script template specified by <paramref name="scriptName"/>.
@@ -114,137 +126,6 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         // Enable the viewer on the remote device
         if (broadcast) partnerSocket.BroadcastTopicCtrl(scriptName);
     }
-
-    // ==================== File IO for Interpreter ====================
-
-    private static void ExportScriptObject(ScriptObject script, string scriptName)
-    {
-        var scriptString = script.ToString(richtext: false);
-        var path = Path.Combine(dataFolderPath, scriptName);
-        using (var writer = new StreamWriter(path, false))
-        {
-            writer.WriteLine(scriptString);
-            writer.Close();
-        }
-    }
-
-    private static ScriptObject ImportScriptObject(string scriptName)
-    {
-        var path = Path.Combine(dataFolderPath, scriptName);
-        ScriptObject rt = null;
-        try
-        {
-            using (var reader = new StreamReader(path))
-            {
-                rt = ProcessCode(reader);
-            }
-        }
-        catch (FileNotFoundException)
-        {
-            DataLogger.Log(LogTag.SCRIPT_ERROR, "File to import is not found: " + scriptName);
-        }
-        return rt;
-    }
-
-    private static ScriptObject ProcessCode(StreamReader reader)
-    {
-        var codeList = new List<CodeObjectOneCommand>();
-        while (reader.Peek() > 0)
-        {
-            var line = reader.ReadLine();
-            var code = _ProcessOneLine(line, reader);
-            if (code != null)
-                codeList.Add(code);
-        }
-        return new ScriptObject(codeList); ;
-    }
-
-    private static
-        Regex regexLoopStart = new Regex(@"LOOP REPEAT {"),
-        regexLoopEnd = new Regex(@"} (?<times>\d) Times;");
-    private static Regex[] regexSingleCmdNoParam = {
-        new Regex(@"(?<cmd>START_ENGINE) \(\)"),
-        new Regex(@"(?<cmd>STOP_ENGINE) \(\)"),
-        new Regex(@"(?<cmd>CLIMB_UP) \(\)"),
-        new Regex(@"(?<cmd>FALL_DOWN) \(\)"),
-        new Regex(@"(?<cmd>MOVE_FORWARD) \(\);"),
-        new Regex(@"(?<cmd>MOVE_BACKWARD) \(\);"),
-        new Regex(@"(?<cmd>TURN_RIGHT) \(\)"),
-        new Regex(@"(?<cmd>TURN_LEFT) \(\)"),
-    };
-    private static Regex[] regexSingleCmdOneParam = {
-        new Regex(@"(?<cmd>WAIT) \((?<param>\d+)\);"),
-        new Regex(@"(?<cmd>MOVE) \((?<param>\w+)\);"),
-        new Regex(@"(?<cmd>SET_TOP_PWR_OUTPUT) \((?<param>[\d\.]+)\)"),
-        new Regex(@"(?<cmd>SET_TAIL_PWR_OUTPUT) \((?<param>[\d\.]+)\)"),
-        new Regex(@"(?<cmd>SET_TOP_BRAKE_OUTPUT) \((?<param>[\d\.]+)\)"),
-        new Regex(@"(?<cmd>SET_TAIL_BRAKE_OUTPUT) \((?<param>[\d\.]+)\)"),
-    };
-
-    private static CodeObjectOneCommand _MatchRegexSingleCommand(string line)
-    {
-        // No param
-        foreach (var r in regexSingleCmdNoParam)
-        {
-            var matched = r.Matches(line);
-            if (matched != null && matched.Count > 0)
-            {
-                return new CodeObjectOneCommand(
-                    matched[0].Groups["cmd"].Value, new string[] { }
-                );
-            }
-        }
-
-        // One param
-        foreach (var r in regexSingleCmdOneParam)
-        {
-            var matched = r.Matches(line);
-            if (matched != null && matched.Count > 0)
-            {
-                return new CodeObjectOneCommand(
-                    matched[0].Groups["cmd"].Value,
-                    new string[] { matched[0].Groups["param"].Value }
-                );
-            }
-        }
-        return null;
-    }
-    private static CodeObjectOneCommand _ProcessOneLine(string oneLine, StreamReader reader)
-    {
-        // Try to match a command
-        var singleCmd = _MatchRegexSingleCommand(oneLine);
-        if (singleCmd != null) return singleCmd;
-
-        // Try to match a loop command
-        var matchLoopStart = regexLoopStart.Matches(oneLine);
-        if (matchLoopStart.Count > 0)
-        {
-            var loopNestedCode = new List<CodeObjectOneCommand>();
-            while (reader.Peek() > 0)
-            {
-                var aNestedLine = reader.ReadLine();
-                var nestedCode = _ProcessOneLine(aNestedLine, reader);
-                if (nestedCode != null)
-                {
-                    loopNestedCode.Add(nestedCode);
-                }
-
-                var matchLoopEnd = regexLoopEnd.Matches(aNestedLine);
-                if (matchLoopEnd.Count > 0)
-                {
-                    return new CodeObjectLoop(
-                        "LOOP",
-                        new string[] { matchLoopEnd[0].Groups["times"].Value },
-                        loopNestedCode
-                    ); ;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    // ==================== Code Interpreter ====================
 
     /// <summary>
     /// Run the loaded script.
@@ -429,15 +310,8 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         gridController.ResetMap();
     }
 
-    public void SwitchCodeView()
-    {
-        // var tmp1 = scriptTextMesh.transform.parent.gameObject;
-        // tmp1.SetActive(!tmp1.activeSelf);
-        var tmp2 = scriptScroller.gameObject;
-        tmp2.SetActive(!tmp2.activeSelf);
-    }
 
-    // ==================== Implementation of EnhancedScroller interfaces ====================
+    // ========== Implementation of EnhancedScroller interfaces ==========
 
     public int GetNumberOfCells(EnhancedScroller scroller)
     {
@@ -497,4 +371,135 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
             scrollPos = 0.0f;
         scriptScroller.ReloadData(scrollPositionFactor: scrollPos);
     }
+
+
+    // ========== File IO for Interpreter ==========
+
+    private static void ExportScriptObject(ScriptObject script, string scriptName)
+    {
+        var scriptString = script.ToString(richtext: false);
+        var path = Path.Combine(dataFolderPath, scriptName);
+        using (var writer = new StreamWriter(path, false))
+        {
+            writer.WriteLine(scriptString);
+            writer.Close();
+        }
+    }
+
+    private static ScriptObject ImportScriptObject(string scriptName)
+    {
+        var path = Path.Combine(dataFolderPath, scriptName);
+        ScriptObject rt = null;
+        try
+        {
+            using (var reader = new StreamReader(path))
+            {
+                rt = ProcessCode(reader);
+            }
+        }
+        catch (FileNotFoundException)
+        {
+            DataLogger.Log(LogTag.SCRIPT_ERROR, "File to import is not found: " + scriptName);
+        }
+        return rt;
+    }
+
+    private static ScriptObject ProcessCode(StreamReader reader)
+    {
+        var codeList = new List<CodeObjectOneCommand>();
+        while (reader.Peek() > 0)
+        {
+            var line = reader.ReadLine();
+            var code = _ProcessOneLine(line, reader);
+            if (code != null)
+                codeList.Add(code);
+        }
+        return new ScriptObject(codeList); ;
+    }
+
+    private static
+        Regex regexLoopStart = new Regex(@"LOOP REPEAT {"),
+        regexLoopEnd = new Regex(@"} (?<times>\d) Times;");
+    private static Regex[] regexSingleCmdNoParam = {
+        new Regex(@"(?<cmd>START_ENGINE) \(\)"),
+        new Regex(@"(?<cmd>STOP_ENGINE) \(\)"),
+        new Regex(@"(?<cmd>CLIMB_UP) \(\)"),
+        new Regex(@"(?<cmd>FALL_DOWN) \(\)"),
+        new Regex(@"(?<cmd>MOVE_FORWARD) \(\);"),
+        new Regex(@"(?<cmd>MOVE_BACKWARD) \(\);"),
+        new Regex(@"(?<cmd>TURN_RIGHT) \(\)"),
+        new Regex(@"(?<cmd>TURN_LEFT) \(\)"),
+    };
+    private static Regex[] regexSingleCmdOneParam = {
+        new Regex(@"(?<cmd>WAIT) \((?<param>\d+)\);"),
+        new Regex(@"(?<cmd>MOVE) \((?<param>\w+)\);"),
+        new Regex(@"(?<cmd>SET_TOP_PWR_OUTPUT) \((?<param>[\d\.]+)\)"),
+        new Regex(@"(?<cmd>SET_TAIL_PWR_OUTPUT) \((?<param>[\d\.]+)\)"),
+        new Regex(@"(?<cmd>SET_TOP_BRAKE_OUTPUT) \((?<param>[\d\.]+)\)"),
+        new Regex(@"(?<cmd>SET_TAIL_BRAKE_OUTPUT) \((?<param>[\d\.]+)\)"),
+    };
+
+    private static CodeObjectOneCommand _MatchRegexSingleCommand(string line)
+    {
+        // No param
+        foreach (var r in regexSingleCmdNoParam)
+        {
+            var matched = r.Matches(line);
+            if (matched != null && matched.Count > 0)
+            {
+                return new CodeObjectOneCommand(
+                    matched[0].Groups["cmd"].Value, new string[] { }
+                );
+            }
+        }
+
+        // One param
+        foreach (var r in regexSingleCmdOneParam)
+        {
+            var matched = r.Matches(line);
+            if (matched != null && matched.Count > 0)
+            {
+                return new CodeObjectOneCommand(
+                    matched[0].Groups["cmd"].Value,
+                    new string[] { matched[0].Groups["param"].Value }
+                );
+            }
+        }
+        return null;
+    }
+    private static CodeObjectOneCommand _ProcessOneLine(string oneLine, StreamReader reader)
+    {
+        // Try to match a command
+        var singleCmd = _MatchRegexSingleCommand(oneLine);
+        if (singleCmd != null) return singleCmd;
+
+        // Try to match a loop command
+        var matchLoopStart = regexLoopStart.Matches(oneLine);
+        if (matchLoopStart.Count > 0)
+        {
+            var loopNestedCode = new List<CodeObjectOneCommand>();
+            while (reader.Peek() > 0)
+            {
+                var aNestedLine = reader.ReadLine();
+                var nestedCode = _ProcessOneLine(aNestedLine, reader);
+                if (nestedCode != null)
+                {
+                    loopNestedCode.Add(nestedCode);
+                }
+
+                var matchLoopEnd = regexLoopEnd.Matches(aNestedLine);
+                if (matchLoopEnd.Count > 0)
+                {
+                    return new CodeObjectLoop(
+                        "LOOP",
+                        new string[] { matchLoopEnd[0].Groups["times"].Value },
+                        loopNestedCode
+                    ); ;
+                }
+            }
+        }
+
+        return null;
+    }
+
 }
