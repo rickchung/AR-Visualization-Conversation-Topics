@@ -46,8 +46,9 @@ public class CmdWithNumberEditingArea : OneCmdEditingArea
         {
             argSlider.interactable = false;
             argSlider.gameObject.SetActive(false);
-
         }
+
+        codeToggle.isOn = !AttachedCodeObject.IsDisabled();
     }
 
     public void OnCmdChange(int value)
