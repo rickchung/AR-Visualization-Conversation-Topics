@@ -233,11 +233,11 @@ public class PartnerSocket : MonoBehaviour
                 new StringMessage { value = code.ToNetMessage() }
             );
         }
-        // Otherwise, send back the command to the local rival avatar
-        else
-        {
-            ProcessAvtarCtrl(code);
-        }
+        // // Otherwise, send back the command to the local rival avatar
+        // else
+        // {
+        //     _ProcessAvtarCtrl(code);
+        // }
     }
 
 
@@ -362,7 +362,7 @@ public class PartnerSocket : MonoBehaviour
 
         switch (ctrlCmd)
         {
-            case CodeInterpreter.CTRL_CLOSE:
+            case CodeInterpreter.CTRL_CLOSE_TOPIC_VIEW:
                 mCodeInterpreter.SetActiveTopicView(false);
                 break;
             // By default, if the ctrlCmd is not any predefined control message,
@@ -381,18 +381,56 @@ public class PartnerSocket : MonoBehaviour
     {
         var ctrlCmd = netMsg.ReadMessage<StringMessage>().value;
         CodeObjectOneCommand co = CodeObjectOneCommand.FromNetMessage(ctrlCmd);
-        ProcessAvtarCtrl(co);
+        _ProcessAvtarCtrl(co);
     }
-
-    private void ProcessAvtarCtrl(CodeObjectOneCommand co)
+    private void _ProcessAvtarCtrl(CodeObjectOneCommand co)
     {
-        if (co.GetCommand().Equals("RESET_POS"))
+        var command = co.GetCommand();
+
+        switch (command)
         {
-            mCodeInterpreter.ResetAvatars(fromRemote: true);
-        }
-        else
-        {
-            mCodeInterpreter.RunCommand(co, fromRemote: true);
+            case CodeInterpreter.CTRL_SEM_LOCK:
+                mCodeInterpreter.IsScriptPaused = true;
+                break;
+
+            case CodeInterpreter.CTRL_SEM_UNLOCK:
+                // If I've finished but still receiving an unlock signal
+                if (mCodeInterpreter.IsScriptRunning == false)
+                {
+                    BroadcastAvatarCtrl(
+                    new CodeObjectOneCommand(
+                        CodeInterpreter.CTRL_SEM_FINISH, new string[] { })
+                    );
+                }
+                // If I'm still running and receiving an unlock signal
+                else
+                {
+                    mCodeInterpreter.IsScriptPaused = false;
+                }
+                break;
+            case CodeInterpreter.CTRL_SEM_FINISH:
+                // If remote and I are finished
+                if (mCodeInterpreter.IsScriptRunning == false)
+                {
+                    mCodeInterpreter.PastExecClear();
+                }
+                // If remote has finished but i'm still running
+                else
+                {
+                    mCodeInterpreter.isRemoteFinished = true;
+                    mCodeInterpreter.IsScriptPaused = false;
+                }
+                break;
+
+            case CodeInterpreter.CTRL_SEM_RUNSCRIPT:
+                mCodeInterpreter.RunLoadedScript();
+                break;
+            case CodeInterpreter.CTRL_SIGNAL_RESET:
+                mCodeInterpreter.ResetAvatars(fromRemote: true);
+                break;
+            default:
+                mCodeInterpreter.RunCommand(co, fromRemote: true);
+                break;
         }
     }
 }

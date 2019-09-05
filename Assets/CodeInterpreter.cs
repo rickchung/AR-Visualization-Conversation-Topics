@@ -4,6 +4,7 @@ using System.Collections;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.Events;
 using EnhancedUI.EnhancedScroller;
 
@@ -16,16 +17,66 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     public PartnerSocket partnerSocket;
     public CodeEditor codeEditor;
     public GridController gridController;
-
     [HideInInspector] public GameObject ViewContainer;
     [HideInInspector] public GameObject codingPanel;
 
-    private const float CMD_RUNNING_DELAY = 0.5f;
-    public const string CTRL_CLOSE = "close";
+    public Button runButton;
 
     private ScriptObject loadedScript;
+    private ScriptExecMode execMode;
     private bool isScriptRunning;
+    private bool isScriptPaused;
+    public bool isRemoteFinished;
     private static string dataFolderPath;
+    public enum ScriptExecMode { ASYNC, SYNC_STEP_SWITCHING, SYNC_CMD_SWITCHING };
+    public ScriptExecMode ExecMode
+    {
+        get
+        {
+            return execMode;
+        }
+
+        set
+        {
+            execMode = value;
+        }
+    }
+    public bool IsScriptPaused
+    {
+        get
+        {
+            return isScriptPaused;
+        }
+        set
+        {
+            isScriptPaused = value;
+        }
+    }
+
+    public bool IsScriptRunning
+    {
+        get
+        {
+            return isScriptRunning;
+        }
+        set
+        {
+            isScriptRunning = value;
+        }
+    }
+
+
+    // ========= Predefined Control Signals ==========
+    private const float CMD_RUNNING_DELAY = 0.5f;
+    public const string CTRL_SIGNAL_RESET = "RESET_POS";
+    public const string CTRL_CLOSE_TOPIC_VIEW = "CLOSE_TOPIC_VIEW";
+    public const string CTRL_SEM_LOCK = "SEM_LOCK";
+    public const string CTRL_SEM_UNLOCK = "SEM_UNLOCK";
+    public const string CTRL_SEM_FINISH = "SEM_FINISH";
+    public const string CTRL_SEM_RUNSCRIPT = "SEM_RUNSCRIPT";
+    private const int CTRL_MAX_WAIT_TIME = 3;
+    private float semTimeElapsed;
+
 
     void Start()
     {
@@ -41,6 +92,8 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         {
             rivalAvatar.IsRival = true;
         }
+
+        runButton.onClick.AddListener(RunLoadedScriptSync);
     }
 
 
@@ -85,7 +138,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     {
         if (ViewContainer) ViewContainer.SetActive(activated);
         if (codingPanel) codingPanel.SetActive(activated);
-        if (broadcast) partnerSocket.BroadcastTopicCtrl(CTRL_CLOSE);
+        if (broadcast) partnerSocket.BroadcastTopicCtrl(CTRL_CLOSE_TOPIC_VIEW);
     }
 
     public void CloseTopicViewAndBroadcast()
@@ -101,6 +154,10 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         tmp2.SetActive(!tmp2.activeSelf);
     }
 
+    public void SetExecMode(float value)
+    {
+        execMode = (ScriptExecMode)((int)value);
+    }
 
     // ========== Script Interpreter ==========
 
@@ -127,23 +184,29 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         if (broadcast) partnerSocket.BroadcastTopicCtrl(scriptName);
     }
 
+    public void RunLoadedScriptSync()
+    {
+        RunLoadedScript();
+        partnerSocket.BroadcastAvatarCtrl(
+            new CodeObjectOneCommand(CTRL_SEM_RUNSCRIPT, new string[] { })
+        );
+    }
+
     /// <summary>
     /// Run the loaded script.
     /// </summary>
     public void RunLoadedScript()
     {
-        // TODO: Make this function synchronized between local and remote devices.
-
         if (loadedScript != null)
         {
-            if (isScriptRunning == false)
+            if (IsScriptRunning == false)
             {
                 DataLogger.Log(
                     this.gameObject, LogTag.SCRIPT,
                     "Start running the loaded script"
                 );
 
-                ResetAvatars();
+                runButton.interactable = false;
                 _RunScript(loadedScript);
             }
             else
@@ -164,14 +227,28 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     }
 
     /// <summary>
-    /// Run the given ScriptObject. This method also preprocesses the script
-    /// by transforming loops into code sequences.
+    /// Run the given ScriptObject by starting a coroutine.
     /// </summary>
     /// <param name="script">Script.</param>
     private void _RunScript(ScriptObject script)
     {
+        // Init sync control
+        switch (execMode)
+        {
+            // Master runs first. Slave waits first.
+            case ScriptExecMode.SYNC_STEP_SWITCHING:
+                if (partnerSocket.IsMaster)
+                {
+                    IsScriptPaused = false;
+                }
+                else
+                {
+                    IsScriptPaused = true;
+                }
+                break;
+        }
+
         StartCoroutine("_RunScriptCoroutine", script);
-        isScriptRunning = true;
     }
 
     /// <summary>
@@ -182,6 +259,8 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     private IEnumerator _RunScriptCoroutine(ScriptObject scriptObject)
     {
         var script = scriptObject.GetScript();
+        isRemoteFinished = false;
+        IsScriptRunning = true;
 
         int counter = 0;
         while (counter < script.Count)
@@ -198,7 +277,12 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
                 {
                     foreach (var c in codeToRepeat)
                     {
-                        yield return _CoroutineRunCommandHelper(c);
+                        do
+                        {
+                            yield return _CoroutineCtrlPreCmd(c);
+                        }
+                        while (IsScriptPaused);
+                        RunCommand(c);
                     }
                 }
             }
@@ -206,29 +290,108 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
             {
                 for (int i = 0; i < 2 * int.Parse(nextCodeObject.GetArgs()[0]); i++)
                 {
-                    yield return _CoroutineRunCommandHelper(nextCodeObject);
+                    do
+                    {
+                        yield return _CoroutineCtrlPreCmd(nextCodeObject);
+                    }
+                    while (IsScriptPaused);
+                    RunCommand(nextCodeObject);
                 }
             }
             else
             {
-                yield return _CoroutineRunCommandHelper(nextCodeObject);
+                do
+                {
+                    yield return _CoroutineCtrlPreCmd(nextCodeObject);
+                }
+                while (IsScriptPaused);
+                RunCommand(nextCodeObject);
             }
 
             nextCodeObject.IsRunning = false;
+            _CoroutineCtrlPostCmd();
         }
-        isScriptRunning = false;
-        UpdateCodeViewer();
+
+        IsScriptRunning = false;
+        // When the remote is also finished,
+        if (isRemoteFinished)
+        {
+            PastExecClear();
+        }
+
+        partnerSocket.BroadcastAvatarCtrl(
+            new CodeObjectOneCommand(CodeInterpreter.CTRL_SEM_FINISH, new string[] { })
+        );
 
         DataLogger.Log(
-            this.gameObject, LogTag.SCRIPT,
-            "The execution of a script has finished."
+            this.gameObject, LogTag.SCRIPT, "The execution of a script has finished."
         );
     }
-
-    private WaitForSeconds _CoroutineRunCommandHelper(CodeObjectOneCommand c)
+    private WaitForSeconds _CoroutineCtrlPreCmd(CodeObjectOneCommand c)
     {
-        RunCommand(c);
-        return new WaitForSeconds(CMD_RUNNING_DELAY);
+        WaitForSeconds ctrlSignal = null;
+        switch (execMode)
+        {
+            case ScriptExecMode.ASYNC:
+                ctrlSignal = new WaitForSeconds(CMD_RUNNING_DELAY); ;
+                break;
+            case ScriptExecMode.SYNC_STEP_SWITCHING:
+                // Set the lock, wait until the remote responses
+                if (IsScriptPaused)
+                {
+                    // Debug.Log("Local script is paused. Waiting for the remote...");
+                    ctrlSignal = null;
+                    semTimeElapsed += Time.deltaTime;
+                    if (semTimeElapsed >= CTRL_MAX_WAIT_TIME)
+                    {
+                        DataLogger.Log(
+                            this.gameObject, LogTag.SYSTEM_WARNING, "Semaphore timeout."
+                        );
+                        IsScriptPaused = false;
+                        semTimeElapsed = 0;
+                        ctrlSignal = new WaitForSeconds(0);
+                    }
+                }
+                else
+                {
+                    ctrlSignal = new WaitForSeconds(CMD_RUNNING_DELAY);
+                    semTimeElapsed = 0;
+                }
+                break;
+            case ScriptExecMode.SYNC_CMD_SWITCHING:
+                ctrlSignal = null;
+                break;
+        }
+
+        return ctrlSignal;
+    }
+    private void _CoroutineCtrlPostCmd()
+    {
+        switch (execMode)
+        {
+            case ScriptExecMode.ASYNC:
+                // Do nothing
+                break;
+            case ScriptExecMode.SYNC_STEP_SWITCHING:
+                IsScriptPaused = true;
+                // If the remote hasn't finished, lock self and send unlock message
+                if (isRemoteFinished == false)
+                {
+                    IsScriptPaused = true;
+                    partnerSocket.BroadcastAvatarCtrl(
+                        new CodeObjectOneCommand(CTRL_SEM_UNLOCK, new string[] { })
+                    );
+                }
+                // If the remote has finished, stop sending unlock messages and unlock self directly
+                else
+                {
+                    IsScriptPaused = false;
+                }
+                break;
+            case ScriptExecMode.SYNC_CMD_SWITCHING:
+                // Do nothing
+                break;
+        }
     }
 
     /// <summary>
@@ -268,16 +431,28 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
 
     public void StopRunningScript()
     {
-        if (isScriptRunning)
+        if (IsScriptRunning)
         {
             StopCoroutine("_RunScriptCoroutine");
-            isScriptRunning = false;
-
-            DataLogger.Log(
-                this.gameObject, LogTag.SCRIPT,
-                "Script is interrupted."
-            );
+            foreach (CodeObjectOneCommand c in loadedScript)
+            {
+                if (c.IsRunning)
+                {
+                    c.IsRunning = false;
+                    break;
+                }
+            }
+            DataLogger.Log(this.gameObject, LogTag.SCRIPT, "Script is interrupted.");
         }
+        PastExecClear();
+    }
+
+    public void PastExecClear()
+    {
+        IsScriptRunning = false;
+        isRemoteFinished = false;
+        runButton.interactable = true;
+        UpdateCodeViewer();
     }
 
     /// <summary>
@@ -288,31 +463,29 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     {
         if (!fromRemote)
         {
-            StopRunningScript();
-            avatar.ResetPosition();
             // Broadcast your reset message
-            CodeObjectOneCommand resetCmd = new CodeObjectOneCommand("RESET_POS", new string[] { });
-            partnerSocket.BroadcastAvatarCtrl(resetCmd);
-
-            DataLogger.Log(
-                this.gameObject, LogTag.SCRIPT,
-                "The avater is reset."
+            partnerSocket.BroadcastAvatarCtrl(new CodeObjectOneCommand(
+                CTRL_SIGNAL_RESET, new string[] { })
             );
         }
-        else
-        {
-            if (rivalAvatar)
-                rivalAvatar.ResetPosition();
-        }
 
-        // TODO: Reset avatars' states (this code does not make sense)
+        StopRunningScript();
+
         if (avatar)
+        {
             avatar.IsDead = false;
+            avatar.ResetPosition();
+        }
         if (rivalAvatar)
+        {
+            rivalAvatar.ResetPosition();
             rivalAvatar.IsDead = false;
+        }
 
         // Reset the map
         gridController.ResetMap();
+
+        DataLogger.Log(this.gameObject, LogTag.SCRIPT, "The avater is reset.");
     }
 
 
