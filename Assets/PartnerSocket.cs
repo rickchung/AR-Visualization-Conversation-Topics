@@ -397,10 +397,7 @@ public class PartnerSocket : MonoBehaviour
                 // If I've finished but still receiving an unlock signal
                 if (mCodeInterpreter.IsScriptRunning == false)
                 {
-                    BroadcastAvatarCtrl(
-                    new CodeObjectOneCommand(
-                        CodeInterpreter.CTRL_SEM_FINISH, new string[] { })
-                    );
+                    mCodeInterpreter.SendImDoneSignal();
                 }
                 // If I'm still running and receiving an unlock signal
                 else

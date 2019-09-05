@@ -70,33 +70,26 @@ public class OneCmdEditingArea : MonoBehaviour, EditingArea
     /// <param name="value"></param>
     virtual public void OnArgChange(int value)
     {
-        if (JustAwakenedFromInactive)
-        {
-            JustAwakenedFromInactive = false;
-        }
-        else
-        {
-            string newCommand = oneCmdLabel.text;
-            int newArg = value;
-            string newArgStr = Enum.ToObject(
-                typeof(GridController.Direction), newArg
-            ).ToString();
+        string newCommand = oneCmdLabel.text;
+        int newArg = value;
+        string newArgStr = Enum.ToObject(
+            typeof(GridController.Direction), newArg
+        ).ToString();
 
-            DataLogger.Log(
-                this.gameObject, LogTag.CODING,
-                string.Format(
-                    "Code Modified, {0}, {1}",
-                    newCommand + " " + newArgStr,
-                    AttachedCodeObject.GetCommand() + " " + AttachedCodeObject.GetArgString()
-                )
-            );
+        DataLogger.Log(
+            this.gameObject, LogTag.CODING,
+            string.Format(
+                "Code Modified, {0}, {1}",
+                newCommand + " " + newArgStr,
+                AttachedCodeObject.GetCommand() + " " + AttachedCodeObject.GetArgString()
+            )
+        );
 
-            AttachedCodeObject.SetCommand(newCommand);
-            AttachedCodeObject.SetArgs(new string[] { newArgStr });
+        AttachedCodeObject.SetCommand(newCommand);
+        AttachedCodeObject.SetArgs(new string[] { newArgStr });
 
-            if (codeViewUpdateDelegate != null)
-                codeViewUpdateDelegate();
-        }
+        if (codeViewUpdateDelegate != null)
+            codeViewUpdateDelegate();
     }
 
     /// <summary>

@@ -280,7 +280,9 @@ public class GridController : MonoBehaviour
                 {
                     ac.IsDead = true;
                     if (!ac.IsRival)
-                        codeInterpreter.StopRunningScript();
+                    {
+                        codeInterpreter.SendImDoneSignal();
+                    }
                 }
                 break;
             case GridCellType.REWARD:

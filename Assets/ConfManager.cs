@@ -124,6 +124,7 @@ public class ConfManager : MonoBehaviour
         arrowKeyPanel.SetActive(conf.isArrowKeyEnabled);
         sttCtrlPanel.SetActive(!conf.isArrowKeyEnabled);
         developerPanel.SetActive(conf.isDeveloperPanelEnabled);
+        codeInterpreter.ExecMode = conf.execMode;
 
         // Set avatars
         if (conf.avatarSetName.Equals("Avatar-Helicopter"))
@@ -256,10 +257,11 @@ public class ConfManager : MonoBehaviour
         public string masterScript, slaveScript;
         public bool isArrowKeyEnabled, isDeveloperPanelEnabled;
         public string avatarSetName;
+        public CodeInterpreter.ScriptExecMode execMode;
 
         public OgStageConfig(
             string name, string problem, string map, string masterScript, string slaveScript,
-            bool isArrowKeyEnabled, bool isDeveloperPanelEnabled, string avatarSetName)
+            bool isArrowKeyEnabled, bool isDeveloperPanelEnabled, string avatarSetName, CodeInterpreter.ScriptExecMode execMode)
         {
             this.name = name;
             this.problem = problem;
@@ -269,6 +271,7 @@ public class ConfManager : MonoBehaviour
             this.isArrowKeyEnabled = isArrowKeyEnabled;
             this.isDeveloperPanelEnabled = isDeveloperPanelEnabled;
             this.avatarSetName = avatarSetName;
+            this.execMode = execMode;
         }
 
         public static OgStageConfig ImportConfigFile(string filename)
@@ -303,12 +306,19 @@ public class ConfManager : MonoBehaviour
                 // L8: The set name of avaters to use
                 var avatarSetName = reader.ReadLine();
                 if (avatarSetName == null) avatarSetName = "Avatar-Default";
+                // L9: Sync mode
+                var syncModeStr = reader.ReadLine();
+                CodeInterpreter.ScriptExecMode syncMode = CodeInterpreter.ScriptExecMode.SYNC_STEP_SWITCHING;
+                if (syncModeStr != null)
+                    if (syncModeStr.Equals("CMD-SYNC"))
+                        syncMode = CodeInterpreter.ScriptExecMode.SYNC_CMD_SWITCHING;
+
 
                 rt = new OgStageConfig(
                     name, problem, map,
                     masterScript, slaveScript,
                     isArrowKeyEnabled, isDeveloperPanelEnabled,
-                    avatarSetName
+                    avatarSetName, syncMode
                 );
             }
 

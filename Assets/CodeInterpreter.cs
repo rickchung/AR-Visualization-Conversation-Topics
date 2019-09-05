@@ -154,11 +154,6 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         tmp2.SetActive(!tmp2.activeSelf);
     }
 
-    public void SetExecMode(float value)
-    {
-        execMode = (ScriptExecMode)((int)value);
-    }
-
     // ========== Script Interpreter ==========
 
     /// <summary>
@@ -269,26 +264,38 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
             nextCodeObject.IsRunning = true;
             UpdateCodeViewer(scrollToTop: false);
 
-            if (nextCodeObject.GetCommand().Equals("LOOP"))
+            if (nextCodeObject.IsDisabled() == false)
             {
-                var numRepeats = ((CodeObjectLoop)nextCodeObject).GetLoopTimes();
-                var codeToRepeat = ((CodeObjectLoop)nextCodeObject).GetNestedCommands(ignoreDisabled: true);
-                for (int _ = 0; _ < numRepeats; _++)
+                if (nextCodeObject.GetCommand().Equals("LOOP"))
                 {
-                    foreach (var c in codeToRepeat)
+                    var numRepeats = ((CodeObjectLoop)nextCodeObject).GetLoopTimes();
+                    var codeToRepeat = ((CodeObjectLoop)nextCodeObject).GetNestedCommands(ignoreDisabled: true);
+                    for (int _ = 0; _ < numRepeats; _++)
+                    {
+                        foreach (var c in codeToRepeat)
+                        {
+                            do
+                            {
+                                yield return _CoroutineCtrlPreCmd(c);
+                            }
+                            while (IsScriptPaused);
+                            RunCommand(c);
+                        }
+                    }
+                }
+                else if (nextCodeObject.GetCommand().Equals("WAIT"))
+                {
+                    for (int i = 0; i < 2 * int.Parse(nextCodeObject.GetArgs()[0]); i++)
                     {
                         do
                         {
-                            yield return _CoroutineCtrlPreCmd(c);
+                            yield return _CoroutineCtrlPreCmd(nextCodeObject);
                         }
                         while (IsScriptPaused);
-                        RunCommand(c);
+                        RunCommand(nextCodeObject);
                     }
                 }
-            }
-            else if (nextCodeObject.GetCommand().Equals("WAIT"))
-            {
-                for (int i = 0; i < 2 * int.Parse(nextCodeObject.GetArgs()[0]); i++)
+                else
                 {
                     do
                     {
@@ -298,30 +305,16 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
                     RunCommand(nextCodeObject);
                 }
             }
-            else
-            {
-                do
-                {
-                    yield return _CoroutineCtrlPreCmd(nextCodeObject);
-                }
-                while (IsScriptPaused);
-                RunCommand(nextCodeObject);
-            }
 
             nextCodeObject.IsRunning = false;
             _CoroutineCtrlPostCmd();
         }
 
         IsScriptRunning = false;
+        SendImDoneSignal();
         // When the remote is also finished,
         if (isRemoteFinished)
-        {
             PastExecClear();
-        }
-
-        partnerSocket.BroadcastAvatarCtrl(
-            new CodeObjectOneCommand(CodeInterpreter.CTRL_SEM_FINISH, new string[] { })
-        );
 
         DataLogger.Log(
             this.gameObject, LogTag.SCRIPT, "The execution of a script has finished."
@@ -349,7 +342,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
                         );
                         IsScriptPaused = false;
                         semTimeElapsed = 0;
-                        ctrlSignal = new WaitForSeconds(0);
+                        ctrlSignal = new WaitForSeconds(CMD_RUNNING_DELAY);
                     }
                 }
                 else
@@ -427,6 +420,13 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         {
             partnerSocket.BroadcastAvatarCtrl(codeObject);
         }
+    }
+
+    public void SendImDoneSignal()
+    {
+        partnerSocket.BroadcastAvatarCtrl(
+            new CodeObjectOneCommand(CodeInterpreter.CTRL_SEM_FINISH, new string[] { })
+        );
     }
 
     public void StopRunningScript()
