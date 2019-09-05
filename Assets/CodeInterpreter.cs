@@ -175,10 +175,10 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     private static Regex[] regexSingleCmdOneParam = {
         new Regex(@"(?<cmd>WAIT) \((?<param>\d+)\);"),
         new Regex(@"(?<cmd>MOVE) \((?<param>\w+)\);"),
-        new Regex(@"(?<cmd>SET_POWER_OUTPUT_TOP) \((?<param>[\d\.]+)\)"),
-        new Regex(@"(?<cmd>SET_POWER_OUTPUT_TAIL) \((?<param>[\d\.]+)\)"),
-        new Regex(@"(?<cmd>SET_BRAKE_OUTPUT_TOP) \((?<param>[\d\.]+)\)"),
-        new Regex(@"(?<cmd>SET_BRAKE_OUTPUT_TAIL) \((?<param>[\d\.]+)\)"),
+        new Regex(@"(?<cmd>SET_TOP_PWR_OUTPUT) \((?<param>[\d\.]+)\)"),
+        new Regex(@"(?<cmd>SET_TAIL_PWR_OUTPUT) \((?<param>[\d\.]+)\)"),
+        new Regex(@"(?<cmd>SET_TOP_BRAKE_OUTPUT) \((?<param>[\d\.]+)\)"),
+        new Regex(@"(?<cmd>SET_TAIL_BRAKE_OUTPUT) \((?<param>[\d\.]+)\)"),
     };
 
     private static CodeObjectOneCommand _MatchRegexSingleCommand(string line)
@@ -492,7 +492,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
 
         // View
         CodeObjectCellView cellView = scroller.GetCellView(codeObjectCellViewPrefab) as CodeObjectCellView;
-        cellView.SetData(codeObject);
+        cellView.SetData(codeObject, dataIndex);
         // Onclick event
         cellView.SetCodeModifyingDelegate(ModifyCodeObject);
 
@@ -510,12 +510,16 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         codeEditor.DispatchEditor(codeObject);
     }
 
-    public void UpdateCodeViewer()
+    public void UpdateCodeViewer(bool scrollToTop = true)
     {
         // Display the script
         if (loadedScript != null)
             scriptTextMesh.SetText(loadedScript.ToString());
-        scriptScroller.ReloadData(scrollPositionFactor: 0.0f);
+
+        var scrollPos = scriptScroller.NormalizedScrollPosition;
+        if (scrollToTop)
+            scrollPos = 0.0f;
+        scriptScroller.ReloadData(scrollPositionFactor: scrollPos);
     }
 
     // ==================== Testing Functions

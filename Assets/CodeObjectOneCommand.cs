@@ -4,6 +4,35 @@
     private string[] args;
     private bool disabled;
 
+    private bool isBeingEdited;
+    private bool isRunning;
+
+    public bool IsRunning
+    {
+        get
+        {
+            return isRunning;
+        }
+
+        set
+        {
+            isRunning = value;
+        }
+    }
+
+    public bool IsBeingEdited
+    {
+        get
+        {
+            return isBeingEdited;
+        }
+
+        set
+        {
+            isBeingEdited = value;
+        }
+    }
+
     public CodeObjectOneCommand(string command, string[] args)
     {
         this.command = command;

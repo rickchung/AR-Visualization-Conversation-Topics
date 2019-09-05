@@ -17,17 +17,24 @@ public class CodeObjectCellView : EnhancedScrollerCellView
     public TMPro.TextMeshProUGUI argumentsText;
     private CodeModifyingDelegate codeModifyingDelegate;
 
-    public void SetData(CodeObjectOneCommand codeObject)
+    public void SetData(CodeObjectOneCommand codeObject, int dataIndex)
     {
         this.codeObject = codeObject;
+
         // Separate cmd and args
         // commandText.text = codeObject.GetCommand(richtext: true);
         // argumentsText.text = codeObject.GetArgString(richtext: true);
         // Combine cmd and args
         commandText.text = (
+            "L" + (dataIndex + 1) + "<pos=12%>" +
             codeObject.GetCommand(richtext: true) + " " +
             codeObject.GetArgString(richtext: true)
         );
+
+        if (codeObject.IsBeingEdited)
+        {
+            commandText.text = "<mark=#ffff00aa>" + commandText.text;
+        }
     }
 
     public void SetCodeModifyingDelegate(CodeModifyingDelegate cmDelegate)

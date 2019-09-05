@@ -8,6 +8,7 @@ public class CodeEditor : MonoBehaviour
     public LoopEditingArea loopEditingArea;
     public CmdWithNumberEditingArea cmdWithNumberEditingArea;
     private GameObject openedEditorArea;
+    private CodeObjectOneCommand currentBeingEdited;
 
     private void Start()
     {
@@ -23,6 +24,12 @@ public class CodeEditor : MonoBehaviour
           this.gameObject, LogTag.CODING,
           "The code editor is open for : " + codeObject.ToString()
         );
+
+        // Remove the previous highlight and set a new one
+        if (currentBeingEdited != null)
+            currentBeingEdited.IsBeingEdited = false;
+        codeObject.IsBeingEdited = true;
+        currentBeingEdited = codeObject;
 
         switch (codeObject.GetCommand())
         {
@@ -42,10 +49,18 @@ public class CodeEditor : MonoBehaviour
                 DispatchRoutine(cmdWithNumberEditingArea.gameObject);
                 break;
         }
+
+        UpdateCodeViewer();
     }
 
     public void DismissEditor()
     {
+        if (currentBeingEdited != null)
+        {
+            currentBeingEdited.IsBeingEdited = false;
+            currentBeingEdited = null;
+        }
+
         openedEditorArea = null;
         loopEditingArea.gameObject.SetActive(false);
         oneCmdEditingArea.gameObject.SetActive(false);
@@ -55,7 +70,7 @@ public class CodeEditor : MonoBehaviour
 
     public void UpdateCodeViewer()
     {
-        codeInterpreter.UpdateCodeViewer();
+        codeInterpreter.UpdateCodeViewer(scrollToTop: false);
     }
 
     private void DispatchRoutine(GameObject toBeDispatch)
