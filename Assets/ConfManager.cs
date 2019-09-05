@@ -21,18 +21,22 @@ public class ConfManager : MonoBehaviour
     public GameObject arrowKeyPanel;
     public GameObject sttCtrlPanel, sttCtrlPanelAlwaysOn;
     public GameObject developerPanel;
-    public GameObject startScreen, endScreen;
+    public GameObject startScreen, endScreen, nextStageScreen;
     public Transform stageProgressView;
     public Button stageButtonPrefab;
-
     public AvatarController[] defaultAvatars, helicopterAvatars;
 
     private List<Button> stageButtons;
+    private List<string> stageKeys;
     private int currentStageIndex;
+    private Dictionary<string, OgStageConfig> stages;
 
     [HideInInspector] public bool isSlave;
 
-    private Dictionary<string, OgStageConfig> stages;
+    public const string CTRL_APPLY_CONFIG = "CTRL_APPLY_CONFIG";
+
+    // ==========
+
 
     private void Start()
     {
@@ -41,6 +45,7 @@ public class ConfManager : MonoBehaviour
         // Open the welcome screen
         startScreen.SetActive(true);
         endScreen.SetActive(false);
+        nextStageScreen.SetActive(false);
 
         // Default layout
         sttCtrlPanel.SetActive(true);
@@ -78,6 +83,7 @@ public class ConfManager : MonoBehaviour
 
         // Init stage buttons
         stageButtons = new List<Button>();
+        stageKeys = new List<string>();
         foreach (var kv in stages)
         {
             var newButton = Instantiate(stageButtonPrefab, parent: stageProgressView);
@@ -88,17 +94,33 @@ public class ConfManager : MonoBehaviour
             newButtonText.text = kv.Key;
             newButton.gameObject.SetActive(true);
 
+            stageKeys.Add(kv.Key);
+
             stageButtons.Add(newButton);
         }
         stageButtons[0].interactable = true;
         stageButtons[stageButtons.Count - 1].GetComponent<Image>().sprite = null;
     }
 
+    // ==========
+
+
     public void ApplyConfiguration(string confName)
     {
-        if (stages.ContainsKey(confName))
+        if (stageKeys.Contains(confName))
         {
-            ApplyConfiguration(stages[confName]);
+            var newStageIndex = stageKeys.IndexOf(confName);
+
+            if (currentStageIndex != newStageIndex)
+            {
+                currentStageIndex = newStageIndex;
+                _ApplyConfiguration(stages[confName]);
+
+                // Also tell the partner to load the configuration
+                partnerSocket.BroadcastAvatarCtrl(
+                    new CodeObjectOneCommand(CTRL_APPLY_CONFIG, new string[] { confName })
+                );
+            }
         }
         else
         {
@@ -106,9 +128,12 @@ public class ConfManager : MonoBehaviour
         }
     }
 
-    public void ApplyConfiguration(OgStageConfig conf)
+    private void _ApplyConfiguration(OgStageConfig conf)
     {
         DataLogger.Log(this.gameObject, LogTag.SYSTEM, "Loading a configuration, " + conf);
+
+        nextStageScreen.SetActive(false);
+
         informationPanel.ReplaceContent(conf.problem);
         gridController.LoadGridMap(conf.map);
         if (partnerSocket.IsMaster)
@@ -142,13 +167,17 @@ public class ConfManager : MonoBehaviour
         }
 
         informationPanel.ShowInfoPanel(true);
+        codeInterpreter.ResetAvatars();
     }
 
-    public void StartGame(string startingStage)
+    // ==========
+
+
+    public void StartGame()
     {
         partnerSocket.SetupRemoteServer();
-        ApplyConfiguration(startingStage);
         currentStageIndex = 0;
+        _ApplyConfiguration(stages[stageKeys[currentStageIndex]]);
         startScreen.SetActive(false);
         codeInterpreter.ResetAvatars();
 
@@ -172,51 +201,41 @@ public class ConfManager : MonoBehaviour
     public void EnableNextStage()
     {
         stageButtons[currentStageIndex].interactable = false;
-        currentStageIndex++;
-        if (stageButtons != null && currentStageIndex < stageButtons.Count)
+
+        var nextStageIndex = currentStageIndex + 1;
+        if (stageButtons != null && nextStageIndex < stageButtons.Count)
         {
-            stageButtons[currentStageIndex].interactable = true;
+            stageButtons[nextStageIndex].interactable = true;
+            nextStageScreen.SetActive(true);
         }
-        if (currentStageIndex == stageButtons.Count)
+        if (nextStageIndex == stageButtons.Count)
         {
             StopGame();
         }
     }
 
-    public void JumpToStage(string name)
+    public void GoToNextStage()
     {
-        DataLogger.Log(
-            this.gameObject, LogTag.SYSTEM_WARNING,
-            "[Admin] Trying to jump to the stage: " + name
-        );
-
-        bool successful = false;
-        switch (name)
+        var tmp = currentStageIndex + 1;
+        if (tmp < stageKeys.Count)
         {
-            case "Tutorial":
-                ApplyConfiguration("Tutorial");
-                currentStageIndex = 0;
-                successful = true;
-                break;
-            case "S1-Algorithm":
-                ApplyConfiguration("S1-Algorithm");
-                currentStageIndex = 1;
-                successful = true;
-                break;
-            case "S2-FlyingHelicopter":
-                ApplyConfiguration("S2-FlyingHelicopter");
-                currentStageIndex = 2;
-                successful = true;
-                break;
-        }
-
-        if (successful)
-        {
-            foreach (var b in stageButtons)
-                b.interactable = false;
-            stageButtons[currentStageIndex].interactable = true;
+            ApplyConfiguration(stageKeys[tmp]);
+            currentStageIndex = tmp;
         }
     }
+
+    public void GoToPrevStage()
+    {
+        var tmp = currentStageIndex - 1;
+        if (tmp >= 0)
+        {
+            ApplyConfiguration(stageKeys[tmp]);
+            currentStageIndex = tmp;
+        }
+    }
+
+    // ==========
+
 
     public void ToggleAlwaysOnRecording(bool value)
     {

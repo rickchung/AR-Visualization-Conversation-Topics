@@ -1,35 +1,26 @@
-SET_TOP_PWR_OUTPUT (1)
-SET_TAIL_PWR_OUTPUT (1)
+StartEngine ();
+ClimbUp ();
+MoveForward ();
+Wait (5);
 
-SET_TOP_BRAKE_OUTPUT (1)
-SET_TAIL_BRAKE_OUTPUT (1)
+SpeedUpTail ();
+Wait (1);
+SlowDownTail ();
+MoveForward ();
+Wait (2);
 
-START_ENGINE ();
-CLIMB_UP ();
+SpeedUpTail ();
+Wait (1);
+SlowDownTail ();
+MoveForward ();
+Wait (3);
 
-MOVE_FORWARD ();
-WAIT (5);
+SlowDownTail ();
+Wait (1);
+SpeedUpTail ();
 
-TURN_LEFT ();
-WAIT (1);
-TURN_RIGHT ();
+MoveForward ();
+Wait (3);
 
-MOVE_FORWARD ();
-WAIT (2);
-
-TURN_LEFT ();
-WAIT (1);
-TURN_RIGHT ();
-
-MOVE_FORWARD ();
-WAIT (3);
-
-TURN_RIGHT ();
-WAIT (1);
-TURN_LEFT ();
-
-MOVE_FORWARD ();
-WAIT (4);
-
-MOVE_BACKWARD ();
-FALL_DOWN ();
+MoveBackward ();
+FallDown ();

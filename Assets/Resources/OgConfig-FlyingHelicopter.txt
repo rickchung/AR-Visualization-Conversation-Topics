@@ -5,12 +5,12 @@ In this stage, you will simulate the flying process of helicopters by programmin
 
 <size=115%><smallcaps>> Your Goal in This Stage</smallcaps></size>
 
-A. ...
+There are two separate systems in your helicopter:
 <indent=4%>
-- ...
+1. A Pilot Control System (PCS) accepts commands and control the movement of your helicopter.
+2. Engine Control Unit (ECU) controls the power of internal engine that affects movement of helicopter. It determines how fast the rotor blades can speed up or slow down.
 </indent>
-B. Collecting all the flags with your partner.
-
+The PCS and ECU are controlled separately by two programs. Your task is to cooperate with your partner and find the best configuration that can fly the helicopter to the destination.
 #
 OgMap-FlyingHelicopter.txt
 OgScript-FlyingHelicopter-M.txt

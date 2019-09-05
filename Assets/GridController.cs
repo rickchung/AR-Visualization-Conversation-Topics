@@ -281,7 +281,7 @@ public class GridController : MonoBehaviour
                     ac.IsDead = true;
                     if (!ac.IsRival)
                     {
-                        codeInterpreter.SendImDoneSignal();
+                        codeInterpreter.InterruptRunningScript();
                     }
                 }
                 break;

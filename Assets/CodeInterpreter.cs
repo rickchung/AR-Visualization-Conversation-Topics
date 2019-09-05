@@ -261,7 +261,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         IsScriptRunning = true;
 
         int counter = 0;
-        while (counter < script.Count)
+        while (counter < script.Count && IsScriptRunning)
         {
             CodeObjectOneCommand nextCodeObject = script[counter++];
             nextCodeObject.IsRunning = true;
@@ -314,15 +314,19 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         }
 
         IsScriptRunning = false;
-        SendImDoneSignal();
+        partnerSocket.BroadcastAvatarCtrl(
+            new CodeObjectOneCommand(CodeInterpreter.CTRL_SEM_FINISH, new string[] { })
+        );
+
         // When the remote is also finished,
         if (isRemoteFinished)
-            PastExecClear();
+            PostExecClear();
 
         DataLogger.Log(
             this.gameObject, LogTag.SCRIPT, "The execution of a script has finished."
         );
     }
+
     private WaitForSeconds _CoroutineCtrlPreCmd(CodeObjectOneCommand c)
     {
         WaitForSeconds ctrlSignal = null;
@@ -361,6 +365,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
 
         return ctrlSignal;
     }
+
     private void _CoroutineCtrlPostCmd()
     {
         switch (execMode)
@@ -425,6 +430,9 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         }
     }
 
+    /// <summary>
+    /// Tell the remote that the local has finished execution. Note this is not the same as "clear".
+    /// </summary>
     public void SendImDoneSignal()
     {
         partnerSocket.BroadcastAvatarCtrl(
@@ -432,25 +440,35 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         );
     }
 
-    public void StopRunningScript()
+    public void InterruptRunningScript()
     {
-        if (IsScriptRunning)
-        {
-            StopCoroutine("_RunScriptCoroutine");
-            foreach (CodeObjectOneCommand c in loadedScript)
-            {
-                if (c.IsRunning)
-                {
-                    c.IsRunning = false;
-                    break;
-                }
-            }
-            DataLogger.Log(this.gameObject, LogTag.SCRIPT, "Script is interrupted.");
-        }
-        PastExecClear();
+        StopCoroutine("_RunScriptCoroutine");
+        IsScriptRunning = false;
+        SendImDoneSignal();
     }
 
-    public void PastExecClear()
+    /// <summary>
+    /// Stop a running script and clear all intermediate states.
+    /// </summary>
+    public void StopAndClearRunningState()
+    {
+        StopCoroutine("_RunScriptCoroutine");
+        foreach (CodeObjectOneCommand c in loadedScript)
+        {
+            if (c.IsRunning)
+            {
+                c.IsRunning = false;
+                break;
+            }
+        }
+        DataLogger.Log(this.gameObject, LogTag.SCRIPT, "Script is interrupted.");
+        PostExecClear();
+    }
+
+    /// <summary>
+    /// Clear all intermediate states that occur during execution
+    /// </summary>
+    public void PostExecClear()
     {
         IsScriptRunning = false;
         isRemoteFinished = false;
@@ -472,7 +490,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
             );
         }
 
-        StopRunningScript();
+        StopAndClearRunningState();
 
         if (avatar)
         {
@@ -601,22 +619,22 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         Regex regexLoopStart = new Regex(@"LOOP REPEAT {"),
         regexLoopEnd = new Regex(@"} (?<times>\d) Times;");
     private static Regex[] regexSingleCmdNoParam = {
-        new Regex(@"(?<cmd>START_ENGINE) \(\)"),
-        new Regex(@"(?<cmd>STOP_ENGINE) \(\)"),
-        new Regex(@"(?<cmd>CLIMB_UP) \(\)"),
-        new Regex(@"(?<cmd>FALL_DOWN) \(\)"),
-        new Regex(@"(?<cmd>MOVE_FORWARD) \(\);"),
-        new Regex(@"(?<cmd>MOVE_BACKWARD) \(\);"),
-        new Regex(@"(?<cmd>TURN_RIGHT) \(\)"),
-        new Regex(@"(?<cmd>TURN_LEFT) \(\)"),
+        new Regex(@"(?<cmd>StartEngine) \(\)"),
+        new Regex(@"(?<cmd>StopEngine) \(\)"),
+        new Regex(@"(?<cmd>ClimbUp) \(\)"),
+        new Regex(@"(?<cmd>FallDown) \(\)"),
+        new Regex(@"(?<cmd>MoveForward) \(\);"),
+        new Regex(@"(?<cmd>MoveBackward) \(\);"),
+        new Regex(@"(?<cmd>SlowDownTail) \(\)"),
+        new Regex(@"(?<cmd>SpeedUpTail) \(\)"),
     };
     private static Regex[] regexSingleCmdOneParam = {
-        new Regex(@"(?<cmd>WAIT) \((?<param>\d+)\);"),
+        new Regex(@"(?<cmd>Wait) \((?<param>\d+)\);"),
         new Regex(@"(?<cmd>MOVE) \((?<param>\w+)\);"),
-        new Regex(@"(?<cmd>SET_TOP_PWR_OUTPUT) \((?<param>[\d\.]+)\)"),
-        new Regex(@"(?<cmd>SET_TAIL_PWR_OUTPUT) \((?<param>[\d\.]+)\)"),
-        new Regex(@"(?<cmd>SET_TOP_BRAKE_OUTPUT) \((?<param>[\d\.]+)\)"),
-        new Regex(@"(?<cmd>SET_TAIL_BRAKE_OUTPUT) \((?<param>[\d\.]+)\)"),
+        new Regex(@"(?<cmd>SetTopPowerOutput) \((?<param>[\d\.]+)\)"),
+        new Regex(@"(?<cmd>SetTailPowerOutput) \((?<param>[\d\.]+)\)"),
+        new Regex(@"(?<cmd>SetTopBrakeOutput) \((?<param>[\d\.]+)\)"),
+        new Regex(@"(?<cmd>SetTailBrakeOutput) \((?<param>[\d\.]+)\)"),
     };
 
     private static CodeObjectOneCommand _MatchRegexSingleCommand(string line)

@@ -29,6 +29,7 @@ public class PartnerSocket : MonoBehaviour
     public GameObject serverMsgPanel;
     public SpeechToTextController speechToTextController;
     public CodeInterpreter mCodeInterpreter;
+    public ConfManager confManager;
     [HideInInspector] public bool useLocalServer;
 
     private Button hostConnBtn;
@@ -409,7 +410,7 @@ public class PartnerSocket : MonoBehaviour
                 // If remote and I are finished
                 if (mCodeInterpreter.IsScriptRunning == false)
                 {
-                    mCodeInterpreter.PastExecClear();
+                    mCodeInterpreter.PostExecClear();
                 }
                 // If remote has finished but i'm still running
                 else
@@ -425,6 +426,11 @@ public class PartnerSocket : MonoBehaviour
             case CodeInterpreter.CTRL_SIGNAL_RESET:
                 mCodeInterpreter.ResetAvatars(fromRemote: true);
                 break;
+
+            case ConfManager.CTRL_APPLY_CONFIG:
+                confManager.ApplyConfiguration(co.GetArgs()[0]);
+                break;
+
             default:
                 mCodeInterpreter.RunCommand(co, fromRemote: true);
                 break;

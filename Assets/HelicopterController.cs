@@ -37,44 +37,44 @@ public class HelicopterController : AvatarController
             float value;
             switch (command)
             {
-                case "START_ENGINE":
+                case "StartEngine":
                     StartEngine();
                     break;
-                case "STOP_ENGINE":
+                case "StopEngine":
                     StopEngine();
                     break;
-                case "CLIMB_UP":
+                case "ClimbUp":
                     ClimbUp();
                     break;
-                case "FALL_DOWN":
+                case "FallDown":
                     FallDown();
                     break;
-                case "MOVE_FORWARD":
+                case "MoveForward":
                     MoveForward();
                     break;
-                case "MOVE_BACKWARD":
+                case "MoveBackward":
                     MoveBackward();
                     break;
-                case "TURN_RIGHT":
+                case "SlowDownTail":
                     HoveringTurnRight();
                     break;
-                case "TURN_LEFT":
+                case "SpeedUpTail":
                     HoveringTurnLeft();
                     break;
 
-                case "SET_TOP_PWR_OUTPUT":
+                case "SetTopPowerOutput":
                     value = float.Parse(args[0]);
                     SetPowerOutputTopRotor(value);
                     break;
-                case "SET_TAIL_PWR_OUTPUT":
+                case "SetTailPowerOutput":
                     value = float.Parse(args[0]);
                     SetPowerOutputTailRotor(value);
                     break;
-                case "SET_TOP_BRAKE_OUTPUT":
+                case "SetTopBrakeOutput":
                     value = float.Parse(args[0]);
                     SetBrakeOutputTopRotor(value);
                     break;
-                case "SET_TAIL_BRAKE_OUTPUT":
+                case "SetTailBrakeOutput":
                     value = float.Parse(args[0]);
                     SetBrakeOutputTailRotor(value);
                     break;

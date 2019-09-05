@@ -117,7 +117,7 @@ public class AvatarController : MonoBehaviour
             GridCellTrap.TriggerTrapEffect(avatar.GetComponent<Collider>());
             IsDead = true;
             if (!IsRival)
-                codeInterpreter.StopRunningScript();
+                codeInterpreter.StopAndClearRunningState();
         }
     }
 
