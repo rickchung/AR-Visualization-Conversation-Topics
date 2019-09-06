@@ -110,14 +110,12 @@ public class AvatarController : MonoBehaviour
         // If running out of the boundary
         else
         {
-            DataLogger.Log(
-                this.gameObject, LogTag.MAP,
+            DataLogger.Log(this.gameObject, LogTag.MAP,
                 "The avatar exceeded the boundary (isRival = " + IsRival + ")"
             );
-            GridCellTrap.TriggerTrapEffect(avatar.GetComponent<Collider>());
             IsDead = true;
-            if (!IsRival)
-                codeInterpreter.StopAndClearRunningState();
+            GridCellTrap.TriggerTrapEffect(avatar.GetComponent<Collider>());
+            if (!IsRival) codeInterpreter.InterruptRunningScript();
         }
     }
 

@@ -407,15 +407,17 @@ public class PartnerSocket : MonoBehaviour
                 }
                 break;
             case CodeInterpreter.CTRL_SEM_FINISH:
-                // If remote and I are finished
+                // If I'm also done
                 if (mCodeInterpreter.IsScriptRunning == false)
                 {
                     mCodeInterpreter.PostExecClear();
                 }
-                // If remote has finished but i'm still running
+                // If I have not finished my script execution
                 else
                 {
+                    // This makes the post-exec control skip step-switching waiting in the future
                     mCodeInterpreter.isRemoteFinished = true;
+                    // This interrupts any current waiting
                     mCodeInterpreter.IsScriptPaused = false;
                 }
                 break;
