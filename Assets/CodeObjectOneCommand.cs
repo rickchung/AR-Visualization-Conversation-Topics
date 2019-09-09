@@ -6,6 +6,7 @@
 
     private bool isBeingEdited;
     private bool isRunning;
+    private bool isLockCommand;
 
     public bool IsRunning
     {
@@ -30,6 +31,19 @@
         set
         {
             isBeingEdited = value;
+        }
+    }
+
+    public bool IsLockCommand
+    {
+        get
+        {
+            return isLockCommand;
+        }
+
+        set
+        {
+            isLockCommand = value;
         }
     }
 

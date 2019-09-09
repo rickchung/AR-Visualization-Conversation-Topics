@@ -17,7 +17,7 @@ public class CodeObjectCellView : EnhancedScrollerCellView
     public TMPro.TextMeshProUGUI argumentsText;
     private CodeModifyingDelegate codeModifyingDelegate;
 
-    public void SetData(CodeObjectOneCommand codeObject, int dataIndex)
+    public void SetData(CodeObjectOneCommand codeObject, int dataIndex, bool isMaster)
     {
         this.codeObject = codeObject;
 
@@ -31,15 +31,24 @@ public class CodeObjectCellView : EnhancedScrollerCellView
             codeObject.GetArgString(richtext: true)
         );
 
-        if (codeObject.IsBeingEdited)
-        {
-            commandText.text = "<mark=#ffff00aa>" + commandText.text;
-        }
+        var prefix = "";
 
+        if (codeObject.IsLockCommand)
+        {
+            prefix = isMaster ?
+                string.Format("<mark={0}>", PartnerSocket.MASTER_SLAVE_COLORS[1]) :
+                string.Format("<mark={0}>", PartnerSocket.MASTER_SLAVE_COLORS[0]);
+        }
         if (codeObject.IsRunning)
         {
-            commandText.text = "<mark=#ffffff88>" + commandText.text;
+            prefix = "<mark=#ffffff88>";
         }
+        if (codeObject.IsBeingEdited)
+        {
+            prefix = "<mark=#ffff00aa>";
+        }
+
+        commandText.text = prefix + commandText.text;
     }
 
     public void SetCodeModifyingDelegate(CodeModifyingDelegate cmDelegate)

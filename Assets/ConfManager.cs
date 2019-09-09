@@ -59,7 +59,7 @@ public class ConfManager : MonoBehaviour
             "OgConfig-Puzzle3",
                 "OgMap-Puzzle3", "OgScript-Puzzle3-M", "OgScript-Puzzle3-S",
             "OgConfig-FlyingHelicopter",
-                "OgMap-FlyingHelicopter", "OgScript-FlyingHelicopter-M", "OgScript-FlyingHelicopter-S",
+                "OgMap-FlyingHelicopter-v1", "OgScript-FlyingHelicopter-M-v1", "OgScript-FlyingHelicopter-S-v1",
         };
         foreach (var s in filesToCopy)
         {
@@ -90,7 +90,7 @@ public class ConfManager : MonoBehaviour
             var newButtonText = newButton.GetComponentInChildren<Text>();
 
             newButton.onClick.AddListener(() => { ApplyConfiguration(kv.Key); });
-            newButton.interactable = false;
+            newButton.interactable = true;
             newButtonText.text = kv.Key;
             newButton.gameObject.SetActive(true);
 
@@ -136,16 +136,6 @@ public class ConfManager : MonoBehaviour
 
         informationPanel.ReplaceContent(conf.problem);
         gridController.LoadGridMap(conf.map);
-        if (partnerSocket.IsMaster)
-        {
-            if (conf.masterScript != null)
-                codeInterpreter.LoadPredefinedScript(conf.masterScript);
-        }
-        else
-        {
-            if (conf.slaveScript != null)
-                codeInterpreter.LoadPredefinedScript(conf.slaveScript);
-        }
         arrowKeyPanel.SetActive(conf.isArrowKeyEnabled);
         sttCtrlPanel.SetActive(!conf.isArrowKeyEnabled);
         developerPanel.SetActive(conf.isDeveloperPanelEnabled);
@@ -164,6 +154,18 @@ public class ConfManager : MonoBehaviour
         else
         {
             codeInterpreter.SetAvatarGameObjects(defaultAvatars[0], defaultAvatars[1]);
+        }
+
+        // Load scripts
+        if (partnerSocket.IsMaster)
+        {
+            if (conf.masterScript != null)
+                codeInterpreter.LoadPredefinedScript(conf.masterScript);
+        }
+        else
+        {
+            if (conf.slaveScript != null)
+                codeInterpreter.LoadPredefinedScript(conf.slaveScript);
         }
 
         informationPanel.ShowInfoPanel(true);

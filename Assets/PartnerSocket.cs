@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using UnityEngine.UI;
+using TMPro;
 using System.Net;
 using System.Net.Sockets;
 using UnityEngine.Networking;
@@ -30,6 +31,7 @@ public class PartnerSocket : MonoBehaviour
     public SpeechToTextController speechToTextController;
     public CodeInterpreter mCodeInterpreter;
     public ConfManager confManager;
+    public TextMeshProUGUI playerRoleIndicator;
     [HideInInspector] public bool useLocalServer;
 
     private Button hostConnBtn;
@@ -51,6 +53,11 @@ public class PartnerSocket : MonoBehaviour
             isMaster = value;
         }
     }
+
+    public static string[] MASTER_SLAVE_COLORS = {
+        "#f4433688",
+        "#2196F388"
+    };
 
     private static class MyMsgType
     {
@@ -293,6 +300,13 @@ public class PartnerSocket : MonoBehaviour
         );
 
         serverMsgText.text = "Connected to " + _serverIpAddress + "\nM=" + IsMaster;
+
+        playerRoleIndicator.text = (
+            "Your Role: " + (IsMaster ?
+                string.Format("<mark={0}>P1", MASTER_SLAVE_COLORS[0]) :
+                string.Format("<mark={0}>P2", MASTER_SLAVE_COLORS[1])
+            )
+        );
 
         // Tell the server you received the message.
         clientToPartner.Send(MyMsgType.MSG_CLIENT_CONNECTED, new StringMessage

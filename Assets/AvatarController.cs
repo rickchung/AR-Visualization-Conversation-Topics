@@ -72,6 +72,11 @@ public class AvatarController : MonoBehaviour
         return isSuccessful;
     }
 
+    public virtual bool IsLockCommand(string command)
+    {
+        return false;
+    }
+
     // ==================== Available Behaviors of an Avatar ====================
 
     /// <summary>
