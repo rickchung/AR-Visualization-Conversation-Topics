@@ -24,12 +24,13 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
 
     private ScriptObject loadedScript;
     private ScriptExecMode execMode;
+    private float semTimeElapsed;
     private bool isScriptRunning;
     private bool isScriptSyncPaused;
     private bool _coroutineLock;
     private bool isRemoteFinished;
     private static string dataFolderPath;
-    public enum ScriptExecMode { ASYNC, SYNC_STEP_SWITCHING, SYNC_CMD_SWITCHING };
+
     public ScriptExecMode ExecMode
     {
         get
@@ -42,7 +43,6 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
             execMode = value;
         }
     }
-
     /// <summary>
     /// This property is different from "IsScriptRunning" and used to keep synchronization between local and remote script executions. When a script is paused, it means it is waiting for the remote procedure to unlock it.
     /// </summary>
@@ -58,7 +58,6 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
             isScriptSyncPaused = value;
         }
     }
-
     /// <summary>
     /// This property indicates whether a local execution is done or interrupted.
     /// </summary>
@@ -74,7 +73,6 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
             isScriptRunning = value;
         }
     }
-
     /// <summary>
     /// Used to catche the execution state of the remote device.
     /// </summary>
@@ -91,20 +89,6 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
             isRemoteFinished = value;
         }
     }
-
-    // ========= Predefined Control Signals ==========
-    private const float CMD_RUNNING_DELAY = 0.5f;
-    public const string CTRL_SIGNAL_RESET = "RESET_POS";
-    public const string CTRL_CLOSE_TOPIC_VIEW = "CLOSE_TOPIC_VIEW";
-    public const string CTRL_SEM_LOCK = "SEM_LOCK";
-    public const string CTRL_SEM_UNLOCK = "SEM_UNLOCK";
-    public const string CTRL_SEM_FINISH = "SEM_FINISH";
-    public const string CTRL_SEM_RUNSCRIPT = "SEM_RUNSCRIPT";
-    private const int CTRL_MAX_WAIT_TIME = 3;
-    private float semTimeElapsed;
-
-    public const string CMD_WAIT = "Wait";
-    public const string CMD_LOOP = "LOOP";
 
 
     void Start()
@@ -195,10 +179,16 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         ScriptObject script = ImportScriptObject(scriptName);
         if ((loadedScript = script) != null)
         {
-            DataLogger.Log(
-                this.gameObject, LogTag.SYSTEM,
+            DataLogger.Log(this.gameObject, LogTag.SYSTEM,
                 "A predefined script is imported " + scriptName + ": " + script
             );
+
+            // Scan the script by the avatar
+            foreach (var v in loadedScript.GetScript())
+            {
+                if (avatar.IsLockCommand(v.GetCommand()))
+                    v.IsLockCommand = true;
+            }
         }
 
         // Display the script
@@ -405,7 +395,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
                 break;
 
             case ScriptExecMode.SYNC_CMD_SWITCHING:
-                ctrlSignal = null;
+                ctrlSignal = new WaitForSeconds(CMD_RUNNING_DELAY); ;
                 break;
         }
         return ctrlSignal;
@@ -580,9 +570,14 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         CodeObjectOneCommand codeObject = loadedScript.GetScript()[dataIndex];
         var size = 45f + (codeObject.GetLength() / 25) * 30f;
 
-        if (codeObject.GetCommand().Equals("LOOP"))
+        var cmd = codeObject.GetCommand();
+        if (cmd.Equals("LOOP"))
         {
             size = (codeObject.GetArgs().Length + 2) * 45f;
+        }
+        else if (cmd.Equals(CMD_WAIT))
+        {
+            size = 90f;
         }
 
         return size;
@@ -595,7 +590,8 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
 
         // View
         CodeObjectCellView cellView = scroller.GetCellView(codeObjectCellViewPrefab) as CodeObjectCellView;
-        cellView.SetData(codeObject, dataIndex);
+        cellView.SetData(codeObject, dataIndex, partnerSocket.IsMaster);
+
         // Onclick event
         cellView.SetCodeModifyingDelegate(ModifyCodeObject);
 
@@ -701,7 +697,6 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
                 );
             }
         }
-
         // One param
         foreach (var r in regexSingleCmdOneParam)
         {
@@ -751,4 +746,25 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         return null;
     }
 
+
+    // ========= Predefined Control Signals ==========
+
+    public enum ScriptExecMode
+    {
+        ASYNC,
+        SYNC_STEP_SWITCHING,
+        SYNC_CMD_SWITCHING
+    };
+
+    private const float CMD_RUNNING_DELAY = 0.5f;
+    public const string CTRL_SIGNAL_RESET = "RESET_POS";
+    public const string CTRL_CLOSE_TOPIC_VIEW = "CLOSE_TOPIC_VIEW";
+    public const string CTRL_SEM_LOCK = "SEM_LOCK";
+    public const string CTRL_SEM_UNLOCK = "SEM_UNLOCK";
+    public const string CTRL_SEM_FINISH = "SEM_FINISH";
+    public const string CTRL_SEM_RUNSCRIPT = "SEM_RUNSCRIPT";
+    private const int CTRL_MAX_WAIT_TIME = 3;
+
+    public const string CMD_WAIT = "Continue_Sec";
+    public const string CMD_LOOP = "LOOP";
 }

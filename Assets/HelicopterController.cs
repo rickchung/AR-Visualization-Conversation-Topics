@@ -148,7 +148,7 @@ public class HelicopterController : AvatarController
     private float poutTailRotor = 1.0f;
     private float boutTopRotor = 1.0f;
     private float boutTailRotor = 1.0f;
-    private float scaleHoverTurn = 0.1f;
+    private float scaleHoverTurn = 0.11f;
     private float scaleTiltAngle = 10.0f;
 
     public void StartEngine()
@@ -168,13 +168,13 @@ public class HelicopterController : AvatarController
 
     public void ClimbUp()
     {
-        SpeedUpTopRotor(poutTopRotor);
-        SpeedUpTailRotor(poutTailRotor);
+        SpeedUpTopRotor(poutTopRotor * 1.5f);
+        SpeedUpTailRotor(poutTailRotor * 1.5f);
     }
     public void FallDown()
     {
-        SlowDownTopRotor(boutTopRotor);
-        SlowDownTailRotor(boutTailRotor);
+        SlowDownTopRotor(boutTopRotor * 1.5f);
+        SlowDownTailRotor(boutTailRotor * 1.5f);
     }
 
     public void HoveringTurnRight()
@@ -200,7 +200,7 @@ public class HelicopterController : AvatarController
     // ==================== Internal Behavior ====================
 
     private float upAcc, forwardAcc, torqueAcc;
-    private const float SCALE_ALTITUDE_MAX = 0.6f, COEF_ATTITUDE = -10;
+    private const float SCALE_ALTITUDE_MAX = 0.8f, COEF_ATTITUDE = -10;
     private const float SCALE_TORQUE = 20f;
     private const float SCALE_UPACC = 100f;
     private const float SCALE_FORWARD_ACC = 30f;
@@ -236,7 +236,7 @@ public class HelicopterController : AvatarController
     {
         if (isEngineOn)
         {
-            if (upAcc > 0) upAcc = 0;
+            // if (upAcc > 0) upAcc = 0;
             upAcc += Physics.gravity.y * amount * SCALE_UPACC;
             torqueAcc -= SCALE_TORQUE * amount;
         }
@@ -305,14 +305,16 @@ public class HelicopterController : AvatarController
     public const string CMD_FALL_DOWN = "Fall_Down";
     public const string CMD_MOVE_FORWARD = "Move_Forward";
     public const string CMD_MOVE_BACKWARD = "Move_Backward";
-    public const string CMD_SLOWDOWN_TAIL = "Tail_SlowDown";
-    public const string CMD_SPEEDUP_TAIL = "Tail_SpeedUp";
+    public const string CMD_SLOWDOWN_TAIL = "SlowDown_Tail";
+    public const string CMD_SPEEDUP_TAIL = "SpeedUp_Tail";
+
     public const string CMD_TOP_POWER = "Set_TopSpeed";
     public const string CMD_TAIL_POWER = "Set_TailSpeed";
     public const string CMD_TOP_BRAKE = "Set_TopBrake";
     public const string CMD_TAIL_BRAKE = "Set_TailBrake";
-    public const string CMD_WAIT_P1 = "Wait_P1";
-    public const string CMD_WAIT_P2 = "Wait_P2";
+
+    public const string CMD_WAIT_P1 = "Wait_For_P1";
+    public const string CMD_WAIT_P2 = "Wait_For_P2";
 
     private const string REGEX_NOARG_CMD = @"(?<cmd>{0}) \(\);";
     private const string REGEX_ONEARG_CMD = @"(?<cmd>{0}) \((?<param>[\d\.]+)\);";
@@ -332,7 +334,6 @@ public class HelicopterController : AvatarController
 
         return rt;
     }
-
     public static List<Regex> GetOneParamCmdRegex()
     {
         string[] cmds = {
