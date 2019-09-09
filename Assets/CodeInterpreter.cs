@@ -670,32 +670,26 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         return new ScriptObject(codeList); ;
     }
 
-    private static
-        Regex regexLoopStart = new Regex(@"LOOP REPEAT {"),
-        regexLoopEnd = new Regex(@"} (?<times>\d) Times;");
-    private static Regex[] regexSingleCmdNoParam = {
-        new Regex(@"(?<cmd>StartEngine) \(\)"),
-        new Regex(@"(?<cmd>StopEngine) \(\)"),
-        new Regex(@"(?<cmd>ClimbUp) \(\)"),
-        new Regex(@"(?<cmd>FallDown) \(\)"),
-        new Regex(@"(?<cmd>MoveForward) \(\);"),
-        new Regex(@"(?<cmd>MoveBackward) \(\);"),
-        new Regex(@"(?<cmd>SlowDownTail) \(\)"),
-        new Regex(@"(?<cmd>SpeedUpTail) \(\)"),
-        new Regex(@"(?<cmd>WaitPilotControl) \(\)"),
-        new Regex(@"(?<cmd>WaitEngineUnitSetup) \(\)"),
-    };
-    private static Regex[] regexSingleCmdOneParam = {
-        new Regex(@"(?<cmd>Wait) \((?<param>\d+)\);"),
-        new Regex(@"(?<cmd>MOVE) \((?<param>\w+)\);"),
-        new Regex(@"(?<cmd>SetTopPowerOutput) \((?<param>[\d\.]+)\)"),
-        new Regex(@"(?<cmd>SetTailPowerOutput) \((?<param>[\d\.]+)\)"),
-        new Regex(@"(?<cmd>SetTopBrakeOutput) \((?<param>[\d\.]+)\)"),
-        new Regex(@"(?<cmd>SetTailBrakeOutput) \((?<param>[\d\.]+)\)"),
-    };
+    private static Regex regexLoopStart = new Regex(@"LOOP REPEAT {");
+    private static Regex regexLoopEnd = new Regex(@"} (?<times>\d) Times;");
+    private static List<Regex> regexSingleCmdNoParam = null;
+    private static List<Regex> regexSingleCmdOneParam = null;
 
     private static CodeObjectOneCommand _MatchRegexSingleCommand(string line)
     {
+        if (regexSingleCmdNoParam == null || regexSingleCmdOneParam == null)
+        {
+            regexSingleCmdNoParam = new List<Regex>();
+            regexSingleCmdNoParam.AddRange(HelicopterController.GetNoParamCmdRegex());
+
+            regexSingleCmdOneParam = new List<Regex>();
+            regexSingleCmdOneParam.AddRange(HelicopterController.GetOneParamCmdRegex());
+            regexSingleCmdOneParam.Add(new Regex(@"(?<cmd>MOVE) \((?<param>\w+)\);"));
+            regexSingleCmdOneParam.Add(
+                new Regex(string.Format(@"(?<cmd>{0}) \((?<param>\d+)\);", CMD_WAIT))
+            );
+        }
+
         // No param
         foreach (var r in regexSingleCmdNoParam)
         {

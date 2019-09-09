@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 public class HelicopterController : AvatarController
@@ -156,7 +157,6 @@ public class HelicopterController : AvatarController
         rbTopRotor.AddTorque(10f * helicopter.up, ForceMode.Impulse);
         rbTailRotor.AddTorque(10f * -helicopter.right, ForceMode.Impulse);
     }
-
     public void StopEngine()
     {
         isEngineOn = false;
@@ -171,7 +171,6 @@ public class HelicopterController : AvatarController
         SpeedUpTopRotor(poutTopRotor);
         SpeedUpTailRotor(poutTailRotor);
     }
-
     public void FallDown()
     {
         SlowDownTopRotor(boutTopRotor);
@@ -182,7 +181,6 @@ public class HelicopterController : AvatarController
     {
         SpeedUpTailRotor(-scaleHoverTurn);
     }
-
     public void HoveringTurnLeft()
     {
         SpeedUpTailRotor(scaleHoverTurn);
@@ -301,19 +299,52 @@ public class HelicopterController : AvatarController
 
     // ==================== Available Method Names ====================
 
-    public const string CMD_START_ENG = "StartEngine";
-    public const string CMD_STOP_ENG = "StopEngine";
-    public const string CMD_CLIMP_UP = "ClimbUp";
-    public const string CMD_FALL_DOWN = "FallDown";
-    public const string CMD_MOVE_FORWARD = "MoveForward";
-    public const string CMD_MOVE_BACKWARD = "MoveBackward";
-    public const string CMD_SLOWDOWN_TAIL = "SlowDownTail";
-    public const string CMD_SPEEDUP_TAIL = "SpeedUpTail";
-    public const string CMD_TOP_POWER = "SetTopPowerOutput";
-    public const string CMD_TAIL_POWER = "SetTailPowerOutput";
-    public const string CMD_TOP_BRAKE = "SetTopBrakeOutput";
-    public const string CMD_TAIL_BRAKE = "SetTailBrakeOutput";
-    public const string CMD_WAIT_P1 = "WaitForPilotControl";
-    public const string CMD_WAIT_P2 = "WaitEngineUnitSetup";
+    public const string CMD_START_ENG = "Start_Engine";
+    public const string CMD_STOP_ENG = "Stop_Engine";
+    public const string CMD_CLIMP_UP = "Climb_Up";
+    public const string CMD_FALL_DOWN = "Fall_Down";
+    public const string CMD_MOVE_FORWARD = "Move_Forward";
+    public const string CMD_MOVE_BACKWARD = "Move_Backward";
+    public const string CMD_SLOWDOWN_TAIL = "Tail_SlowDown";
+    public const string CMD_SPEEDUP_TAIL = "Tail_SpeedUp";
+    public const string CMD_TOP_POWER = "Set_TopSpeed";
+    public const string CMD_TAIL_POWER = "Set_TailSpeed";
+    public const string CMD_TOP_BRAKE = "Set_TopBrake";
+    public const string CMD_TAIL_BRAKE = "Set_TailBrake";
+    public const string CMD_WAIT_P1 = "Wait_P1";
+    public const string CMD_WAIT_P2 = "Wait_P2";
+
+    private const string REGEX_NOARG_CMD = @"(?<cmd>{0}) \(\);";
+    private const string REGEX_ONEARG_CMD = @"(?<cmd>{0}) \((?<param>[\d\.]+)\);";
+    public static List<Regex> GetNoParamCmdRegex()
+    {
+        string[] cmds = {
+            CMD_START_ENG, CMD_STOP_ENG,
+            CMD_CLIMP_UP, CMD_FALL_DOWN,
+            CMD_MOVE_FORWARD, CMD_MOVE_BACKWARD,
+            CMD_SLOWDOWN_TAIL, CMD_SPEEDUP_TAIL,
+            CMD_WAIT_P1, CMD_WAIT_P2,
+        };
+
+        var rt = new List<Regex>();
+        foreach (var i in cmds)
+            rt.Add(new Regex(string.Format(REGEX_NOARG_CMD, i)));
+
+        return rt;
+    }
+
+    public static List<Regex> GetOneParamCmdRegex()
+    {
+        string[] cmds = {
+            CMD_TOP_POWER, CMD_TAIL_POWER,
+            CMD_TOP_BRAKE, CMD_TAIL_BRAKE,
+        };
+
+        var rt = new List<Regex>();
+        foreach (var i in cmds)
+            rt.Add(new Regex(string.Format(REGEX_ONEARG_CMD, i)));
+
+        return rt;
+    }
 
 }
