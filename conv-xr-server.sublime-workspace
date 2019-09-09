@@ -523,16 +523,7 @@
 			"file": "Google-Service/gcd_host/main_app/views.py",
 			"settings":
 			{
-				"buffer_size": 1837,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "Google-Service/gcd_host/main_app/lib/raw_topic.txt",
-			"settings":
-			{
-				"buffer_size": 2154,
+				"buffer_size": 1835,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -541,7 +532,7 @@
 			"file": "Google-Service/gcd_host/main_app/lib/w2v.py",
 			"settings":
 			{
-				"buffer_size": 4167,
+				"buffer_size": 4170,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -1122,10 +1113,10 @@
 	],
 	"file_history":
 	[
+		"/Users/rickchung/Projects/Conv-XR-DataVis/Google-Service/gcd_host/main_app/lib/raw_topic.txt",
 		"/Users/rickchung/Projects/Conv-XR-DataVis/Google-Service/gcd_host/main_app/lib/stopwords.txt",
 		"/Users/rickchung/Projects/Conv-XR-DataVis/Google-Service/gcd_host/main_app/lib/short_trans.py",
 		"/Users/rickchung/Projects/Conv-XR-DataVis/Google-Service/gcd_host/main_app/lib/topics.txt",
-		"/Users/rickchung/Projects/Conv-XR-DataVis/Google-Service/gcd_host/main_app/lib/raw_topic.txt",
 		"/Users/rickchung/Projects/Conv-XR-DataVis/Google-Service/gcd_host/main_app/lib/java-content-selected.txt",
 		"/Users/rickchung/Projects/ERDE-XR-Project/Mobile-AR-Ebola/.gitignore",
 		"/Users/rickchung/Projects/Conv-XR-DataVis/Assets/Data/java-concepts.txt",
@@ -1267,6 +1258,7 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"terms",
 			"Sequential",
 			"doc_to_tokens",
 			"outtopn",
@@ -1319,7 +1311,7 @@
 	"groups":
 	[
 		{
-			"selected": 2,
+			"selected": 0,
 			"sheets":
 			[
 				{
@@ -1328,15 +1320,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 1837,
+						"buffer_size": 1835,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								550,
-								550
+								1293,
+								1293
 							]
 						],
 						"settings":
@@ -1347,70 +1339,41 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 204.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "Google-Service/gcd_host/main_app/lib/raw_topic.txt",
+					"file": "Google-Service/gcd_host/main_app/lib/w2v.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2154,
+						"buffer_size": 4170,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								47,
-								47
+								1438,
+								1438
 							]
 						],
 						"settings":
 						{
 							"rainbow_inited": true,
-							"syntax": "Packages/MarkdownEditing/Markdown.sublime-syntax"
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "Google-Service/gcd_host/main_app/lib/w2v.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 4167,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								0,
-								0
-							]
-						],
-						"settings":
-						{
-							"rainbow_inited": true,
-							"syntax": "Packages/Python/Python.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
 					"type": "text"
 				}
 			]
