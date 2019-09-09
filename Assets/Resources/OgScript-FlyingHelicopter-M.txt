@@ -1,26 +1,33 @@
-StartEngine ();
-ClimbUp ();
-MoveForward ();
+Start_Engine ();
+
+Wait_For_P1 ();
+Climb_Up ();
+Move_Forward ();
 Wait (5);
 
-SpeedUpTail ();
+Wait_For_P1 ();
+SpeedUp_Tail ();
 Wait (1);
-SlowDownTail ();
-MoveForward ();
+SlowDown_Tail ();
+Move_Forward ();
 Wait (2);
 
-SpeedUpTail ();
+Wait_For_P1 ();
+SpeedUp_Tail ();
 Wait (1);
-SlowDownTail ();
-MoveForward ();
+SlowDown_Tail ();
+Move_Forward ();
 Wait (3);
 
-SlowDownTail ();
+Wait_For_P1 ();
+SlowDown_Tail ();
 Wait (1);
-SpeedUpTail ();
+SpeedUp_Tail ();
 
-MoveForward ();
+Wait_For_P1 ();
+Move_Forward ();
 Wait (3);
+Move_Backward ();
 
-MoveBackward ();
-FallDown ();
+Wait_For_P1 ();
+Fall_Down ();

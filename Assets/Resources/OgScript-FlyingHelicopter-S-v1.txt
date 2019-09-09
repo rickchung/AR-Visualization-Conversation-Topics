@@ -1,23 +1,23 @@
-Wait_For_P2 ();
+Wait_For_P1 ();
 Set_TopSpeed (1);
 Set_TailSpeed (1);
 
-Wait_For_P2 ();
+Wait_For_P1 ();
 Set_TopSpeed (1);
 Set_TailSpeed (1);
 
-Wait_For_P2 ();
+Wait_For_P1 ();
 Set_TopSpeed (1);
 Set_TailSpeed (1);
 
-Wait_For_P2 ();
+Wait_For_P1 ();
 Set_TopSpeed (1);
 Set_TailSpeed (1);
 
-Wait_For_P2 ();
+Wait_For_P1 ();
 Set_TopSpeed (1);
 Set_TailSpeed (1);
 
-Wait_For_P2 ();
+Wait_For_P1 ();
 Set_TopBrake (1);
 Set_TailBrake (1);

@@ -12,9 +12,10 @@ There are two separate systems in your helicopter:
 </indent>
 The PCS and ECU are controlled separately by two programs. Your task is to cooperate with your partner and find the best configuration that can fly the helicopter to the destination.
 #
-OgMap-FlyingHelicopter.txt
-OgScript-FlyingHelicopter-M.txt
-OgScript-FlyingHelicopter-S.txt
+OgMap-FlyingHelicopter-v1.txt
+OgScript-FlyingHelicopter-M-v1.txt
+OgScript-FlyingHelicopter-S-v1.txt
 false
 false
 Avatar-Helicopter
+CMD-SYNC

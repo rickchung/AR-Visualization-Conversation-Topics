@@ -1,0 +1,26 @@
+Start_Engine ();
+
+Set_TopSpeed (1);
+Set_TailSpeed (1);
+Climb_Up ();
+
+Move_Forward ();
+Continue_Sec (3);
+
+SpeedUp_Tail ();
+Continue_Sec (1);
+SlowDown_Tail ();
+
+Continue_Sec (3);
+
+Set_TopSpeed (6);
+Set_TailSpeed (6);
+Climb_Up ();
+
+Continue_Sec (8);
+
+Move_Backward ();
+
+Set_TopBrake (10);
+Set_TailBrake (10);
+Fall_Down ();
