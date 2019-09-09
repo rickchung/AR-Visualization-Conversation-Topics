@@ -22,15 +22,15 @@ public class CmdWithNumberEditingArea : OneCmdEditingArea
         oneCmdDropdown.ClearOptions();
 
         // If a command is not allowed to be modified, disable the dropdown menu
-        if (!availableCommands.Contains(command))
+        if (!modifiableCmds.Contains(command))
         {
             oneCmdDropdown.GetComponentInChildren<TextMeshProUGUI>().text = command;
             oneCmdDropdown.interactable = false;
         }
         else
         {
-            oneCmdDropdown.AddOptions(availableCommands);
-            oneCmdDropdown.value = availableCommands.IndexOf(command);
+            oneCmdDropdown.AddOptions(modifiableCmds);
+            oneCmdDropdown.value = modifiableCmds.IndexOf(command);
             oneCmdDropdown.interactable = true;
         }
 
@@ -77,7 +77,7 @@ public class CmdWithNumberEditingArea : OneCmdEditingArea
                 AttachedCodeObject.SetCommand(newCommand);
 
                 // Check whether the new command requires arguments
-                if (cmdWithArgs.Contains(newCommand))
+                if (modifiableCmdsWtArgs.Contains(newCommand))
                 {
                     AttachedCodeObject.SetArgs(new string[] { "1" });
                     argSlider.value = 1.0f;
@@ -123,17 +123,21 @@ public class CmdWithNumberEditingArea : OneCmdEditingArea
     }
 
     // ========== TODO: Find a way to list available options of parameters ==========
-    private static List<string> availableCommands = new List<string>() {
-        "START_ENGINE", "STOP_ENGINE",
-        "CLIMB_UP", "FALL_DOWN",
-        "MOVE_FORWARD","MOVE_BACKWARD",
-        "TURN_RIGHT", "TURN_LEFT",
-        "WAIT",
+    private static List<string> modifiableCmds = new List<string>() {
+        HelicopterController.CMD_START_ENG, HelicopterController.CMD_STOP_ENG,
+        HelicopterController.CMD_CLIMP_UP, HelicopterController.CMD_FALL_DOWN,
+        HelicopterController.CMD_MOVE_FORWARD, HelicopterController.CMD_MOVE_BACKWARD,
+        HelicopterController.CMD_SLOWDOWN_TAIL, HelicopterController.CMD_SPEEDUP_TAIL,
+
+        // HelicopterController.CMD_TOP_POWER, HelicopterController.CMD_TAIL_POWER,
+        // HelicopterController.CMD_TOP_BRAKE, HelicopterController.CMD_TAIL_BRAKE,
+
+        CodeInterpreter.CMD_WAIT,
     };
 
-    private static List<string> cmdWithArgs = new List<string>()
+    private static List<string> modifiableCmdsWtArgs = new List<string>()
     {
-        "WAIT"
+        CodeInterpreter.CMD_WAIT
     };
 
     // ==========

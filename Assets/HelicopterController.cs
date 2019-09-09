@@ -37,44 +37,44 @@ public class HelicopterController : AvatarController
             float value;
             switch (command)
             {
-                case "StartEngine":
+                case CMD_START_ENG:
                     StartEngine();
                     break;
-                case "StopEngine":
+                case CMD_STOP_ENG:
                     StopEngine();
                     break;
-                case "ClimbUp":
+                case CMD_CLIMP_UP:
                     ClimbUp();
                     break;
-                case "FallDown":
+                case CMD_FALL_DOWN:
                     FallDown();
                     break;
-                case "MoveForward":
+                case CMD_MOVE_FORWARD:
                     MoveForward();
                     break;
-                case "MoveBackward":
+                case CMD_MOVE_BACKWARD:
                     MoveBackward();
                     break;
-                case "SlowDownTail":
+                case CMD_SLOWDOWN_TAIL:
                     HoveringTurnRight();
                     break;
-                case "SpeedUpTail":
+                case CMD_SPEEDUP_TAIL:
                     HoveringTurnLeft();
                     break;
 
-                case "SetTopPowerOutput":
+                case CMD_TOP_POWER:
                     value = float.Parse(args[0]);
                     SetPowerOutputTopRotor(value);
                     break;
-                case "SetTailPowerOutput":
+                case CMD_TAIL_POWER:
                     value = float.Parse(args[0]);
                     SetPowerOutputTailRotor(value);
                     break;
-                case "SetTopBrakeOutput":
+                case CMD_TOP_BRAKE:
                     value = float.Parse(args[0]);
                     SetBrakeOutputTopRotor(value);
                     break;
-                case "SetTailBrakeOutput":
+                case CMD_TAIL_BRAKE:
                     value = float.Parse(args[0]);
                     SetBrakeOutputTailRotor(value);
                     break;
@@ -82,6 +82,17 @@ public class HelicopterController : AvatarController
         }
 
         return isSuccessful;
+    }
+
+    override public bool IsLockCommand(string command)
+    {
+        switch (command)
+        {
+            case CMD_WAIT_P1:
+            case CMD_WAIT_P2:
+                return true;
+        }
+        return false;
     }
 
     override public void ResetPosition()
@@ -207,6 +218,11 @@ public class HelicopterController : AvatarController
 
         // Hack forward acceleration
         rbHelicopter.AddForce(forwardAcc * cockpit.forward, ForceMode.Acceleration);
+
+        // // Ensure the tail rotor has the right rotation
+        // var trEular = tailRotor.localEulerAngles;
+        // trEular.y = 0; trEular.z = 0;
+        // tailRotor.localEulerAngles = trEular;
     }
 
     private void SpeedUpTopRotor(float amount)
@@ -281,5 +297,23 @@ public class HelicopterController : AvatarController
                 forwardAcc = 0;
         }
     }
+
+
+    // ==================== Available Method Names ====================
+
+    public const string CMD_START_ENG = "StartEngine";
+    public const string CMD_STOP_ENG = "StopEngine";
+    public const string CMD_CLIMP_UP = "ClimbUp";
+    public const string CMD_FALL_DOWN = "FallDown";
+    public const string CMD_MOVE_FORWARD = "MoveForward";
+    public const string CMD_MOVE_BACKWARD = "MoveBackward";
+    public const string CMD_SLOWDOWN_TAIL = "SlowDownTail";
+    public const string CMD_SPEEDUP_TAIL = "SpeedUpTail";
+    public const string CMD_TOP_POWER = "SetTopPowerOutput";
+    public const string CMD_TAIL_POWER = "SetTailPowerOutput";
+    public const string CMD_TOP_BRAKE = "SetTopBrakeOutput";
+    public const string CMD_TAIL_BRAKE = "SetTailBrakeOutput";
+    public const string CMD_WAIT_P1 = "WaitForPilotControl";
+    public const string CMD_WAIT_P2 = "WaitEngineUnitSetup";
 
 }

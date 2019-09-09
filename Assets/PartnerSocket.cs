@@ -391,7 +391,7 @@ public class PartnerSocket : MonoBehaviour
         switch (command)
         {
             case CodeInterpreter.CTRL_SEM_LOCK:
-                mCodeInterpreter.IsScriptPaused = true;
+                mCodeInterpreter.IsScriptSyncPaused = true;
                 break;
 
             case CodeInterpreter.CTRL_SEM_UNLOCK:
@@ -403,11 +403,11 @@ public class PartnerSocket : MonoBehaviour
                 // If I'm still running and receiving an unlock signal
                 else
                 {
-                    mCodeInterpreter.IsScriptPaused = false;
+                    mCodeInterpreter.IsScriptSyncPaused = false;
                 }
                 break;
             case CodeInterpreter.CTRL_SEM_FINISH:
-                // If I'm also done
+                // If I've done and been waiting for the remote to finish
                 if (mCodeInterpreter.IsScriptRunning == false)
                 {
                     mCodeInterpreter.PostExecClear();
@@ -415,10 +415,10 @@ public class PartnerSocket : MonoBehaviour
                 // If I have not finished my script execution
                 else
                 {
-                    // This makes the post-exec control skip step-switching waiting in the future
-                    mCodeInterpreter.isRemoteFinished = true;
-                    // This interrupts any current waiting
-                    mCodeInterpreter.IsScriptPaused = false;
+                    // This makes the post-exec control skip future step-switching waiting
+                    mCodeInterpreter.IsRemoteFinished = true;
+                    // This interrupts any current waiting (one-shot)
+                    mCodeInterpreter.IsScriptSyncPaused = false;
                 }
                 break;
 

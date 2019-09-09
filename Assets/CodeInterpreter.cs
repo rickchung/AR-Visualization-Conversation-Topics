@@ -25,9 +25,9 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     private ScriptObject loadedScript;
     private ScriptExecMode execMode;
     private bool isScriptRunning;
-    private bool isScriptPaused;
+    private bool isScriptSyncPaused;
     private bool _coroutineLock;
-    public bool isRemoteFinished;
+    private bool isRemoteFinished;
     private static string dataFolderPath;
     public enum ScriptExecMode { ASYNC, SYNC_STEP_SWITCHING, SYNC_CMD_SWITCHING };
     public ScriptExecMode ExecMode
@@ -42,18 +42,27 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
             execMode = value;
         }
     }
-    public bool IsScriptPaused
+
+    /// <summary>
+    /// This property is different from "IsScriptRunning" and used to keep synchronization between local and remote script executions. When a script is paused, it means it is waiting for the remote procedure to unlock it.
+    /// </summary>
+    /// <value></value>
+    public bool IsScriptSyncPaused
     {
         get
         {
-            return isScriptPaused;
+            return isScriptSyncPaused;
         }
         set
         {
-            isScriptPaused = value;
+            isScriptSyncPaused = value;
         }
     }
 
+    /// <summary>
+    /// This property indicates whether a local execution is done or interrupted.
+    /// </summary>
+    /// <value></value>
     public bool IsScriptRunning
     {
         get
@@ -66,6 +75,22 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         }
     }
 
+    /// <summary>
+    /// Used to catche the execution state of the remote device.
+    /// </summary>
+    /// <value></value>
+    public bool IsRemoteFinished
+    {
+        get
+        {
+            return isRemoteFinished;
+        }
+
+        set
+        {
+            isRemoteFinished = value;
+        }
+    }
 
     // ========= Predefined Control Signals ==========
     private const float CMD_RUNNING_DELAY = 0.5f;
@@ -77,6 +102,9 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     public const string CTRL_SEM_RUNSCRIPT = "SEM_RUNSCRIPT";
     private const int CTRL_MAX_WAIT_TIME = 3;
     private float semTimeElapsed;
+
+    public const string CMD_WAIT = "Wait";
+    public const string CMD_LOOP = "LOOP";
 
 
     void Start()
@@ -154,6 +182,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         var tmp2 = scriptScroller.gameObject;
         tmp2.SetActive(!tmp2.activeSelf);
     }
+
 
     // ========== Script Interpreter ==========
 
@@ -236,9 +265,9 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
             // In the step-switching mode, the master runs first and the slave does later.
             case ScriptExecMode.SYNC_STEP_SWITCHING:
                 if (partnerSocket.IsMaster)
-                    IsScriptPaused = false;
+                    IsScriptSyncPaused = false;
                 else
-                    IsScriptPaused = true;
+                    IsScriptSyncPaused = true;
                 break;
         }
 
@@ -257,7 +286,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         DataLogger.DumpWholeScript(scriptObject);
 
         var script = scriptObject.GetScript();
-        isRemoteFinished = false;
+        IsRemoteFinished = false;
         IsScriptRunning = true;
 
         int counter = 0;
@@ -275,7 +304,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
             if (nextCodeObject.IsDisabled() == false)
             {
                 // If it's a loop
-                if (nextCodeObject.GetCommand().Equals("LOOP"))
+                if (nextCodeObject.GetCommand().Equals(CMD_LOOP))
                 {
                     var numRepeats = ((CodeObjectLoop)nextCodeObject).GetLoopTimes();
                     var codeToRepeat = ((CodeObjectLoop)nextCodeObject).GetNestedCommands(ignoreDisabled: true);
@@ -293,7 +322,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
                     }
                 }
                 // If the command is "Wait"
-                else if (nextCodeObject.GetCommand().Equals("Wait"))
+                else if (nextCodeObject.GetCommand().Equals(CMD_WAIT))
                 {
                     for (int i = 0; i < 2 * int.Parse(nextCodeObject.GetArgs()[0]); i++)
                     {
@@ -323,14 +352,17 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         IsScriptRunning = false;
         // Tell the remote that I'm done.
         SendImDoneSignal();
-        // This piece of code is run if the remote finishs ahead of me
-        if (isRemoteFinished) PostExecClear();
+
+        // If the remote has already finished when I'm done, do the final cleanup
+        if (IsRemoteFinished)
+            PostExecClear();
 
         DataLogger.Log(this.gameObject, LogTag.SCRIPT,
             "The execution of a script has finished."
         );
     }
 
+    // A preprocessing procedure used befure running a command
     private WaitForSeconds _CoroutineCtrlPreCmd(CodeObjectOneCommand c)
     {
         WaitForSeconds ctrlSignal = null;
@@ -339,9 +371,10 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
             case ScriptExecMode.ASYNC:
                 ctrlSignal = new WaitForSeconds(CMD_RUNNING_DELAY); ;
                 break;
+
             case ScriptExecMode.SYNC_STEP_SWITCHING:
                 // Set the lock, wait until the remote responses
-                if (IsScriptPaused)
+                if (IsScriptSyncPaused)
                 {
                     // Debug.Log("Locked!");
                     _coroutineLock = true;
@@ -354,7 +387,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
                         DataLogger.Log(this.gameObject, LogTag.SYSTEM_WARNING,
                             "Semaphore timeout."
                         );
-                        IsScriptPaused = false;
+                        IsScriptSyncPaused = false;
                         semTimeElapsed = 0;
                         ctrlSignal = new WaitForSeconds(0);
                     }
@@ -370,6 +403,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
                     semTimeElapsed = 0;
                 }
                 break;
+
             case ScriptExecMode.SYNC_CMD_SWITCHING:
                 ctrlSignal = null;
                 break;
@@ -377,6 +411,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         return ctrlSignal;
     }
 
+    // A post-processing procedure used after running a command
     private void _CoroutineCtrlPostCmd()
     {
         switch (execMode)
@@ -384,12 +419,13 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
             case ScriptExecMode.ASYNC:
                 // Do nothing
                 break;
+
             case ScriptExecMode.SYNC_STEP_SWITCHING:
                 // If the remote hasn't finished,
-                if (isRemoteFinished == false)
+                if (IsRemoteFinished == false)
                 {
                     // Lock self and send unlock message
-                    IsScriptPaused = true;
+                    IsScriptSyncPaused = true;
                     partnerSocket.BroadcastAvatarCtrl(
                         new CodeObjectOneCommand(CTRL_SEM_UNLOCK, new string[] { })
                     );
@@ -398,9 +434,10 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
                 else
                 {
                     // Do not send unlock messages and unlock self directly
-                    IsScriptPaused = false;
+                    IsScriptSyncPaused = false;
                 }
                 break;
+
             case ScriptExecMode.SYNC_CMD_SWITCHING:
                 // Do nothing
                 break;
@@ -419,9 +456,10 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
 
         if (!runner.IsDead)
         {
-            DataLogger.Log(
-                this.gameObject, LogTag.SCRIPT,
-                string.Format("Running Cmd, fromRemote={0}, {1}", fromRemote, codeObject)
+            DataLogger.Log(this.gameObject, LogTag.SCRIPT,
+                string.Format(
+                    "Running Cmd, fromRemote={0}, {1}", fromRemote, codeObject
+                )
             );
             string command = codeObject.GetCommand();
             string[] args = codeObject.GetArgs();
@@ -452,6 +490,9 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         );
     }
 
+    /// <summary>
+    /// This method is used to interrupt the exec of local scripts and notify the remote. It does not stop the virtual sync execution (in other words, the local will still wait for the remote completion after this method is invoked). This method is especially useful in the cases like the avatar triggers a trap or goes out of boundary where you need to interrupt the local script but not mean to reset everything. See "StopAndClearRunningState()".
+    /// </summary>
     public void InterruptRunningScript()
     {
         StopCoroutine("_RunScriptCoroutine");
@@ -478,12 +519,12 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     }
 
     /// <summary>
-    /// Clear all intermediate states that occur during execution
+    /// Clear all intermediate states that occur during execution. This method should only be invoked at the very end of sync execution after all devices finish executions.
     /// </summary>
     public void PostExecClear()
     {
         IsScriptRunning = false;
-        isRemoteFinished = false;
+        IsRemoteFinished = false;
         runButton.interactable = true;
         UpdateCodeViewer();
     }
@@ -584,6 +625,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         scriptScroller.ReloadData(scrollPositionFactor: scrollPos);
     }
 
+
     // ========== File IO for Interpreter ==========
 
     private static void ExportScriptObject(ScriptObject script, string scriptName)
@@ -640,6 +682,8 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         new Regex(@"(?<cmd>MoveBackward) \(\);"),
         new Regex(@"(?<cmd>SlowDownTail) \(\)"),
         new Regex(@"(?<cmd>SpeedUpTail) \(\)"),
+        new Regex(@"(?<cmd>WaitPilotControl) \(\)"),
+        new Regex(@"(?<cmd>WaitEngineUnitSetup) \(\)"),
     };
     private static Regex[] regexSingleCmdOneParam = {
         new Regex(@"(?<cmd>Wait) \((?<param>\d+)\);"),
