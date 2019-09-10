@@ -96,6 +96,19 @@ public class HelicopterController : AvatarController
         return false;
     }
 
+    override public bool IsStaticCommand(string command)
+    {
+        switch (command)
+        {
+            case CMD_TOP_POWER:
+            case CMD_TAIL_POWER:
+            case CMD_TOP_BRAKE:
+            case CMD_TAIL_BRAKE:
+                return true;
+        }
+        return false;
+    }
+
     override public void ResetPosition()
     {
         base.ResetPosition();
@@ -112,7 +125,7 @@ public class HelicopterController : AvatarController
 
         // Reset the physics
         StopEngine();
-        forwardAcc = upAcc = torqueAcc = 0;
+        forwardAcc = upAcc = torqueAcc = curAltitudeLv = 0;
         rbHelicopter.velocity = Vector3.zero;
         rbHelicopter.angularVelocity = Vector3.zero;
         rbHelicopter.constraints = RigidbodyConstraints.None;
@@ -168,13 +181,15 @@ public class HelicopterController : AvatarController
 
     public void ClimbUp()
     {
-        SpeedUpTopRotor(poutTopRotor * 1.5f);
-        SpeedUpTailRotor(poutTailRotor * 1.5f);
+        curAltitudeLv += 1;
+        SpeedUpTopRotor(poutTopRotor);
+        SpeedUpTailRotor(poutTailRotor);
     }
     public void FallDown()
     {
-        SlowDownTopRotor(boutTopRotor * 1.5f);
-        SlowDownTailRotor(boutTailRotor * 1.5f);
+        curAltitudeLv -= 1;
+        SlowDownTopRotor(boutTopRotor);
+        SlowDownTailRotor(boutTailRotor);
     }
 
     public void HoveringTurnRight()
@@ -200,16 +215,19 @@ public class HelicopterController : AvatarController
     // ==================== Internal Behavior ====================
 
     private float upAcc, forwardAcc, torqueAcc;
-    private const float SCALE_ALTITUDE_MAX = 0.8f, COEF_ATTITUDE = -10;
+    private const float SCALE_ALTITUDE_MAX = 0.4f, COEF_ATTITUDE = -10;
+    private int curAltitudeLv = 0;
     private const float SCALE_TORQUE = 20f;
-    private const float SCALE_UPACC = 100f;
+    private const float SCALE_UPACC = 300f;
     private const float SCALE_FORWARD_ACC = 30f;
 
     private void FixedUpdate()
     {
         var effectiveUpAcc = (
-            upAcc * Mathf.Exp(COEF_ATTITUDE * (helicopter.localPosition.y / SCALE_ALTITUDE_MAX)
-        ));
+            upAcc * Mathf.Exp(
+                COEF_ATTITUDE * (helicopter.localPosition.y / SCALE_ALTITUDE_MAX * curAltitudeLv)
+            )
+        );
 
         rbHelicopter.AddForce(effectiveUpAcc * helicopter.up, ForceMode.Acceleration);
         rbHelicopter.AddTorque(torqueAcc * helicopter.up, ForceMode.Acceleration);
@@ -253,7 +271,6 @@ public class HelicopterController : AvatarController
             torqueAcc -= SCALE_TORQUE * amount;
         }
     }
-
     /// <summary>
     /// To simplify physics, slowing down the tail rotor only increases torque of the helicopter.
     /// </summary>

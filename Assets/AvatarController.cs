@@ -77,6 +77,11 @@ public class AvatarController : MonoBehaviour
         return false;
     }
 
+    public virtual bool IsStaticCommand(string command)
+    {
+        return false;
+    }
+
     // ==================== Available Behaviors of an Avatar ====================
 
     /// <summary>

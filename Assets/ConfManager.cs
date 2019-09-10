@@ -139,6 +139,7 @@ public class ConfManager : MonoBehaviour
         arrowKeyPanel.SetActive(conf.isArrowKeyEnabled);
         sttCtrlPanel.SetActive(!conf.isArrowKeyEnabled);
         developerPanel.SetActive(conf.isDeveloperPanelEnabled);
+
         codeInterpreter.ExecMode = conf.execMode;
 
         // Set avatars
@@ -331,9 +332,7 @@ public class ConfManager : MonoBehaviour
                 var syncModeStr = reader.ReadLine();
                 CodeInterpreter.ScriptExecMode syncMode = CodeInterpreter.ScriptExecMode.SYNC_STEP_SWITCHING;
                 if (syncModeStr != null)
-                    if (syncModeStr.Equals("CMD-SYNC"))
-                        syncMode = CodeInterpreter.ScriptExecMode.SYNC_CMD_SWITCHING;
-
+                    syncMode = (CodeInterpreter.ScriptExecMode)int.Parse(syncModeStr);
 
                 rt = new OgStageConfig(
                     name, problem, map,

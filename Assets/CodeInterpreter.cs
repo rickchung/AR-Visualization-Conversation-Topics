@@ -24,11 +24,10 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
 
     private ScriptObject loadedScript;
     private ScriptExecMode execMode;
+    private bool _cmdSwitchLock, _cmdSwitchRunOnceFlag, _stepSwitchLock, _coroutineLock;
     private float semTimeElapsed;
-    private bool isScriptRunning;
-    private bool isScriptSyncPaused;
-    private bool _coroutineLock;
-    private bool isRemoteFinished;
+    private bool isScriptRunning, isRemoteFinished;
+
     private static string dataFolderPath;
 
     public ScriptExecMode ExecMode
@@ -43,21 +42,35 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
             execMode = value;
         }
     }
+
     /// <summary>
     /// This property is different from "IsScriptRunning" and used to keep synchronization between local and remote script executions. When a script is paused, it means it is waiting for the remote procedure to unlock it.
     /// </summary>
     /// <value></value>
-    public bool IsScriptSyncPaused
+    public bool StepSwitchLock
     {
         get
         {
-            return isScriptSyncPaused;
+            return _stepSwitchLock;
         }
         set
         {
-            isScriptSyncPaused = value;
+            _stepSwitchLock = value;
         }
     }
+
+    public bool CmdSwitchLock
+    {
+        get
+        {
+            return _cmdSwitchLock;
+        }
+        set
+        {
+            _cmdSwitchLock = value;
+        }
+    }
+
     /// <summary>
     /// This property indicates whether a local execution is done or interrupted.
     /// </summary>
@@ -73,6 +86,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
             isScriptRunning = value;
         }
     }
+
     /// <summary>
     /// Used to catche the execution state of the remote device.
     /// </summary>
@@ -208,7 +222,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     }
 
     /// <summary>
-    /// Run the loaded script.
+    /// /// Run the loaded script.
     /// </summary>
     public void RunLoadedScript()
     {
@@ -254,10 +268,24 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         {
             // In the step-switching mode, the master runs first and the slave does later.
             case ScriptExecMode.SYNC_STEP_SWITCHING:
+                CTRL_MAX_WAIT_TIME = 3;
                 if (partnerSocket.IsMaster)
-                    IsScriptSyncPaused = false;
+                    StepSwitchLock = false;
                 else
-                    IsScriptSyncPaused = true;
+                    StepSwitchLock = true;
+                break;
+
+            case ScriptExecMode.SYNC_CMD_SWITCHING:
+                if (partnerSocket.IsMaster)
+                {
+                    StepSwitchLock = true;
+                }
+                else
+                {
+                    StepSwitchLock = false;
+                }
+                _cmdSwitchRunOnceFlag = true;
+                CTRL_MAX_WAIT_TIME = 100;
                 break;
         }
 
@@ -302,36 +330,37 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
                     {
                         foreach (var c in codeToRepeat)
                         {
+                            CmdSwitchLock = avatar.IsLockCommand(c.GetCommand());
                             do
                                 yield return _CoroutineCtrlPreCmd(c);
                             while (_coroutineLock);
                             RunCommand(c);
-                            _CoroutineCtrlPostCmd();
-
+                            _CoroutineCtrlPostCmd(c);
                         }
                     }
                 }
                 // If the command is "Wait"
                 else if (nextCodeObject.GetCommand().Equals(CMD_WAIT))
                 {
+                    CmdSwitchLock = avatar.IsLockCommand(nextCodeObject.GetCommand());
                     for (int i = 0; i < 2 * int.Parse(nextCodeObject.GetArgs()[0]); i++)
                     {
                         do
                             yield return _CoroutineCtrlPreCmd(nextCodeObject);
                         while (_coroutineLock);
                         RunCommand(nextCodeObject);
-                        _CoroutineCtrlPostCmd();
-
+                        _CoroutineCtrlPostCmd(nextCodeObject);
                     }
                 }
                 // For all the other kinds of commands
                 else
                 {
+                    CmdSwitchLock = avatar.IsLockCommand(nextCodeObject.GetCommand());
                     do
                         yield return _CoroutineCtrlPreCmd(nextCodeObject);
                     while (_coroutineLock);
                     RunCommand(nextCodeObject);
-                    _CoroutineCtrlPostCmd();
+                    _CoroutineCtrlPostCmd(nextCodeObject);
                 }
             }
 
@@ -353,31 +382,58 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     }
 
     // A preprocessing procedure used befure running a command
+    // This process "locks" the execution until a certain condition is met.
     private WaitForSeconds _CoroutineCtrlPreCmd(CodeObjectOneCommand c)
     {
         WaitForSeconds ctrlSignal = null;
         switch (execMode)
         {
             case ScriptExecMode.ASYNC:
-                ctrlSignal = new WaitForSeconds(CMD_RUNNING_DELAY); ;
+                ctrlSignal = new WaitForSeconds(CMD_RUNNING_DELAY);
                 break;
 
+            case ScriptExecMode.SYNC_CMD_SWITCHING:
+                if (CmdSwitchLock)
+                {
+                    if (_cmdSwitchRunOnceFlag)
+                    {
+                        _cmdSwitchRunOnceFlag = false;
+                        SendUnlockSignal();
+                    }
+
+                    _coroutineLock = true;
+                    ctrlSignal = null;
+
+                    semTimeElapsed += Time.deltaTime;
+                    if (semTimeElapsed >= CTRL_MAX_WAIT_TIME)
+                    {
+                        DataLogger.Log(this.gameObject, LogTag.SYSTEM_WARNING, "Lock Time Out. Proceeed");
+                        _coroutineLock = false;
+                        semTimeElapsed = 0;
+                        ctrlSignal = new WaitForSeconds(0);
+                    }
+                }
+                else
+                {
+                    _coroutineLock = false;
+                    ctrlSignal = new WaitForSeconds(CMD_RUNNING_DELAY);
+                }
+                break;
             case ScriptExecMode.SYNC_STEP_SWITCHING:
                 // Set the lock, wait until the remote responses
-                if (IsScriptSyncPaused)
+                if (StepSwitchLock)
                 {
                     // Debug.Log("Locked!");
                     _coroutineLock = true;
                     ctrlSignal = null;
-                    semTimeElapsed += Time.deltaTime;
 
-                    // If I've waited for an unlocking signal too long
+                    semTimeElapsed += Time.deltaTime;
                     if (semTimeElapsed >= CTRL_MAX_WAIT_TIME)
                     {
                         DataLogger.Log(this.gameObject, LogTag.SYSTEM_WARNING,
-                            "Semaphore timeout."
+                            "Lock Time Out. Proceeed"
                         );
-                        IsScriptSyncPaused = false;
+                        StepSwitchLock = false;
                         semTimeElapsed = 0;
                         ctrlSignal = new WaitForSeconds(0);
                     }
@@ -387,22 +443,20 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
                 {
                     // Debug.Log("Unlocked!");
                     _coroutineLock = false;
+
                     // I may still need to wait several seconds to make the execution as smooth as possible
                     var leftWaitingTime = Mathf.Max(0, CMD_RUNNING_DELAY - semTimeElapsed);
                     ctrlSignal = new WaitForSeconds(leftWaitingTime);
                     semTimeElapsed = 0;
                 }
                 break;
-
-            case ScriptExecMode.SYNC_CMD_SWITCHING:
-                ctrlSignal = new WaitForSeconds(CMD_RUNNING_DELAY); ;
-                break;
         }
         return ctrlSignal;
     }
 
     // A post-processing procedure used after running a command
-    private void _CoroutineCtrlPostCmd()
+    // This process reset the "lock".
+    private void _CoroutineCtrlPostCmd(CodeObjectOneCommand c)
     {
         switch (execMode)
         {
@@ -410,26 +464,23 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
                 // Do nothing
                 break;
 
+            case ScriptExecMode.SYNC_CMD_SWITCHING:
+                _cmdSwitchRunOnceFlag = true;
+                break;
             case ScriptExecMode.SYNC_STEP_SWITCHING:
                 // If the remote hasn't finished,
                 if (IsRemoteFinished == false)
                 {
                     // Lock self and send unlock message
-                    IsScriptSyncPaused = true;
-                    partnerSocket.BroadcastAvatarCtrl(
-                        new CodeObjectOneCommand(CTRL_SEM_UNLOCK, new string[] { })
-                    );
+                    StepSwitchLock = true;
+                    SendUnlockSignal();
                 }
                 // If the remote has finished,
                 else
                 {
                     // Do not send unlock messages and unlock self directly
-                    IsScriptSyncPaused = false;
+                    StepSwitchLock = false;
                 }
-                break;
-
-            case ScriptExecMode.SYNC_CMD_SWITCHING:
-                // Do nothing
                 break;
         }
     }
@@ -441,26 +492,35 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     /// <param name="fromRemote">Whether the codeObjec is for my rival's avatar</param>
     public void RunCommand(CodeObjectOneCommand codeObject, bool fromRemote = false)
     {
-        // Choose the runner according to the source of input commands
-        AvatarController runner = (!fromRemote) ? avatar : rivalAvatar;
+        string command = codeObject.GetCommand();
+        string[] args = codeObject.GetArgs();
 
-        if (!runner.IsDead)
+        if (!avatar.IsStaticCommand(command))
         {
-            DataLogger.Log(this.gameObject, LogTag.SCRIPT,
-                string.Format(
-                    "Running Cmd, fromRemote={0}, {1}", fromRemote, codeObject
-                )
-            );
-            string command = codeObject.GetCommand();
-            string[] args = codeObject.GetArgs();
-            runner.ParseCommand(command, args);
+            // Choose the runner according to the source of input commands
+            AvatarController runner = (!fromRemote) ? avatar : rivalAvatar;
+
+            if (!runner.IsDead)
+            {
+                DataLogger.Log(this.gameObject, LogTag.SCRIPT,
+                    string.Format(
+                        "Running Cmd, fromRemote={0}, {1}", fromRemote, codeObject
+                    )
+                );
+                runner.ParseCommand(command, args);
+            }
+            else
+            {
+                DataLogger.Log(
+                    this.gameObject, LogTag.SCRIPT,
+                    string.Format("Avatar is dead., {0}, {1}", fromRemote, codeObject)
+                );
+            }
         }
         else
         {
-            DataLogger.Log(
-                this.gameObject, LogTag.SCRIPT,
-                string.Format("Avatar is dead., {0}, {1}", fromRemote, codeObject)
-            );
+            avatar.ParseCommand(command, args);
+            rivalAvatar.ParseCommand(command, args);
         }
 
         // If this method is invoked locally, it will broadcast the command to remote devices. Note: When a message arrives at the remote device, it will also invoke this method but with the flag fromRemote = true, to prevent a broadcast storm.
@@ -477,6 +537,13 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     {
         partnerSocket.BroadcastAvatarCtrl(
             new CodeObjectOneCommand(CodeInterpreter.CTRL_SEM_FINISH, new string[] { })
+        );
+    }
+
+    private void SendUnlockSignal()
+    {
+        partnerSocket.BroadcastAvatarCtrl(
+            new CodeObjectOneCommand(CTRL_SEM_UNLOCK, new string[] { })
         );
     }
 
@@ -763,7 +830,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     public const string CTRL_SEM_UNLOCK = "SEM_UNLOCK";
     public const string CTRL_SEM_FINISH = "SEM_FINISH";
     public const string CTRL_SEM_RUNSCRIPT = "SEM_RUNSCRIPT";
-    private const int CTRL_MAX_WAIT_TIME = 3;
+    private int CTRL_MAX_WAIT_TIME = 3;
 
     public const string CMD_WAIT = "Continue_Sec";
     public const string CMD_LOOP = "LOOP";
