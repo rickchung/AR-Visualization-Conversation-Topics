@@ -1,14 +1,11 @@
 Flying a Helicopter
 <size=115%><smallcaps>> Simulation: Flying a Helicopter by Programming</smallcaps></size>
 
-In this stage, you will simulate the flying process of helicopters by programming.
-
-<size=115%><smallcaps>> Your Goal in This Stage</smallcaps></size>
-
-There are two separate systems in your helicopter:
+In this stage, you will simulate the flying process of helicopters by programming. To achieve this, you need to know the collaboration of two separate systems in your helicopter:
 <indent=4%>
-1. A Pilot Control System (PCS) accepts commands and control the movement of your helicopter.
-2. Engine Control Unit (ECU) controls the power of internal engine that affects movement of helicopter. It determines how fast the rotor blades can speed up or slow down.
+1. <mark=#f4433688>Player 1 (P1)</mark> is the pilot control system (PCS) who controls the navigation of the helicopter.
+
+2. <mark=#2196F388>Player 2 (P2)</mark>  is the engine Control Unit (ECU) who controls the power of internal engine that affects movement of helicopter.
 </indent>
 The PCS and ECU are controlled separately by two programs. Your task is to cooperate with your partner and find the best configuration that can fly the helicopter to the destination.
 #
@@ -18,4 +15,4 @@ OgScript-FlyingHelicopter-S-v1.txt
 false
 false
 Avatar-Helicopter
-CMD-SYNC
+2
