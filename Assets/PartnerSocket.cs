@@ -434,6 +434,7 @@ public class PartnerSocket : MonoBehaviour
                     mCodeInterpreter.IsRemoteFinished = true;
                     // This interrupts any current waiting (one-shot)
                     mCodeInterpreter.StepSwitchLock = false;
+                    mCodeInterpreter.CmdSwitchLock = false;
                 }
                 break;
 
@@ -445,7 +446,7 @@ public class PartnerSocket : MonoBehaviour
                 break;
 
             case ConfManager.CTRL_APPLY_CONFIG:
-                confManager.ApplyConfiguration(co.GetArgs()[0]);
+                confManager.ApplyConfigurationSync(co.GetArgs()[0]);
                 break;
 
             default:

@@ -77,8 +77,8 @@ public class ConfManager : MonoBehaviour
 
         // Init configurations of stages
         stages = new Dictionary<string, OgStageConfig>();
-        stages.Add("Tutorial", OgStageConfig.ImportConfigFile("OgConfig-Tutorial"));
-        stages.Add("S1-Algorithm", OgStageConfig.ImportConfigFile("OgConfig-Puzzle3"));
+        // stages.Add("Tutorial", OgStageConfig.ImportConfigFile("OgConfig-Tutorial"));
+        // stages.Add("S1-Algorithm", OgStageConfig.ImportConfigFile("OgConfig-Puzzle3"));
         stages.Add("S2-FlyingHelicopter", OgStageConfig.ImportConfigFile("OgConfig-FlyingHelicopter"));
 
         // Init stage buttons
@@ -89,7 +89,7 @@ public class ConfManager : MonoBehaviour
             var newButton = Instantiate(stageButtonPrefab, parent: stageProgressView);
             var newButtonText = newButton.GetComponentInChildren<Text>();
 
-            newButton.onClick.AddListener(() => { ApplyConfiguration(kv.Key); });
+            newButton.onClick.AddListener(() => { ApplyConfigurationSync(kv.Key); });
             newButton.interactable = true;
             newButtonText.text = kv.Key;
             newButton.gameObject.SetActive(true);
@@ -105,7 +105,7 @@ public class ConfManager : MonoBehaviour
     // ==========
 
 
-    public void ApplyConfiguration(string confName)
+    public void ApplyConfigurationSync(string confName)
     {
         if (stageKeys.Contains(confName))
         {
@@ -222,7 +222,7 @@ public class ConfManager : MonoBehaviour
         var tmp = currentStageIndex + 1;
         if (tmp < stageKeys.Count)
         {
-            ApplyConfiguration(stageKeys[tmp]);
+            ApplyConfigurationSync(stageKeys[tmp]);
             currentStageIndex = tmp;
         }
     }
@@ -232,7 +232,7 @@ public class ConfManager : MonoBehaviour
         var tmp = currentStageIndex - 1;
         if (tmp >= 0)
         {
-            ApplyConfiguration(stageKeys[tmp]);
+            ApplyConfigurationSync(stageKeys[tmp]);
             currentStageIndex = tmp;
         }
     }

@@ -161,8 +161,16 @@ public class HelicopterController : AvatarController
     private float poutTailRotor = 1.0f;
     private float boutTopRotor = 1.0f;
     private float boutTailRotor = 1.0f;
-    private float scaleHoverTurn = 0.11f;
+    private float scaleHoverTurn = 0.33f;
     private float scaleTiltAngle = 10.0f;
+
+    private float upAcc, effectiveUpAcc, forwardAcc, torqueAcc;
+    private const float SCALE_ALTITUDE_MAX = 0.2f, COEF_ATTITUDE = -1;
+    private int curAltitudeLv = 0;
+    private const float SCALE_TORQUE = 20f;
+    private float SCALE_UPACC = 25f;
+    private float SCALE_DOWNACC = 10f;
+    private const float SCALE_FORWARD_ACC = 30f;
 
     public void StartEngine()
     {
@@ -183,13 +191,13 @@ public class HelicopterController : AvatarController
     {
         curAltitudeLv += 1;
         SpeedUpTopRotor(poutTopRotor);
-        SpeedUpTailRotor(poutTailRotor);
+        // SpeedUpTailRotor(poutTailRotor);
     }
     public void FallDown()
     {
         curAltitudeLv -= 1;
         SlowDownTopRotor(boutTopRotor);
-        SlowDownTailRotor(boutTailRotor);
+        // SlowDownTailRotor(boutTailRotor);
     }
 
     public void HoveringTurnRight()
@@ -214,28 +222,28 @@ public class HelicopterController : AvatarController
 
     // ==================== Internal Behavior ====================
 
-    private float upAcc, forwardAcc, torqueAcc;
-    private const float SCALE_ALTITUDE_MAX = 0.4f, COEF_ATTITUDE = -10;
-    private int curAltitudeLv = 0;
-    private const float SCALE_TORQUE = 20f;
-    private const float SCALE_UPACC = 300f;
-    private const float SCALE_FORWARD_ACC = 30f;
-
     private void FixedUpdate()
     {
-        var effectiveUpAcc = (
-            upAcc * Mathf.Exp(
-                COEF_ATTITUDE * (helicopter.localPosition.y / SCALE_ALTITUDE_MAX * curAltitudeLv)
-            )
-        );
+        if (upAcc > 0)
+        {
+            effectiveUpAcc = (
+                upAcc * Mathf.Exp(
+                    COEF_ATTITUDE * ((helicopter.localPosition.y / SCALE_ALTITUDE_MAX) * curAltitudeLv)
+                )
+            );
+            rbHelicopter.AddForce(effectiveUpAcc * helicopter.up, ForceMode.Acceleration);
+        }
+        else
+        {
+            rbHelicopter.AddForce(upAcc * helicopter.up, ForceMode.Acceleration);
+        }
 
-        rbHelicopter.AddForce(effectiveUpAcc * helicopter.up, ForceMode.Acceleration);
         rbHelicopter.AddTorque(torqueAcc * helicopter.up, ForceMode.Acceleration);
 
         // Hack forward acceleration
         rbHelicopter.AddForce(forwardAcc * cockpit.forward, ForceMode.Acceleration);
 
-        // // Ensure the tail rotor has the right rotation
+        // // TODO: Ensure the tail rotor has the right rotation
         // var trEular = tailRotor.localEulerAngles;
         // trEular.y = 0; trEular.z = 0;
         // tailRotor.localEulerAngles = trEular;
@@ -247,16 +255,16 @@ public class HelicopterController : AvatarController
         {
             if (upAcc < 0) upAcc = 0;
             upAcc += -Physics.gravity.y * amount * SCALE_UPACC;
-            torqueAcc += SCALE_TORQUE * amount;
+            // torqueAcc += SCALE_TORQUE * amount;
         }
     }
     private void SlowDownTopRotor(float amount)
     {
         if (isEngineOn)
         {
-            // if (upAcc > 0) upAcc = 0;
-            upAcc += Physics.gravity.y * amount * SCALE_UPACC;
-            torqueAcc -= SCALE_TORQUE * amount;
+            if (upAcc > 0) upAcc = 0;
+            upAcc += Physics.gravity.y * amount * SCALE_DOWNACC;
+            // torqueAcc -= SCALE_TORQUE * amount;
         }
     }
 

@@ -4,18 +4,19 @@ Wait_For_P2 ();
 Climb_Up ();
 
 Move_Forward ();
+Continue_Sec (8);
+Move_Backward ();
 
-Continue_Sec (3);
+Wait_For_P2 ();
+Fall_Down ();
 
-SpeedUp_Tail ();
-Continue_Sec (1);
-SlowDown_Tail ();
+Continue_Sec (4);
 
 Wait_For_P2 ();
 Climb_Up ();
 
-Continue_Sec (4);
-
+Move_Forward ();
+Continue_Sec (6);
 Move_Backward ();
 
 Wait_For_P2 ();
