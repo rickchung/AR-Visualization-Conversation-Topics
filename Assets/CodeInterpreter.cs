@@ -312,11 +312,13 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         // The flag may be set to false by other routines at some time point.
         while (counter < script.Count && IsScriptRunning)
         {
-            CodeObjectOneCommand nextCodeObject = script[counter++];
+            var nextIndex = counter;
+            counter++;
+            CodeObjectOneCommand nextCodeObject = script[nextIndex];
 
             // Show the code highlight
             nextCodeObject.IsRunning = true;
-            UpdateCodeViewer(scrollToTop: false);
+            UpdateCodeViewer(scrollToTop: false, scrollToIndex: nextIndex);
 
             // If the code is not disabled in the editor
             if (nextCodeObject.IsDisabled() == false)
@@ -676,7 +678,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         codeEditor.DispatchEditor(codeObject);
     }
 
-    public void UpdateCodeViewer(bool scrollToTop = true)
+    public void UpdateCodeViewer(bool scrollToTop = true, int scrollToIndex = -1)
     {
         // Display the script
         if (loadedScript != null)
@@ -684,8 +686,33 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
 
         var scrollPos = scriptScroller.NormalizedScrollPosition;
         if (scrollToTop)
+        {
             scrollPos = 0.0f;
+        }
         scriptScroller.ReloadData(scrollPositionFactor: scrollPos);
+
+        if (scrollToIndex > 0)
+        {
+            var scrollPosTop = scriptScroller.ScrollPosition;
+            var scrollVisibleSize = scriptScroller.ScrollRectSize;
+            var scrollWholeSize = scriptScroller.ScrollSize;
+            var curCellPos = scriptScroller.GetScrollPositionForDataIndex(
+                scrollToIndex, EnhancedScroller.CellViewPositionEnum.Before
+            );
+
+            // If it is not within a visiable range
+            if (!(curCellPos > scrollPos && curCellPos < (scrollPos + scrollVisibleSize)))
+            {
+                if (curCellPos + scrollVisibleSize > scriptScroller.ScrollSize)
+                {
+                    scriptScroller.ScrollPosition = scrollWholeSize;
+                }
+                else
+                {
+                    scriptScroller.JumpToDataIndex(scrollToIndex);
+                }
+            }
+        }
     }
 
 

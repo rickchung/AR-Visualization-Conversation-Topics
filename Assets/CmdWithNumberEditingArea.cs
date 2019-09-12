@@ -26,12 +26,14 @@ public class CmdWithNumberEditingArea : OneCmdEditingArea
         {
             oneCmdDropdown.GetComponentInChildren<TextMeshProUGUI>().text = command;
             oneCmdDropdown.interactable = false;
+            codeToggle.interactable = false;
         }
         else
         {
             oneCmdDropdown.AddOptions(modifiableCmds);
             oneCmdDropdown.value = modifiableCmds.IndexOf(command);
             oneCmdDropdown.interactable = true;
+            codeToggle.interactable = true;
         }
 
         // If the attached code has some arguments, put the values in the slider
