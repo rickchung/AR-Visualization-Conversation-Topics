@@ -59,4 +59,15 @@ public class ScriptObject : IEnumerable
         return rt;
 
     }
+
+    public ScriptObject DeepCopy()
+    {
+        ScriptObject other = (ScriptObject)this.MemberwiseClone();
+        other.mScript = new List<CodeObjectOneCommand>();
+        foreach (var v in this.mScript)
+        {
+            other.mScript.Add(v.DeepCopy());
+        }
+        return other;
+    }
 }

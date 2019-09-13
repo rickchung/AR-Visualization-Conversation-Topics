@@ -31,6 +31,8 @@ public class ConfManager : MonoBehaviour
     private int currentStageIndex;
     private Dictionary<string, OgStageConfig> stages;
 
+    private ScriptObject scriptSolution;
+
     [HideInInspector] public bool isSlave;
 
     public const string CTRL_APPLY_CONFIG = "CTRL_APPLY_CONFIG";
@@ -55,11 +57,24 @@ public class ConfManager : MonoBehaviour
         var dataFolderPath = Application.persistentDataPath;
         var filesToCopy = new string[] {
             "OgConfig-Tutorial",
-                "OgMap-Tutorial1", "OgScript-Tutorial1-M", "OgScript-Tutorial1-S",
+                "OgMap-Tutorial1",
+                "OgScript-Tutorial1-M",
+                "OgScript-Tutorial1-S",
+
             "OgConfig-Puzzle3",
-                "OgMap-Puzzle3", "OgScript-Puzzle3-M", "OgScript-Puzzle3-S",
+                "OgMap-Puzzle3",
+                "OgScript-Puzzle3-M",
+                "OgScript-Puzzle3-S",
+
             "OgConfig-FlyingHelicopter",
-                "OgMap-FlyingHelicopter-v1", "OgScript-FlyingHelicopter-M-v1", "OgScript-FlyingHelicopter-S-v1",
+                "OgMap-FlyingHelicopter-v1",
+                "OgScript-FlyingHelicopter-M-v1",
+                "OgScript-FlyingHelicopter-S-v1",
+
+            "OgConfig-FlyingHelicopter-Tutorial",
+                "OgMap-FlyingHelicopter-v0",
+                "OgScript-FlyingHelicopter-M-v0",
+                "OgScript-FlyingHelicopter-S-v0",
         };
         foreach (var s in filesToCopy)
         {
@@ -79,7 +94,8 @@ public class ConfManager : MonoBehaviour
         stages = new Dictionary<string, OgStageConfig>();
         // stages.Add("Tutorial", OgStageConfig.ImportConfigFile("OgConfig-Tutorial"));
         // stages.Add("S1-Algorithm", OgStageConfig.ImportConfigFile("OgConfig-Puzzle3"));
-        stages.Add("S2-FlyingHelicopter", OgStageConfig.ImportConfigFile("OgConfig-FlyingHelicopter"));
+        stages.Add("S-Tutorial", OgStageConfig.ImportConfigFile("OgConfig-FlyingHelicopter-Tutorial"));
+        stages.Add("S-Helicopter", OgStageConfig.ImportConfigFile("OgConfig-FlyingHelicopter"));
 
         // Init stage buttons
         stageButtons = new List<Button>();
@@ -161,12 +177,16 @@ public class ConfManager : MonoBehaviour
         if (partnerSocket.IsMaster)
         {
             if (conf.masterScript != null)
+            {
                 codeInterpreter.LoadPredefinedScript(conf.masterScript);
+            }
         }
         else
         {
             if (conf.slaveScript != null)
+            {
                 codeInterpreter.LoadPredefinedScript(conf.slaveScript);
+            }
         }
 
         informationPanel.ShowInfoPanel(true);

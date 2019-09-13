@@ -6,7 +6,7 @@ public class CodeEditor : MonoBehaviour
     public CodeInterpreter codeInterpreter;
     public OneCmdEditingArea oneCmdEditingArea;
     public LoopEditingArea loopEditingArea;
-    public CmdWithNumberEditingArea cmdWithNumberEditingArea;
+    public CmdArgEditingArea cmdWithNumberEditingArea;
     private GameObject openedEditorArea;
     private CodeObjectOneCommand currentBeingEdited;
 
@@ -16,6 +16,14 @@ public class CodeEditor : MonoBehaviour
         oneCmdEditingArea.gameObject.SetActive(false);
         loopEditingArea.gameObject.SetActive(false);
         cmdWithNumberEditingArea.gameObject.SetActive(false);
+    }
+
+    public void LoadModifiableCommands(AvatarController avatar)
+    {
+        cmdWithNumberEditingArea.SetModifiableCmdList(
+            avatar.GetModifiableCmds(),
+            avatar.GetModifiableCmdsWithArgs()
+        );
     }
 
     public void DispatchEditor(CodeObjectOneCommand codeObject)
@@ -33,6 +41,7 @@ public class CodeEditor : MonoBehaviour
 
         switch (codeObject.GetCommand())
         {
+            // TODO: oneCmdEditingArea is a legacy editer. Use cmdWithNumberEditingArea instead.
             case "MOVE":
                 oneCmdEditingArea.AttachCodeObject(codeObject);
                 oneCmdEditingArea.codeViewUpdateDelegate = UpdateCodeViewer;

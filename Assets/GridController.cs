@@ -3,7 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum GridCellType { BASE, TRAP, REWARD, REWARD_DUAL, WALL, WALL_2, WALL_3 };
+public enum GridCellType { BASE, TRAP, REWARD, REWARD_DUAL, WALL, WALL_2, WALL_3, P1_START, P2_START };
 public delegate void GridCellUpdateDelegate(GridCellType cellType, Collider other);
 
 public class GridController : MonoBehaviour
@@ -274,7 +274,6 @@ public class GridController : MonoBehaviour
             case GridCellType.WALL_2:
             case GridCellType.WALL_3:
                 DataLogger.Log(this.gameObject, LogTag.MAP, "A trap is triggered.");
-
                 var ac = other.GetComponent<AvatarController>();
                 if (ac != null)
                 {

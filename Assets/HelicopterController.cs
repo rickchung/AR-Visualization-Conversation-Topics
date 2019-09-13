@@ -98,15 +98,16 @@ public class HelicopterController : AvatarController
 
     override public bool IsStaticCommand(string command)
     {
-        switch (command)
-        {
-            case CMD_TOP_POWER:
-            case CMD_TAIL_POWER:
-            case CMD_TOP_BRAKE:
-            case CMD_TAIL_BRAKE:
-                return true;
-        }
-        return false;
+        // switch (command)
+        // {
+        //     case CMD_TOP_POWER:
+        //     case CMD_TAIL_POWER:
+        //     case CMD_TOP_BRAKE:
+        //     case CMD_TAIL_BRAKE:
+        //         return true;
+        // }
+        // return false;
+        return true;
     }
 
     override public void ResetPosition()
@@ -373,4 +374,34 @@ public class HelicopterController : AvatarController
         return rt;
     }
 
+
+    private List<string> modifiableCmds = new List<string>() {
+        CMD_START_ENG, CMD_STOP_ENG,
+        CMD_CLIMP_UP, CMD_FALL_DOWN,
+        CMD_MOVE_FORWARD, CMD_MOVE_BACKWARD,
+        CMD_SLOWDOWN_TAIL, CMD_SPEEDUP_TAIL,
+
+        CMD_TOP_POWER, CMD_TAIL_POWER,
+        CMD_TOP_BRAKE, CMD_TAIL_BRAKE,
+
+        CodeInterpreter.CMD_WAIT,
+    };
+
+    private static List<string> modifiableCmdsWtArgs = new List<string>()
+    {
+        CMD_TOP_POWER, CMD_TAIL_POWER,
+        CMD_TOP_BRAKE, CMD_TAIL_BRAKE,
+
+        CodeInterpreter.CMD_WAIT,
+    };
+
+    override public List<string> GetModifiableCmds()
+    {
+        return modifiableCmds;
+    }
+
+    override public List<string> GetModifiableCmdsWithArgs()
+    {
+        return modifiableCmdsWtArgs;
+    }
 }

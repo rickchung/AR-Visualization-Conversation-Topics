@@ -4,10 +4,19 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class CmdWithNumberEditingArea : OneCmdEditingArea
+public class CmdArgEditingArea : OneCmdEditingArea
 {
     public Slider argSlider;
     public TextMeshProUGUI sliderLabel;
+
+    private List<string> modifiableCmds;
+    private List<string> modifiableCmdsWtArgs;
+
+    public void SetModifiableCmdList(List<string> modifiableCmds, List<string> modifiableCmdsWtArgs)
+    {
+        this.modifiableCmds = modifiableCmds;
+        this.modifiableCmdsWtArgs = modifiableCmdsWtArgs;
+    }
 
     override public void AttachCodeObject(
         CodeObjectOneCommand codeObject, bool showSubmitBtn = true)
@@ -54,48 +63,41 @@ public class CmdWithNumberEditingArea : OneCmdEditingArea
 
     public void OnCmdChange(int value)
     {
-        if (JustAwakenedFromInactive)
-        {
-            JustAwakenedFromInactive = false;
-        }
-        else
-        {
-            // Get the new command from the dropdown list
-            string newCommand = oneCmdDropdown.options[value].text;
-            // Old command is from the attached object
-            var oldCommand = AttachedCodeObject.GetCommand();
+        // Get the new command from the dropdown list
+        string newCommand = oneCmdDropdown.options[value].text;
+        // Old command is from the attached object
+        var oldCommand = AttachedCodeObject.GetCommand();
 
-            if (!newCommand.Equals(oldCommand))
+        if (!newCommand.Equals(oldCommand))
+        {
+            DataLogger.Log(
+                this.gameObject, LogTag.CODING,
+                string.Format(
+                    "Code Modified, {0}, {1}", oldCommand + " " + newCommand,
+                    AttachedCodeObject.GetCommand() + " " + AttachedCodeObject.GetArgString()
+                )
+            );
+
+            // Replace the old command by the new one
+            AttachedCodeObject.SetCommand(newCommand);
+
+            // Check whether the new command requires arguments
+            if (modifiableCmdsWtArgs.Contains(newCommand))
             {
-                DataLogger.Log(
-                    this.gameObject, LogTag.CODING,
-                    string.Format(
-                        "Code Modified, {0}, {1}", oldCommand + " " + newCommand,
-                        AttachedCodeObject.GetCommand() + " " + AttachedCodeObject.GetArgString()
-                    )
-                );
-
-                // Replace the old command by the new one
-                AttachedCodeObject.SetCommand(newCommand);
-
-                // Check whether the new command requires arguments
-                if (modifiableCmdsWtArgs.Contains(newCommand))
-                {
-                    AttachedCodeObject.SetArgs(new string[] { "1" });
-                    argSlider.value = 1.0f;
-                    argSlider.gameObject.SetActive(true);
-                    argSlider.interactable = true;
-                }
-                else
-                {
-                    AttachedCodeObject.SetArgs(new string[] { });
-                    argSlider.gameObject.SetActive(false);
-                    argSlider.interactable = false;
-                }
-
-                if (codeViewUpdateDelegate != null)
-                    codeViewUpdateDelegate();
+                AttachedCodeObject.SetArgs(new string[] { "1" });
+                argSlider.value = 1.0f;
+                argSlider.gameObject.SetActive(true);
+                argSlider.interactable = true;
             }
+            else
+            {
+                AttachedCodeObject.SetArgs(new string[] { });
+                argSlider.gameObject.SetActive(false);
+                argSlider.interactable = false;
+            }
+
+            if (codeViewUpdateDelegate != null)
+                codeViewUpdateDelegate();
         }
     }
 
@@ -123,24 +125,4 @@ public class CmdWithNumberEditingArea : OneCmdEditingArea
         if (codeViewUpdateDelegate != null)
             codeViewUpdateDelegate();
     }
-
-    // ========== TODO: Find a way to list available options of parameters ==========
-    private static List<string> modifiableCmds = new List<string>() {
-        HelicopterController.CMD_START_ENG, HelicopterController.CMD_STOP_ENG,
-        HelicopterController.CMD_CLIMP_UP, HelicopterController.CMD_FALL_DOWN,
-        HelicopterController.CMD_MOVE_FORWARD, HelicopterController.CMD_MOVE_BACKWARD,
-        HelicopterController.CMD_SLOWDOWN_TAIL, HelicopterController.CMD_SPEEDUP_TAIL,
-
-        // HelicopterController.CMD_TOP_POWER, HelicopterController.CMD_TAIL_POWER,
-        // HelicopterController.CMD_TOP_BRAKE, HelicopterController.CMD_TAIL_BRAKE,
-
-        CodeInterpreter.CMD_WAIT,
-    };
-
-    private static List<string> modifiableCmdsWtArgs = new List<string>()
-    {
-        CodeInterpreter.CMD_WAIT
-    };
-
-    // ==========
 }

@@ -202,6 +202,18 @@ public class AvatarController : MonoBehaviour
         startingCellInVec = vc;
     }
 
+    public virtual List<string> GetModifiableCmds()
+    {
+        List<string> cmds = new List<string>() { };
+        return cmds;
+    }
+
+    public virtual List<string> GetModifiableCmdsWithArgs()
+    {
+        List<string> cmds = new List<string>() { };
+        return cmds;
+    }
+
     // ==================== Testing Functions ====================
 
     public void _TestAnything(int dir)

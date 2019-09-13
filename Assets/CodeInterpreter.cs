@@ -23,6 +23,8 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     public Button runButton;
 
     private ScriptObject loadedScript;
+    private ScriptObject solutionScript;
+    private System.Random rand = new System.Random();
     private ScriptExecMode execMode;
     private bool _cmdSwitchLock, _cmdSwitchRunOnceFlag, _stepSwitchLock, _coroutineLock;
     private float semTimeElapsed;
@@ -145,6 +147,9 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         // Enable avatars
         avatar.gameObject.SetActive(true);
         rivalAvatar.gameObject.SetActive(true);
+
+        // Init code editor
+        codeEditor.LoadModifiableCommands(avatar);
     }
 
     public UnityAction GetTopicButtonEvent(string topic)
@@ -203,6 +208,10 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
                 if (avatar.IsLockCommand(v.GetCommand()))
                     v.IsLockCommand = true;
             }
+
+            solutionScript = loadedScript.DeepCopy();
+
+            RandomizeLoadedScript();
         }
 
         // Display the script
@@ -211,6 +220,41 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         SetActiveTopicView(true, broadcast: false);
         // Enable the viewer on the remote device
         if (broadcast) partnerSocket.BroadcastTopicCtrl(scriptName);
+    }
+
+    public void RandomizeLoadedScript()
+    {
+        var availableCmds = avatar.GetModifiableCmds();
+        var cmdsWithArgs = avatar.GetModifiableCmdsWithArgs();
+        if (loadedScript != null)
+        {
+            foreach (var v in loadedScript.GetScript())
+            {
+                if (v.IsLockCommand == false && availableCmds.Contains(v.GetCommand()))
+                {
+                    var randCmd = availableCmds[rand.Next(availableCmds.Count)];
+                    // Replace the old command by the new one
+                    v.SetCommand(randCmd);
+
+                    // Check whether the new command requires arguments
+                    if (cmdsWithArgs.Contains(randCmd))
+                    {
+                        v.SetArgs(new string[] { rand.Next(10).ToString() });
+                    }
+                    else
+                    {
+                        v.SetArgs(new string[] { });
+                    }
+                }
+            }
+            UpdateCodeViewer();
+        }
+    }
+
+    public void LoadSolutionScript()
+    {
+        loadedScript = solutionScript.DeepCopy();
+        UpdateCodeViewer();
     }
 
     public void RunLoadedScriptSync()

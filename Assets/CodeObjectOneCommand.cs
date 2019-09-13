@@ -132,6 +132,12 @@
         return command + " " + argstr + ";";
     }
 
+    public CodeObjectOneCommand DeepCopy()
+    {
+        CodeObjectOneCommand other = (CodeObjectOneCommand)this.MemberwiseClone();
+        return other;
+    }
+
     // ==================== Networking
 
     public string ToNetMessage()
