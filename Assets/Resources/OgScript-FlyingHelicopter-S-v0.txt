@@ -1,0 +1,4 @@
+Wait_For_P1 ();
+Move_Forward ();
+Continue_Sec (5);
+Fall_Down ();
