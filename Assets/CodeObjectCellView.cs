@@ -25,11 +25,12 @@ public class CodeObjectCellView : EnhancedScrollerCellView
         // commandText.text = codeObject.GetCommand(richtext: true);
         // argumentsText.text = codeObject.GetArgString(richtext: true);
         // Combine cmd and args
-        commandText.text = (
+        var textToDisplay = (
             "L" + (dataIndex + 1) + "<pos=12%>" +
             codeObject.GetCommand(richtext: true) + " " +
             codeObject.GetArgString(richtext: true)
         );
+        commandText.text = textToDisplay;
 
         var prefix = "";
 

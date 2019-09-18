@@ -17,6 +17,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     public PartnerSocket partnerSocket;
     public CodeEditor codeEditor;
     public GridController gridController;
+    // TODO: Remove deprecated variables
     [HideInInspector] public GameObject ViewContainer;
     [HideInInspector] public GameObject codingPanel;
 
@@ -128,6 +129,11 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
 
     // ========== Misc Methods ==========
 
+    /// <summary>
+    /// Set avatars in the scene. This method is invoked when a new configuration (stage) is opened.
+    /// </summary>
+    /// <param name="player1"></param>
+    /// <param name="rival"></param>
     public void SetAvatarGameObjects(AvatarController player1, AvatarController rival)
     {
         // Disable the existing avatars if existing
@@ -152,6 +158,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         codeEditor.LoadModifiableCommands(avatar);
     }
 
+    [Obsolete("This method is not used since topic view is disabled in this version.")]
     public UnityAction GetTopicButtonEvent(string topic)
     {
         UnityAction action = () =>
@@ -161,6 +168,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         return action;
     }
 
+    [Obsolete("This method is not used since topic view is disabled in this version.")]
     /// <summary>
     /// Enable or disable the avatar visualization
     /// </summary>
@@ -173,6 +181,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         if (broadcast) partnerSocket.BroadcastTopicCtrl(CTRL_CLOSE_TOPIC_VIEW);
     }
 
+    [Obsolete("This method is not used since topic view is disabled in this version.")]
     public void CloseTopicViewAndBroadcast()
     {
         SetActiveTopicView(false, true);
@@ -191,6 +200,8 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
 
     /// <summary>
     /// Load the predefined script template specified by <paramref name="scriptName"/>.
+    ///
+    /// Note: This method should always be called "after" the avatars you want to use in a scene are loaded because some properties of a script are associated with the avatars in use, which will be evaluated when reading/evaluating the code from a file.
     /// </summary>
     /// <param name="scriptName">Script name.</param>
     public void LoadPredefinedScript(string scriptName, bool broadcast = false)
@@ -237,9 +248,11 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
                     v.SetCommand(randCmd);
 
                     // Check whether the new command requires arguments
-                    if (cmdsWithArgs.Contains(randCmd))
+                    if (v.GetArgOps() != null)
                     {
-                        v.SetArgs(new string[] { rand.Next(10).ToString() });
+                        // TODO: Only the first arg works now.
+                        var args = new string[] { v.GetArgOps()[0] };
+                        v.SetArgs(args);
                     }
                     else
                     {
@@ -762,7 +775,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
 
     // ========== File IO for Interpreter ==========
 
-    private static void ExportScriptObject(ScriptObject script, string scriptName)
+    private void ExportScriptObject(ScriptObject script, string scriptName)
     {
         var scriptString = script.ToString(richtext: false);
         var path = Path.Combine(dataFolderPath, scriptName);
@@ -773,7 +786,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         }
     }
 
-    private static ScriptObject ImportScriptObject(string scriptName)
+    private ScriptObject ImportScriptObject(string scriptName)
     {
         var path = Path.Combine(dataFolderPath, scriptName);
         ScriptObject rt = null;
@@ -781,7 +794,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         {
             using (var reader = new StreamReader(path))
             {
-                rt = ProcessCode(reader);
+                rt = ParseTextCodeFromReader(reader);
             }
         }
         catch (FileNotFoundException)
@@ -791,7 +804,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         return rt;
     }
 
-    private static ScriptObject ProcessCode(StreamReader reader)
+    private ScriptObject ParseTextCodeFromReader(StreamReader reader)
     {
         var codeList = new List<CodeObjectOneCommand>();
         while (reader.Peek() > 0)
@@ -804,52 +817,65 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         return new ScriptObject(codeList); ;
     }
 
-    private static Regex regexLoopStart = new Regex(@"LOOP REPEAT {");
-    private static Regex regexLoopEnd = new Regex(@"} (?<times>\d) Times;");
-    private static List<Regex> regexSingleCmdNoParam = null;
-    private static List<Regex> regexSingleCmdOneParam = null;
+    private Regex regexLoopStart = new Regex(@"LOOP REPEAT {");
+    private Regex regexLoopEnd = new Regex(@"} (?<times>\d) Times;");
+    private List<Regex> regexCmdNoParams = null;
+    private List<Regex> regexCmdWithParams = null;
+    private Dictionary<string, string[]> cmdArgDict;
 
-    private static CodeObjectOneCommand _MatchRegexSingleCommand(string line)
+    private CodeObjectOneCommand _MatchRegexSingleCommand(string line)
     {
-        if (regexSingleCmdNoParam == null || regexSingleCmdOneParam == null)
+        // If the regex list hasn't been set, import it here from the AvatarContoller
+        // TODO: There may be a better way to init these variables. This is just a lazy solution.
+        if (regexCmdNoParams == null || regexCmdWithParams == null)
         {
-            regexSingleCmdNoParam = new List<Regex>();
-            regexSingleCmdNoParam.AddRange(HelicopterController.GetNoParamCmdRegex());
+            // TODO: Note I use "HelicopterController" here simply because I'm lazy. It should change to something more general just in case in the future we have other objects.
 
-            regexSingleCmdOneParam = new List<Regex>();
-            regexSingleCmdOneParam.AddRange(HelicopterController.GetOneParamCmdRegex());
-            regexSingleCmdOneParam.Add(new Regex(@"(?<cmd>MOVE) \((?<param>\w+)\);"));
-            regexSingleCmdOneParam.Add(
-                new Regex(string.Format(@"(?<cmd>{0}) \((?<param>\d+)\);", CMD_WAIT))
-            );
+            regexCmdNoParams = new List<Regex>();
+            regexCmdNoParams.AddRange(HelicopterController.GetNoParamCmdRegex());
+
+            regexCmdWithParams = new List<Regex>();
+            regexCmdWithParams.AddRange(HelicopterController.GetOneParamCmdRegex());
+            regexCmdWithParams.Add(new Regex(@"(?<cmd>MOVE) \((?<param>\w+)\);"));
+            regexCmdWithParams.Add(new Regex(string.Format(@"(?<cmd>{0}) \((?<param>\d+)\);", CMD_WAIT)));
+
+            cmdArgDict = new Dictionary<string, string[]>();
+            cmdArgDict.Add(CMD_WAIT, new string[] { "0", "1" });
+            var avatarCmdArgDict = avatar.GetAvailableCmdArgs();
+            if (avatarCmdArgDict != null)
+            {
+                foreach (KeyValuePair<string, string[]> kv in avatarCmdArgDict)
+                {
+                    cmdArgDict.Add(kv.Key, kv.Value);
+                }
+            }
         }
 
         // No param
-        foreach (var r in regexSingleCmdNoParam)
+        foreach (var r in regexCmdNoParams)
         {
             var matched = r.Matches(line);
             if (matched != null && matched.Count > 0)
             {
-                return new CodeObjectOneCommand(
-                    matched[0].Groups["cmd"].Value, new string[] { }
-                );
+                var cmd = matched[0].Groups["cmd"].Value;
+                return new CodeObjectOneCommand(cmd, new string[] { });
             }
         }
-        // One param
-        foreach (var r in regexSingleCmdOneParam)
+        // One or more parameters
+        foreach (var r in regexCmdWithParams)
         {
             var matched = r.Matches(line);
             if (matched != null && matched.Count > 0)
             {
-                return new CodeObjectOneCommand(
-                    matched[0].Groups["cmd"].Value,
-                    new string[] { matched[0].Groups["param"].Value }
-                );
+                var cmd = matched[0].Groups["cmd"].Value;
+                var arg = matched[0].Groups["param"].Value;
+                var argOps = cmdArgDict.ContainsKey(cmd) ? cmdArgDict[cmd] : new string[0];
+                return new CodeObjectOneCommand(cmd, new string[] { arg }, argOps);
             }
         }
         return null;
     }
-    private static CodeObjectOneCommand _ProcessOneLine(string oneLine, StreamReader reader)
+    private CodeObjectOneCommand _ProcessOneLine(string oneLine, StreamReader reader)
     {
         // Try to match a command
         var singleCmd = _MatchRegexSingleCommand(oneLine);

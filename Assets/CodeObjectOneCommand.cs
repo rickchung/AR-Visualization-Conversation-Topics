@@ -2,12 +2,11 @@
 {
     private string command;
     private string[] args;
+    private string[] firstArgOptions;  // TODO: Ad-hoc lazy solution
     private bool disabled;
-
     private bool isBeingEdited;
     private bool isRunning;
     private bool isLockCommand;
-
     public bool IsRunning
     {
         get
@@ -20,7 +19,6 @@
             isRunning = value;
         }
     }
-
     public bool IsBeingEdited
     {
         get
@@ -33,7 +31,6 @@
             isBeingEdited = value;
         }
     }
-
     public bool IsLockCommand
     {
         get
@@ -52,6 +49,11 @@
         this.command = command;
         this.args = args;
         this.disabled = false;
+    }
+
+    public CodeObjectOneCommand(string command, string[] args, string[] firstArgOptions) : this(command, args)
+    {
+        this.firstArgOptions = firstArgOptions;
     }
 
     // ====================
@@ -79,10 +81,19 @@
         return args;
     }
 
+    public string[] GetArgOps()
+    {
+        return firstArgOptions;
+    }
+
     /// <summary>
     /// Return the arg of this code as a string. The richtext flag specifies whether to return the string command reflecting the state of this code object. For example, when the code is disabled, the string will show in a faded font.
     virtual public string GetArgString(bool richtext = false)
     {
+        // TODO: Ad-hoc lazy solution for a special command
+        if (command.Equals("..."))
+            return "";
+
         var rt = "(" + string.Join(",", args) + ")";
 
         if (richtext && IsDisabled())
@@ -137,7 +148,6 @@
         CodeObjectOneCommand other = (CodeObjectOneCommand)this.MemberwiseClone();
         return other;
     }
-
     // ==================== Networking
 
     public string ToNetMessage()

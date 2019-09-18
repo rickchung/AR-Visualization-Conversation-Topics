@@ -7,8 +7,9 @@ using TMPro;
 public class CmdArgEditingArea : OneCmdEditingArea
 {
     public Slider argSlider;
+    public GameObject argSelector;
+    public Button argSelectorButton;
     public TextMeshProUGUI sliderLabel;
-
     private List<string> modifiableCmds;
     private List<string> modifiableCmdsWtArgs;
 
@@ -46,11 +47,34 @@ public class CmdArgEditingArea : OneCmdEditingArea
         }
 
         // If the attached code has some arguments, put the values in the slider
+        // TODO: This code should determine
+        //      1) the number of arguments in the to-be-attached CodeObject
+        //      2) the types of those arguments
+        // Now it assume there is only one float argument. It does not work with v2 commands.
         if (args.Length > 0)
         {
-            argSlider.value = float.Parse(args[0]);
-            argSlider.gameObject.SetActive(true);
-            argSlider.interactable = true;
+            var argOps = AttachedCodeObject.GetArgOps();
+            if (argOps == null)
+            {
+                argSlider.value = float.Parse(args[0]);
+                argSlider.gameObject.SetActive(true);
+                argSlider.interactable = true;
+                argSelector.SetActive(false);
+            }
+            else
+            {
+                argSelector.SetActive(true);
+                foreach (GameObject gobj in argSelector.transform)
+                    Destroy(gobj);
+                foreach (var op in argOps)
+                {
+                    var newBtn = Instantiate(argSelectorButton);
+                    newBtn.transform.parent = argSelector.transform;
+                    newBtn.GetComponentInChildren<Text>().text = op;
+                }
+                argSlider.interactable = false;
+                argSlider.gameObject.SetActive(false);
+            }
         }
         else
         {

@@ -1,4 +1,4 @@
-Wait_For_P1 ();
-Move_Forward ();
+...
+Move (forward);
 Continue_Sec (5);
-Fall_Down ();
+Climb (down);

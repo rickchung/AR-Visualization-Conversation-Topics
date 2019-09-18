@@ -26,6 +26,8 @@ public class HelicopterController : AvatarController
         topOrgPos = topRotor.localPosition;
         tailOrgPos = tailRotor.localPosition;
 
+        poutTopRotor = poutTailRotor = boutTopRotor = boutTailRotor = 1;
+
         gameObject.SetActive(false);
     }
 
@@ -38,6 +40,57 @@ public class HelicopterController : AvatarController
             float value;
             switch (command)
             {
+                // Engine(start); Engine(stop);
+                case CMD_ENGINE:
+                    switch (args[0])
+                    {
+                        case "start":
+                            StartEngine();
+                            break;
+                        case "stop":
+                            StopEngine();
+                            break;
+                    }
+                    break;
+                // Climb(up, 10); Climb(down, 10);
+                case CMD_CLIMB:
+                    switch (args[0])
+                    {
+                        case "up":
+                            SetPowerOutputTopRotor(poutTopRotor * 2);
+                            ClimbUp();
+                            break;
+                        case "down":
+                            SetBrakeOutputTopRotor(boutTopRotor * 2);
+                            FallDown();
+                            break;
+                    }
+                    break;
+                // Move(forward); Move(backward);
+                case CMD_MOVE:
+                    switch (args[0])
+                    {
+                        case "forward":
+                            MoveForward();
+                            break;
+                        case "backward":
+                            MoveBackward();
+                            break;
+                    }
+                    break;
+                // Turn(left); Turn(right);
+                case CMD_TURN:
+                    switch (args[0])
+                    {
+                        case "left":
+                            HoveringTurnLeft();
+                            break;
+                        case "right":
+                            HoveringTurnRight();
+                            break;
+                    }
+                    break;
+
                 case CMD_START_ENG:
                     StartEngine();
                     break;
@@ -85,12 +138,31 @@ public class HelicopterController : AvatarController
         return isSuccessful;
     }
 
+    private Dictionary<string, string[]> availableCmdArgs = new Dictionary<string, string[]>
+    {
+        {CMD_CLIMB, new string[] {"up", "down"}},
+        {CMD_ENGINE, new string[] {"start", "stop"}},
+        {CMD_TURN, new string[] {"left", "right"}},
+        {CMD_MOVE, new string[] {"forward", "backword"}}
+    };
+    override public string[] GetAvailableArgsForCmd(string command)
+    {
+        if (availableCmdArgs.ContainsKey(command))
+            return availableCmdArgs[command];
+        return null;
+    }
+    override public Dictionary<string, string[]> GetAvailableCmdArgs()
+    {
+        return availableCmdArgs;
+    }
+
     override public bool IsLockCommand(string command)
     {
         switch (command)
         {
             case CMD_WAIT_P1:
             case CMD_WAIT_P2:
+            case CMD_WAIT_PX:
                 return true;
         }
         return false;
@@ -123,6 +195,8 @@ public class HelicopterController : AvatarController
         tailRotor.localRotation = tailOrgRot;
         topRotor.localPosition = topOrgPos;
         tailRotor.localPosition = tailOrgPos;
+
+        poutTopRotor = poutTailRotor = boutTopRotor = boutTailRotor = 1;
 
         // Reset the physics
         StopEngine();
@@ -157,7 +231,6 @@ public class HelicopterController : AvatarController
     // ==================== Pilot Control System ====================
 
     private bool isEngineOn = false;
-
     private float poutTopRotor = 1.0f;
     private float poutTailRotor = 1.0f;
     private float boutTopRotor = 1.0f;
@@ -324,7 +397,16 @@ public class HelicopterController : AvatarController
 
 
     // ==================== Available Method Names ====================
+    // Whether a code is execuable is determined by the method "ParseCommand" above.
 
+    // V2 Commands
+    public const string CMD_MOVE = "Move";
+    public const string CMD_CLIMB = "Climb";
+    public const string CMD_ENGINE = "Engine";
+    public const string CMD_TURN = "Turn";
+    public const string CMD_WAIT_PX = "...";
+
+    // V1 Commands
     public const string CMD_START_ENG = "Start_Engine";
     public const string CMD_STOP_ENG = "Stop_Engine";
     public const string CMD_CLIMP_UP = "Climb_Up";
@@ -339,11 +421,13 @@ public class HelicopterController : AvatarController
     public const string CMD_TOP_BRAKE = "Set_TopBrake";
     public const string CMD_TAIL_BRAKE = "Set_TailBrake";
 
+    // Used to control the synchronization
     public const string CMD_WAIT_P1 = "Wait_For_P1";
     public const string CMD_WAIT_P2 = "Wait_For_P2";
 
+    // Regex for parsing code in text files
     private const string REGEX_NOARG_CMD = @"(?<cmd>{0}) \(\);";
-    private const string REGEX_ONEARG_CMD = @"(?<cmd>{0}) \((?<param>[\d\.]+)\);";
+    private const string REGEX_ONEARG_CMD = @"(?<cmd>{0}) \((?<param>[\w\d\.]+)\);";
     public static List<Regex> GetNoParamCmdRegex()
     {
         string[] cmds = {
@@ -358,6 +442,8 @@ public class HelicopterController : AvatarController
         foreach (var i in cmds)
             rt.Add(new Regex(string.Format(REGEX_NOARG_CMD, i)));
 
+        rt.Add(new Regex(@"(?<cmd>\.\.\.)"));
+
         return rt;
     }
     public static List<Regex> GetOneParamCmdRegex()
@@ -365,6 +451,7 @@ public class HelicopterController : AvatarController
         string[] cmds = {
             CMD_TOP_POWER, CMD_TAIL_POWER,
             CMD_TOP_BRAKE, CMD_TAIL_BRAKE,
+            CMD_ENGINE, CMD_MOVE, CMD_CLIMB, CMD_TURN,
         };
 
         var rt = new List<Regex>();
@@ -374,34 +461,42 @@ public class HelicopterController : AvatarController
         return rt;
     }
 
-
-    private List<string> modifiableCmds = new List<string>() {
-        CMD_START_ENG, CMD_STOP_ENG,
-        CMD_CLIMP_UP, CMD_FALL_DOWN,
-        CMD_MOVE_FORWARD, CMD_MOVE_BACKWARD,
-        CMD_SLOWDOWN_TAIL, CMD_SPEEDUP_TAIL,
-
-        CMD_TOP_POWER, CMD_TAIL_POWER,
-        CMD_TOP_BRAKE, CMD_TAIL_BRAKE,
-
-        CodeInterpreter.CMD_WAIT,
-    };
-
-    private static List<string> modifiableCmdsWtArgs = new List<string>()
-    {
-        CMD_TOP_POWER, CMD_TAIL_POWER,
-        CMD_TOP_BRAKE, CMD_TAIL_BRAKE,
-
-        CodeInterpreter.CMD_WAIT,
-    };
-
+    /// <summary>
+    /// Return the list of modifiable commands of this avatar. A modifiable command is a command that can be modified in the code editor. When the command is added into the editor, the dropdown list will be activated and let the user to change the command of a code block.
+    /// </summary>
+    /// <returns></returns>
     override public List<string> GetModifiableCmds()
     {
+        List<string> modifiableCmds = new List<string>() {
+            CMD_ENGINE, CMD_MOVE, CMD_TURN, CMD_CLIMB,
+
+            // CMD_START_ENG, CMD_STOP_ENG,
+            // CMD_CLIMP_UP, CMD_FALL_DOWN,
+            // CMD_MOVE_FORWARD, CMD_MOVE_BACKWARD,
+            // CMD_SLOWDOWN_TAIL, CMD_SPEEDUP_TAIL,
+            // CMD_TOP_POWER, CMD_TAIL_POWER,
+            // CMD_TOP_BRAKE, CMD_TAIL_BRAKE,
+
+            CodeInterpreter.CMD_WAIT,
+        };
         return modifiableCmds;
     }
 
+    /// <summary>
+    /// Return the list of commands with arguments. In a code editor, a command with arguments is initialized differently from the one without arguments. This list is therefore used to check whether a command has arguments or not.
+    ///
+    /// TODO: Rename this method.
+    /// </summary>
+    /// <returns></returns>
     override public List<string> GetModifiableCmdsWithArgs()
     {
+        List<string> modifiableCmdsWtArgs = new List<string>()
+        {
+            CMD_TOP_POWER, CMD_TAIL_POWER,
+            CMD_TOP_BRAKE, CMD_TAIL_BRAKE,
+
+            CodeInterpreter.CMD_WAIT,
+        };
         return modifiableCmdsWtArgs;
     }
 }

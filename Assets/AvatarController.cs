@@ -214,6 +214,17 @@ public class AvatarController : MonoBehaviour
         return cmds;
     }
 
+    public virtual string[] GetAvailableArgsForCmd(string command)
+    {
+        return null;
+    }
+
+    public virtual Dictionary<string, string[]> GetAvailableCmdArgs()
+    {
+        return null;
+    }
+
+
     // ==================== Testing Functions ====================
 
     public void _TestAnything(int dir)
