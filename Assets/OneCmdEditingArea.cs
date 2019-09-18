@@ -102,8 +102,8 @@ public class OneCmdEditingArea : MonoBehaviour, EditingArea
         AttachedCodeObject.SetDisabled(!value);
 
         Debug.Log(string.Format(
-           "Code Disabled, {0}, {1}",
-           AttachedCodeObject.ToString(), value
+            "A command {0} is {1}",
+            AttachedCodeObject.ToString(), value ? "enabled" : "disabled"
         ));
 
         if (codeViewUpdateDelegate != null)

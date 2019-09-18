@@ -28,11 +28,6 @@ public class CodeEditor : MonoBehaviour
 
     public void DispatchEditor(CodeObjectOneCommand codeObject)
     {
-        DataLogger.Log(
-          this.gameObject, LogTag.CODING,
-          "The code editor is open for : " + codeObject.ToString()
-        );
-
         // Remove the previous highlight and set a new one
         if (currentBeingEdited != null)
             currentBeingEdited.IsBeingEdited = false;
@@ -60,6 +55,10 @@ public class CodeEditor : MonoBehaviour
         }
 
         UpdateCodeViewer();
+
+        DataLogger.Log(
+            this.gameObject, LogTag.CODING,
+            "The code editor is open for : " + codeObject.ToString());
     }
 
     public void DismissEditor()
@@ -76,6 +75,11 @@ public class CodeEditor : MonoBehaviour
         cmdWithNumberEditingArea.gameObject.SetActive(false);
         transform.gameObject.SetActive(false);
         UpdateCodeViewer();
+    }
+
+    public string[] GetArgOptions(string cmd)
+    {
+        return codeInterpreter.GetArgOptions(cmd);
     }
 
     public void UpdateCodeViewer()

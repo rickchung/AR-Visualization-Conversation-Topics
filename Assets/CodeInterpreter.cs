@@ -233,31 +233,29 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         if (broadcast) partnerSocket.BroadcastTopicCtrl(scriptName);
     }
 
+    /// <summary>
+    /// Replace the commands in the existing code objects by random commands
+    /// </summary>
     public void RandomizeLoadedScript()
     {
+        // Only use modifiable commands
         var availableCmds = avatar.GetModifiableCmds();
-        var cmdsWithArgs = avatar.GetModifiableCmdsWithArgs();
+
         if (loadedScript != null)
         {
             foreach (var v in loadedScript.GetScript())
             {
+                // If a code object is not locked and one of available commands
                 if (v.IsLockCommand == false && availableCmds.Contains(v.GetCommand()))
                 {
+                    // Get a random command
                     var randCmd = availableCmds[rand.Next(availableCmds.Count)];
                     // Replace the old command by the new one
                     v.SetCommand(randCmd);
-
-                    // Check whether the new command requires arguments
-                    if (v.GetArgOps() != null)
-                    {
-                        // TODO: Only the first arg works now.
-                        var args = new string[] { v.GetArgOps()[0] };
-                        v.SetArgs(args);
-                    }
-                    else
-                    {
-                        v.SetArgs(new string[] { });
-                    }
+                    // If the command has arguments, set them by default values
+                    var argOptions = GetArgOptions(randCmd);
+                    v.SetArgOps(argOptions);
+                    v.ResetArgs();
                 }
             }
             UpdateCodeViewer();
@@ -823,33 +821,43 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     private List<Regex> regexCmdWithParams = null;
     private Dictionary<string, string[]> cmdArgDict;
 
+    /// <summary>
+    /// Initialize the regex list and argument dictionary by the attached avatar controller.
+    /// This method should be called before parsing a text script.
+    /// </summary>
+    private void _InitRegexAndArgDict()
+    {
+        // TODO: There may be a better way to init these variables. This is just a lazy solution.
+        // TODO: Note I use "HelicopterController" here simply because I'm lazy.
+
+        // Regex of commands without parameters
+        regexCmdNoParams = new List<Regex>();
+        regexCmdNoParams.AddRange(HelicopterController.GetNoParamCmdRegex());
+        // Regex of commands with parameters
+        regexCmdWithParams = new List<Regex>();
+        regexCmdWithParams.AddRange(HelicopterController.GetOneParamCmdRegex());
+        regexCmdWithParams.Add(new Regex(@"(?<cmd>MOVE) \((?<param>\w+)\);"));
+        regexCmdWithParams.Add(new Regex(string.Format(@"(?<cmd>{0}) \((?<param>\d+)\);", CMD_WAIT)));
+
+        // Used to look up options of arguments
+        cmdArgDict = new Dictionary<string, string[]>();
+        cmdArgDict.Add(CMD_WAIT, new string[] { "1", "10" });
+        var avatarCmdArgDict = avatar.GetAvailableCmdArgs();
+        if (avatarCmdArgDict != null)
+        {
+            foreach (KeyValuePair<string, string[]> kv in avatarCmdArgDict)
+            {
+                cmdArgDict.Add(kv.Key, kv.Value);
+            }
+        }
+    }
+
     private CodeObjectOneCommand _MatchRegexSingleCommand(string line)
     {
         // If the regex list hasn't been set, import it here from the AvatarContoller
-        // TODO: There may be a better way to init these variables. This is just a lazy solution.
         if (regexCmdNoParams == null || regexCmdWithParams == null)
         {
-            // TODO: Note I use "HelicopterController" here simply because I'm lazy. It should change to something more general just in case in the future we have other objects.
-
-            regexCmdNoParams = new List<Regex>();
-            regexCmdNoParams.AddRange(HelicopterController.GetNoParamCmdRegex());
-
-            regexCmdWithParams = new List<Regex>();
-            regexCmdWithParams.AddRange(HelicopterController.GetOneParamCmdRegex());
-            regexCmdWithParams.Add(new Regex(@"(?<cmd>MOVE) \((?<param>\w+)\);"));
-            regexCmdWithParams.Add(new Regex(string.Format(@"(?<cmd>{0}) \((?<param>\d+)\);", CMD_WAIT)));
-
-            // Used to lookup ossible values of arguments
-            cmdArgDict = new Dictionary<string, string[]>();
-            cmdArgDict.Add(CMD_WAIT, new string[] { "0", "10" });
-            var avatarCmdArgDict = avatar.GetAvailableCmdArgs();
-            if (avatarCmdArgDict != null)
-            {
-                foreach (KeyValuePair<string, string[]> kv in avatarCmdArgDict)
-                {
-                    cmdArgDict.Add(kv.Key, kv.Value);
-                }
-            }
+            _InitRegexAndArgDict();
         }
 
         // No param
@@ -870,7 +878,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
             {
                 var cmd = matched[0].Groups["cmd"].Value;
                 var arg = matched[0].Groups["param"].Value;
-                var argOps = cmdArgDict.ContainsKey(cmd) ? cmdArgDict[cmd] : new string[0];
+                var argOps = GetArgOptions(cmd);
                 return new CodeObjectOneCommand(cmd, new string[] { arg }, argOps);
             }
         }
@@ -911,6 +919,12 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         return null;
     }
 
+    public string[] GetArgOptions(string cmd)
+    {
+        if (cmdArgDict.ContainsKey(cmd))
+            return cmdArgDict[cmd];
+        return new string[0];
+    }
 
     // ========= Predefined Control Signals ==========
 

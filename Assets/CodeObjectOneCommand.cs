@@ -125,6 +125,19 @@
         this.args = args;
     }
 
+    public void SetArgOps(string[] argOps)
+    {
+        firstArgOptions = argOps;
+    }
+
+    public void ResetArgs()
+    {
+        if (firstArgOptions != null && firstArgOptions.Length > 0)
+            SetArgs(new string[] { firstArgOptions[0] });
+        else
+            SetArgs(new string[] { });
+    }
+
     public void SetDisabled(bool disabled)
     {
         this.disabled = disabled;
