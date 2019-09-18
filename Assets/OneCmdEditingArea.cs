@@ -11,7 +11,7 @@ public class OneCmdEditingArea : MonoBehaviour, EditingArea
     public TextMeshProUGUI oneCmdLabel;
     public TMP_Dropdown oneCmdDropdown;
     public Button oneCmdSubmitBtn;
-    public Toggle codeToggle;
+    public Button codeToggle;
 
     public CodeViewUpdateDelegate codeViewUpdateDelegate;
 
@@ -59,8 +59,6 @@ public class OneCmdEditingArea : MonoBehaviour, EditingArea
             typeof(GridController.Direction), args[0]
         );
 
-        codeToggle.isOn = !AttachedCodeObject.IsDisabled();
-
         oneCmdSubmitBtn.gameObject.SetActive(showSubmitBtn);
     }
 
@@ -98,6 +96,9 @@ public class OneCmdEditingArea : MonoBehaviour, EditingArea
     /// <param name="value"></param>
     public void OnToggleChange(bool value)
     {
+        if (!value == AttachedCodeObject.IsDisabled())
+            return;
+
         string newCommand = oneCmdLabel.text;
         AttachedCodeObject.SetDisabled(!value);
 
@@ -106,8 +107,8 @@ public class OneCmdEditingArea : MonoBehaviour, EditingArea
             AttachedCodeObject.ToString(), value ? "enabled" : "disabled"
         ));
 
-        if (codeViewUpdateDelegate != null)
-            codeViewUpdateDelegate();
+        UpdateCodeViewer();
+        DismissEditor();
     }
 
     public void DismissEditor()
@@ -118,6 +119,15 @@ public class OneCmdEditingArea : MonoBehaviour, EditingArea
             AttachedCodeObject = null;
             editorDispatcher.DismissEditor();
         }
+    }
+
+    /// <summary>
+    /// Update the code viewer by the attached delegate
+    /// </summary>
+    public void UpdateCodeViewer()
+    {
+        if (codeViewUpdateDelegate != null)
+            codeViewUpdateDelegate();
     }
 
     // ========== TODO: Find a way to list available options of parameters ==========

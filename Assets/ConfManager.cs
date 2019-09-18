@@ -257,6 +257,11 @@ public class ConfManager : MonoBehaviour
         }
     }
 
+    public void CloseNextStageScreen()
+    {
+        nextStageScreen.SetActive(false);
+    }
+
     // ==========
 
 

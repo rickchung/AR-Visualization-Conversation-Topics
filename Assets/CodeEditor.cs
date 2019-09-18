@@ -34,6 +34,13 @@ public class CodeEditor : MonoBehaviour
         codeObject.IsBeingEdited = true;
         currentBeingEdited = codeObject;
 
+        // Enable the code
+        if (codeObject.IsDisabled())
+        {
+            codeObject.SetDisabled(false);
+            Debug.Log(string.Format("A command {0} is enabled", codeObject.ToString()));
+        }
+
         switch (codeObject.GetCommand())
         {
             // TODO: oneCmdEditingArea is a legacy editer. Use cmdWithNumberEditingArea instead.

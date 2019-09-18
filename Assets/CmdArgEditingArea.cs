@@ -102,17 +102,6 @@ public class CmdArgEditingArea : OneCmdEditingArea
             }
         }
         //  ===== End of The Argument Selector =====
-
-        codeToggle.isOn = !AttachedCodeObject.IsDisabled();
-    }
-
-    /// <summary>
-    /// Update the code viewer by the attached delegate
-    /// </summary>
-    private void UpdateCodeViewer()
-    {
-        if (codeViewUpdateDelegate != null)
-            codeViewUpdateDelegate();
     }
 
     /// <summary>
