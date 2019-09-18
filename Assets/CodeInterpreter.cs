@@ -839,8 +839,9 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
             regexCmdWithParams.Add(new Regex(@"(?<cmd>MOVE) \((?<param>\w+)\);"));
             regexCmdWithParams.Add(new Regex(string.Format(@"(?<cmd>{0}) \((?<param>\d+)\);", CMD_WAIT)));
 
+            // Used to lookup ossible values of arguments
             cmdArgDict = new Dictionary<string, string[]>();
-            cmdArgDict.Add(CMD_WAIT, new string[] { "0", "1" });
+            cmdArgDict.Add(CMD_WAIT, new string[] { "0", "10" });
             var avatarCmdArgDict = avatar.GetAvailableCmdArgs();
             if (avatarCmdArgDict != null)
             {

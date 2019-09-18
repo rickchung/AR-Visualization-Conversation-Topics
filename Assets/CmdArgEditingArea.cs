@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -31,6 +32,9 @@ public class CmdArgEditingArea : OneCmdEditingArea
         // Clean available commands in the previous run
         oneCmdDropdown.ClearOptions();
 
+
+        // ===== The Command Selector =====
+
         // If a command is not allowed to be modified, disable the dropdown menu
         if (!modifiableCmds.Contains(command))
         {
@@ -46,41 +50,61 @@ public class CmdArgEditingArea : OneCmdEditingArea
             codeToggle.interactable = true;
         }
 
+        //  ===== End of The Command Selector =====
+
+
+        //  ===== The Argument Selector =====
+
         // If the attached code has some arguments, put the values in the slider
-        // TODO: This code should determine
+        //
+        // TODO: There are may features haven't implemented...
         //      1) the number of arguments in the to-be-attached CodeObject
         //      2) the types of those arguments
-        // Now it assume there is only one float argument. It does not work with v2 commands.
-        if (args.Length > 0)
-        {
-            var argOps = AttachedCodeObject.GetArgOps();
-            if (argOps == null)
-            {
-                argSlider.value = float.Parse(args[0]);
-                argSlider.gameObject.SetActive(true);
-                argSlider.interactable = true;
-                argSelector.SetActive(false);
-            }
-            else
-            {
-                argSelector.SetActive(true);
-                foreach (GameObject gobj in argSelector.transform)
-                    Destroy(gobj);
-                foreach (var op in argOps)
-                {
-                    var newBtn = Instantiate(argSelectorButton);
-                    newBtn.transform.parent = argSelector.transform;
-                    newBtn.GetComponentInChildren<Text>().text = op;
-                }
-                argSlider.interactable = false;
-                argSlider.gameObject.SetActive(false);
-            }
-        }
-        else
+        //      3) Now this code only works for the first argument
+
+        var argOps = AttachedCodeObject.GetArgOps();
+
+        // If options is null, it means the command does not accept any arguments
+        if (argOps == null)
         {
             argSlider.interactable = false;
             argSlider.gameObject.SetActive(false);
+            argSelector.SetActive(false);
         }
+        else
+        {
+            int arg0 = -1;
+            // Determine the type of args
+            if (Int32.TryParse(argOps[0], out arg0))
+            {
+                argSelector.SetActive(false);
+
+                argSlider.value = Int32.Parse(AttachedCodeObject.GetArgs()[0]);
+
+                argSlider.gameObject.SetActive(true);
+                argSlider.interactable = true;
+            }
+            else
+            {
+                argSlider.gameObject.SetActive(false);
+                argSlider.interactable = false;
+
+                foreach (Transform c in argSelector.transform)
+                {
+                    Destroy(c.gameObject);
+                }
+                foreach (var op in argOps)
+                {
+                    var newBtn = Instantiate(argSelectorButton, parent: argSelector.transform);
+                    newBtn.GetComponentInChildren<Text>().text = op;
+                }
+
+                argSelector.SetActive(true);
+            }
+        }
+
+        //  ===== End of The Argument Selector =====
+
 
         codeToggle.isOn = !AttachedCodeObject.IsDisabled();
     }

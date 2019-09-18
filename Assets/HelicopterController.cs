@@ -61,7 +61,7 @@ public class HelicopterController : AvatarController
                             ClimbUp();
                             break;
                         case "down":
-                            SetBrakeOutputTopRotor(boutTopRotor * 2);
+                            SetBrakeOutputTopRotor(boutTopRotor * 4);
                             FallDown();
                             break;
                     }
