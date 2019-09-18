@@ -331,15 +331,12 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
                 break;
 
             case ScriptExecMode.SYNC_CMD_SWITCHING:
-                if (partnerSocket.IsMaster)
-                {
-                    StepSwitchLock = true;
-                }
-                else
-                {
-                    StepSwitchLock = false;
-                }
-                _cmdSwitchRunOnceFlag = true;
+                // if (partnerSocket.IsMaster)
+                //     StepSwitchLock = true;
+                // else
+                //     StepSwitchLock = false;
+                CmdSwitchLock = false;
+                _cmdSwitchRunOnceFlag = false;
                 CTRL_MAX_WAIT_TIME = 100;
                 break;
         }

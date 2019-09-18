@@ -1,23 +1,9 @@
-Start_Engine ();
-
-Wait_For_P2 ();
-Climb_Up ();
-
-Move_Forward ();
-Continue_Sec (8);
-Move_Backward ();
-
-Wait_For_P2 ();
-Fall_Down ();
-
-Continue_Sec (4);
-
-Wait_For_P2 ();
-Climb_Up ();
-
-Move_Forward ();
+Engine (start);
+Climb (up);
+...
+Climb (down);
 Continue_Sec (6);
-Move_Backward ();
-
-Wait_For_P2 ();
-Fall_Down ();
+Climb (up);
+Continue_Sec (3);
+...
+Climb (down);

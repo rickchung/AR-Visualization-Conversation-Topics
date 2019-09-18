@@ -203,8 +203,7 @@ public class ConfManager : MonoBehaviour
         _ApplyConfiguration(stages[stageKeys[currentStageIndex]]);
         startScreen.SetActive(false);
         codeInterpreter.ResetAvatars();
-
-        informationPanel.ShowInstructionScreen(true);
+        // informationPanel.ShowInstructionScreen(true);
     }
 
     public void StopGame()

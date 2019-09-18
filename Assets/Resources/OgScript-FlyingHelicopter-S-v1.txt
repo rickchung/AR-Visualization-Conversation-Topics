@@ -1,11 +1,8 @@
-Wait_For_P1 ();
-Set_TopSpeed (10);
-
-Wait_For_P1 ();
-Set_TopBrake (5);
-
-Wait_For_P1 ();
-Set_TopSpeed (10);
-
-Wait_For_P1 ();
-Set_TopBrake (5);
+...
+Move (forward);
+Continue_Sec (8);
+Move (backward);
+...
+Move (forward);
+Continue_Sec (7);
+Move (backward);

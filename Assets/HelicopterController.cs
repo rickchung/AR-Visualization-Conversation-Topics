@@ -57,11 +57,11 @@ public class HelicopterController : AvatarController
                     switch (args[0])
                     {
                         case "up":
-                            SetPowerOutputTopRotor(poutTopRotor * 2);
+                            SetPowerOutputTopRotor(4);
                             ClimbUp();
                             break;
                         case "down":
-                            SetBrakeOutputTopRotor(boutTopRotor * 4);
+                            SetBrakeOutputTopRotor(2);
                             FallDown();
                             break;
                     }

@@ -1,4 +1,4 @@
 ...
 Move (forward);
-Continue_Sec (5);
+Continue_Sec (3);
 Climb (down);

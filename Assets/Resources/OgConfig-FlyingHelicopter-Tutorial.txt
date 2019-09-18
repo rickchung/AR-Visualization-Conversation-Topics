@@ -1,11 +1,5 @@
 Tutorial
 <size=115%><smallcaps>> Simulation: Flying a Helicopter by Programming</smallcaps></size>
-
-<mark=#f4433688>Player 1 (P1)</mark> is the pilot control system (PCS) who controls the navigation of the helicopter.
-
-<mark=#2196F388>Player 2 (P2)</mark>  is the engine Control Unit (ECU) who controls the power of internal engine that affects movement of helicopter.
-
-P1 and P2 are controlled separately by two programs. Your task is to cooperate with your partner and find the best configuration that can fly the helicopter to the destination.
 #
 OgMap-FlyingHelicopter-v0.txt
 OgScript-FlyingHelicopter-M-v0.txt
