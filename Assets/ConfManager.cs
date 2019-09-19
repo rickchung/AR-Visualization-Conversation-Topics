@@ -222,6 +222,10 @@ public class ConfManager : MonoBehaviour
             );
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
+        else
+        {
+            endScreen.SetActive(false);
+        }
     }
 
     public void EnableNextStage()
