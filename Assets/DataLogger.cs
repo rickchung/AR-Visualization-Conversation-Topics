@@ -67,12 +67,12 @@ public class DataLogger : MonoBehaviour
         }
     }
 
-    public static void DumpWholeScript(ScriptObject script)
+    public static void DumpWholeScript(ScriptObject script, string fnamePrefix = "")
     {
         var timestamp = System.DateTime.Now.ToString("MM-dd-HH-mm-ss");
         var filename = Path.Combine(
             Application.persistentDataPath,
-            "ScriptSnapshot-" + timestamp + ".txt"
+            fnamePrefix + "ScriptSnapshot-" + timestamp + ".txt"
         );
         using (var writer = new StreamWriter(filename))
         {

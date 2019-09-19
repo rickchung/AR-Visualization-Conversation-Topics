@@ -82,6 +82,8 @@ public class CodeEditor : MonoBehaviour
         cmdWithNumberEditingArea.gameObject.SetActive(false);
         transform.gameObject.SetActive(false);
         UpdateCodeViewer();
+
+        codeInterpreter.DumpCurrentScript("PostEdit-");
     }
 
     public string[] GetArgOptions(string cmd)

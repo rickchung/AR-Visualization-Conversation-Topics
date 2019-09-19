@@ -209,9 +209,8 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         ScriptObject script = ImportScriptObject(scriptName);
         if ((loadedScript = script) != null)
         {
-            DataLogger.Log(this.gameObject, LogTag.SYSTEM,
-                "A predefined script is imported " + scriptName + ": " + script
-            );
+            DataLogger.Log(
+                this.gameObject, LogTag.SYSTEM, "A predefined script is imported " + scriptName);
 
             // Scan the script by the avatar
             foreach (var v in loadedScript.GetScript())
@@ -352,8 +351,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     /// <returns></returns>
     private IEnumerator _RunScriptCoroutine(ScriptObject scriptObject)
     {
-        // Dump the script
-        DataLogger.DumpWholeScript(scriptObject);
+        DumpCurrentScript("PreExec-");
 
         var script = scriptObject.GetScript();
         IsRemoteFinished = false;
@@ -921,6 +919,12 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
         if (cmdArgDict.ContainsKey(cmd))
             return cmdArgDict[cmd];
         return null;
+    }
+
+    public void DumpCurrentScript(string fnamePrefix = "")
+    {
+        DataLogger.DumpWholeScript(loadedScript, fnamePrefix);
+
     }
 
     // ========= Predefined Control Signals ==========
