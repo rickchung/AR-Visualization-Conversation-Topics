@@ -91,6 +91,18 @@ public class HelicopterController : AvatarController
                     }
                     break;
 
+                case CMD_HOVOR:
+                    if (forwardAcc < 0)
+                        MoveForward();
+                    else if (forwardAcc > 0)
+                        MoveBackward();
+                    if (torqueAcc < 0)
+                        HoveringTurnRight();
+                    else if (torqueAcc > 0)
+                        HoveringTurnLeft();
+                    forwardAcc = torqueAcc = 0;
+                    break;
+
                 case CMD_START_ENG:
                     StartEngine();
                     break;
@@ -405,6 +417,7 @@ public class HelicopterController : AvatarController
     public const string CMD_ENGINE = "Engine";
     public const string CMD_TURN = "Turn";
     public const string CMD_WAIT_PX = "...";
+    public const string CMD_HOVOR = "Hover";
 
     // V1 Commands
     public const string CMD_START_ENG = "Start_Engine";
@@ -436,6 +449,7 @@ public class HelicopterController : AvatarController
             CMD_MOVE_FORWARD, CMD_MOVE_BACKWARD,
             CMD_SLOWDOWN_TAIL, CMD_SPEEDUP_TAIL,
             CMD_WAIT_P1, CMD_WAIT_P2,
+            CMD_HOVOR,
         };
 
         var rt = new List<Regex>();
@@ -468,7 +482,7 @@ public class HelicopterController : AvatarController
     override public List<string> GetModifiableCmds()
     {
         List<string> modifiableCmds = new List<string>() {
-            CMD_ENGINE, CMD_MOVE, CMD_TURN, CMD_CLIMB,
+            CMD_ENGINE, CMD_MOVE, CMD_TURN, CMD_CLIMB, CMD_HOVOR,
 
             // CMD_START_ENG, CMD_STOP_ENG,
             // CMD_CLIMP_UP, CMD_FALL_DOWN,

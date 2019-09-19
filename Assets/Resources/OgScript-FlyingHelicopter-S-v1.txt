@@ -1,8 +1,8 @@
 ...
 Move (forward);
 Continue_Sec (8);
-Move (backward);
+Hover ();
 ...
 Move (forward);
 Continue_Sec (7);
-Move (backward);
+Hover ();
