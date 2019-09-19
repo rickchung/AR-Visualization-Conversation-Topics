@@ -1,5 +1,5 @@
 Tutorial
-<size=115%><smallcaps>> Simulation: Flying a Helicopter by Programming</smallcaps></size>
+<u>GOAL</u>: Fly your helicopter to the destination.
 #
 OgMap-FlyingHelicopter-v0.txt
 OgScript-FlyingHelicopter-M-v0.txt
