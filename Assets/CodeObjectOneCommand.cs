@@ -76,14 +76,37 @@
             return string.Format("<alpha=#44><s>{0}</s><alpha=#FF>", rt);
     }
 
+    public void SetCommand(string command)
+    {
+        this.command = command;
+    }
+
     public string[] GetArgs()
     {
         return args;
     }
 
+    public void SetArgs(string[] args)
+    {
+        this.args = args;
+    }
+
+    public void ResetArgs()
+    {
+        if (firstArgOptions != null && firstArgOptions.Length > 0)
+            SetArgs(new string[] { firstArgOptions[0] });
+        else
+            SetArgs(new string[] { });
+    }
+
     public string[] GetArgOps()
     {
         return firstArgOptions;
+    }
+
+    public void SetArgOps(string[] argOps)
+    {
+        firstArgOptions = argOps;
     }
 
     /// <summary>
@@ -104,38 +127,14 @@
         return rt;
     }
 
-
-    public bool IsDisabled()
-    {
-        return this.disabled;
-    }
-
     virtual public int GetLength()
     {
         return GetCommand().Length;
     }
 
-    public void SetCommand(string command)
+    public bool IsDisabled()
     {
-        this.command = command;
-    }
-
-    public void SetArgs(string[] args)
-    {
-        this.args = args;
-    }
-
-    public void SetArgOps(string[] argOps)
-    {
-        firstArgOptions = argOps;
-    }
-
-    public void ResetArgs()
-    {
-        if (firstArgOptions != null && firstArgOptions.Length > 0)
-            SetArgs(new string[] { firstArgOptions[0] });
-        else
-            SetArgs(new string[] { });
+        return this.disabled;
     }
 
     public void SetDisabled(bool disabled)
@@ -161,6 +160,7 @@
         CodeObjectOneCommand other = (CodeObjectOneCommand)this.MemberwiseClone();
         return other;
     }
+
     // ==================== Networking
 
     public string ToNetMessage()

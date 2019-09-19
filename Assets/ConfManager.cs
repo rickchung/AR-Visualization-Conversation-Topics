@@ -106,12 +106,11 @@ public class ConfManager : MonoBehaviour
             var newButtonText = newButton.GetComponentInChildren<Text>();
 
             newButton.onClick.AddListener(() => { ApplyConfigurationSync(kv.Key); });
-            newButton.interactable = true;
+            newButton.interactable = false;  // To test you can make it true
             newButtonText.text = kv.Key;
             newButton.gameObject.SetActive(true);
 
             stageKeys.Add(kv.Key);
-
             stageButtons.Add(newButton);
         }
         stageButtons[0].interactable = true;
@@ -198,7 +197,9 @@ public class ConfManager : MonoBehaviour
 
     public void StartGame()
     {
-        partnerSocket.SetupRemoteServer();
+        if (!partnerSocket.IsConnected())
+            partnerSocket.SetupRemoteServer();
+
         currentStageIndex = 0;
         _ApplyConfiguration(stages[stageKeys[currentStageIndex]]);
         startScreen.SetActive(false);
@@ -211,13 +212,16 @@ public class ConfManager : MonoBehaviour
         endScreen.SetActive(true);
     }
 
-    public void RestartGame()
+    public void RestartGame(bool decoy = false)
     {
-        DataLogger.Log(
-            this.gameObject, LogTag.SYSTEM_WARNING,
-            "[Admin] Trying to restart the scene..."
-        );
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        if (!decoy)
+        {
+            DataLogger.Log(
+                this.gameObject, LogTag.SYSTEM_WARNING,
+                "[Admin] Trying to restart the scene..."
+            );
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
     }
 
     public void EnableNextStage()

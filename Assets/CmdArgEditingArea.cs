@@ -62,6 +62,9 @@ public class CmdArgEditingArea : OneCmdEditingArea
             argSlider.interactable = false;
             argSlider.gameObject.SetActive(false);
             argSelector.SetActive(false);
+            // Enable the submission button
+            oneCmdSubmitBtn.gameObject.SetActive(true);
+
         }
         else
         {

@@ -920,7 +920,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
     {
         if (cmdArgDict.ContainsKey(cmd))
             return cmdArgDict[cmd];
-        return new string[0];
+        return null;
     }
 
     // ========= Predefined Control Signals ==========

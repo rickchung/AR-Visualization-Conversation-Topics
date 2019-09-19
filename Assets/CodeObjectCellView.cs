@@ -24,12 +24,19 @@ public class CodeObjectCellView : EnhancedScrollerCellView
         // Separate cmd and args
         // commandText.text = codeObject.GetCommand(richtext: true);
         // argumentsText.text = codeObject.GetArgString(richtext: true);
+
         // Combine cmd and args
-        var textToDisplay = (
-            "L" + (dataIndex + 1) + "<pos=12%>" +
-            codeObject.GetCommand(richtext: true) + " " +
-            codeObject.GetArgString(richtext: true)
-        );
+        var cmd = codeObject.GetCommand(richtext: true);
+        var argstr = codeObject.GetArgString(richtext: true);
+
+        // TODO: Ad-hoc solution to reverse wording of some commands
+        if (cmd.Equals("Engine"))
+        {
+            cmd = codeObject.GetArgs()[0].ToUpper();
+            argstr = "(Engine)";
+        }
+
+        var textToDisplay = ("L" + (dataIndex + 1) + "<pos=12%>" + cmd + " " + argstr);
         commandText.text = textToDisplay;
 
         var prefix = "";

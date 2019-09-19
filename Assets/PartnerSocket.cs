@@ -91,6 +91,14 @@ public class PartnerSocket : MonoBehaviour
             SetupLocalServer();
     }
 
+    public bool IsConnected()
+    {
+        if (clientToPartner == null)
+        {
+            return false;
+        }
+        return clientToPartner.isConnected;
+    }
 
     // ============================================================
 
