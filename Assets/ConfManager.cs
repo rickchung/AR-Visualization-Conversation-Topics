@@ -48,6 +48,8 @@ public class ConfManager : MonoBehaviour
         startScreen.SetActive(true);
         endScreen.SetActive(false);
         nextStageScreen.SetActive(false);
+        // Add user's random name
+        startScreen.GetComponentInChildren<TMPro.TextMeshProUGUI>().text = DataLogger.username;
 
         // Default layout
         sttCtrlPanel.SetActive(true);
@@ -55,6 +57,9 @@ public class ConfManager : MonoBehaviour
 
         // Load predefined maps/scripts to the data folder
         var dataFolderPath = Application.persistentDataPath;
+        // This is just a list of files to import during the initialization of game.
+        // They will be copied from the package to the storage on the device.
+        // To add a config into the game, see the variable "stages" below.
         var filesToCopy = new string[] {
             "OgConfig-Tutorial",
                 "OgMap-Tutorial1",
@@ -75,6 +80,11 @@ public class ConfManager : MonoBehaviour
                 "OgMap-FlyingHelicopter-v0",
                 "OgScript-FlyingHelicopter-M-v0",
                 "OgScript-FlyingHelicopter-S-v0",
+
+            "OgConfig-FlyingHelicopter-Adv",
+                "OgMap-FlyingHelicopter",
+                "OgScript-FlyingHelicopter-M",
+                "OgScript-FlyingHelicopter-S",
         };
         foreach (var s in filesToCopy)
         {
@@ -96,6 +106,7 @@ public class ConfManager : MonoBehaviour
         // stages.Add("S1-Algorithm", OgStageConfig.ImportConfigFile("OgConfig-Puzzle3"));
         stages.Add("S-Tutorial", OgStageConfig.ImportConfigFile("OgConfig-FlyingHelicopter-Tutorial"));
         stages.Add("S-Helicopter", OgStageConfig.ImportConfigFile("OgConfig-FlyingHelicopter"));
+        // stages.Add("S-Extra", OgStageConfig.ImportConfigFile("OgConfig-FlyingHelicopter-Adv"));
 
         // Init stage buttons
         stageButtons = new List<Button>();
@@ -115,6 +126,8 @@ public class ConfManager : MonoBehaviour
         }
         stageButtons[0].interactable = true;
         stageButtons[stageButtons.Count - 1].GetComponent<Image>().sprite = null;
+
+        ToggleAlwaysOnRecording(true);
     }
 
     // ==========
@@ -276,8 +289,8 @@ public class ConfManager : MonoBehaviour
     {
         // When mic is always on, do not send the final clip but every clip
         voiceController.ToggleMicrophone(value);
-        voiceController.sendEveryClip = value;
-        voiceController.sendFinalClip = !value;
+        // voiceController.sendEveryClip = value;
+        // voiceController.sendFinalClip = !value;
 
         sttCtrlPanelAlwaysOn.SetActive(value);
         sttCtrlPanel.SetActive(!value);

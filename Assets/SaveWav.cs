@@ -41,7 +41,7 @@ public static class SavWav
             filename += ".wav";
         }
 
-        var filepath = Path.Combine(Application.persistentDataPath, filename);
+        var filepath = Path.Combine(DataLogger.userFolderName, filename);
         // Debug.Log(filepath);
 
         // Make sure directory exists if user is saving to sub dir.

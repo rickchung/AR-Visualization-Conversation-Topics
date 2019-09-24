@@ -15,12 +15,33 @@ public class DataLogger : MonoBehaviour
 {
     public static DataLogger dataLogger;
     private static string logFilePath;
+    public static string userFolderName;
+    public static string username;
+    private static string[] randWordList = {
+        "Cheetah","Red","Citrus","Poppy","Julianne","Winnie","Alyson","Peaches","Mango","Blaze","Ginger","Apricot","Nicky","Marmalade","Orangey","Apricat","Buttercup","Pumpkin","Blizzard","Arlene","Tiffany","Coral","Autumn","Jess","Isla","Lioness","Treasure","Daisy","Carrots","Flame","Dana","Auburn","Tabasco","Nala","Salmon","Butterscotch","Copper","Stripes","Patchwork","Tangerine","Saffron","Cinnamon","Merlot","Paprika","Top Cat","Miss Natural","Scarlet","Amber","Tigger","OJ","Millie","Lauren","Ruth","Maria","Scarlett","Katherine","Emily","Jennifer","Hollie","Isabella",
+    };
 
     private void Awake()
     {
         dataLogger = this;
+
+        // Random name
+        var rand = new System.Random();
+        var randName = "";
+        for (var i = 0; i < 2; i++)
+        {
+            randName += randWordList[rand.Next(randWordList.Length)];
+            randName += "-";
+        }
+        // Add timestamp
         var tnow = DateTime.Now.ToString().Replace('/', '-').Replace(':', '-').Replace(' ', '-');
-        logFilePath = Path.Combine(Application.persistentDataPath, tnow) + "-Log.txt";
+        randName += tnow;
+        // Create a folder
+        username = randName;
+        userFolderName = Path.Combine(Application.persistentDataPath, randName);
+        Directory.CreateDirectory(userFolderName);
+        // Log file name
+        logFilePath = Path.Combine(userFolderName, tnow) + "-Log.txt";
 
         Debug.Log("Log data will be saved to " + logFilePath);
     }
@@ -71,8 +92,7 @@ public class DataLogger : MonoBehaviour
     {
         var timestamp = System.DateTime.Now.ToString("MM-dd-HH-mm-ss");
         var filename = Path.Combine(
-            Application.persistentDataPath,
-            fnamePrefix + "ScriptSnapshot-" + timestamp + ".txt"
+            userFolderName, fnamePrefix + "ScriptSnapshot-" + timestamp + ".txt"
         );
         using (var writer = new StreamWriter(filename))
         {

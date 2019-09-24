@@ -127,7 +127,9 @@ public class VoiceController : MonoBehaviour
         if (sendFinalClip)
         {
             if (mergedFilePath != null)
+            {
                 networkManager.RequestSpeechToText(mergedFilePath);
+            }
         }
     }
 
@@ -155,7 +157,6 @@ public class VoiceController : MonoBehaviour
             {
                 networkManager.RequestSpeechToText(SaveMicFile(audioSource.clip));
             }
-
             // Send an STT request for a cumulative clip
             if (sendCumulativeClip)
             {
