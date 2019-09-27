@@ -6,11 +6,12 @@ using System.IO;
 
 public class FrontCamController : MonoBehaviour
 {
-
     public RawImage frontCamTexture;
     public AspectRatioFitter frontCamAspFilter;
     private bool isFrontCamAvailable;
     private WebCamTexture frontCam;
+    private float camTimeElapsed;
+    private const float SHUTTER_SPEED = 1.0f;
 
 
     void Start()
@@ -22,7 +23,16 @@ public class FrontCamController : MonoBehaviour
     void Update()
     {
         if (isFrontCamAvailable)
+        {
             UpdateCamTexture(frontCam, frontCamTexture, frontCamAspFilter);
+
+            camTimeElapsed += Time.deltaTime;
+            if (camTimeElapsed >= SHUTTER_SPEED)
+            {
+                SaveCamTexture(frontCam);
+                camTimeElapsed = 0;
+            }
+        }
     }
 
     public void ToggleFrontCam(bool value)
@@ -95,7 +105,7 @@ public class FrontCamController : MonoBehaviour
     }
 
     /// <summary>
-    /// TODO: Finish the file saving function.
+    /// Save one frame of camera image
     /// </summary>
     /// <param name="cam"></param>
     private void SaveCamTexture(WebCamTexture cam)
@@ -103,10 +113,7 @@ public class FrontCamController : MonoBehaviour
         Texture2D snapshot = new Texture2D(cam.width, cam.height);
         snapshot.SetPixels(cam.GetPixels());
         snapshot.Apply();
-        // File.WriteAllBytes(
-        //     Path.Combine(frameDirPath, frameCounter.ToString() + ".png"),
-        //     snapshot.EncodeToJPG());
-        // ++frameCounter;
+        var image = snapshot.EncodeToJPG();
+        DataLogger.LogImage(image, "FrontCam");
     }
-
 }

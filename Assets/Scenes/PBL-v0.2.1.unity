@@ -1387,7 +1387,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.000015258789, y: -0.000030465022}
+  m_AnchoredPosition: {x: 0.000015258789, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &159862573
@@ -4133,11 +4133,11 @@ MonoBehaviour:
     lineCount: 1
     pageCount: 1
     materialCount: 1
-  m_havePropertiesChanged: 0
+  m_havePropertiesChanged: 1
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_spriteAnimator: {fileID: 0}
-  m_isInputParsingRequired: 0
+  m_isInputParsingRequired: 1
   m_inputSource: 0
   m_hasFontAssetChanged: 0
   m_subTextObjects:
@@ -4272,11 +4272,11 @@ MonoBehaviour:
     lineCount: 2
     pageCount: 1
     materialCount: 1
-  m_havePropertiesChanged: 0
+  m_havePropertiesChanged: 1
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_spriteAnimator: {fileID: 0}
-  m_isInputParsingRequired: 0
+  m_isInputParsingRequired: 1
   m_inputSource: 0
   m_hasFontAssetChanged: 0
   m_subTextObjects:
@@ -8272,10 +8272,10 @@ RectTransform:
   m_Father: {fileID: 1452800944}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 90.39, y: 63.3}
-  m_SizeDelta: {x: 180.98, y: 126.6}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 81.3, y: -164.5}
+  m_SizeDelta: {x: 162.7, y: 95.4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &527118115
 MonoBehaviour:
@@ -8289,7 +8289,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_AspectMode: 0
-  m_AspectRatio: 1.4295418
+  m_AspectRatio: 1.7054507
 --- !u!114 &527118116
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15207,11 +15207,11 @@ MonoBehaviour:
     lineCount: 3
     pageCount: 1
     materialCount: 1
-  m_havePropertiesChanged: 0
+  m_havePropertiesChanged: 1
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_spriteAnimator: {fileID: 0}
-  m_isInputParsingRequired: 0
+  m_isInputParsingRequired: 1
   m_inputSource: 0
   m_hasFontAssetChanged: 0
   m_subTextObjects:
@@ -17138,7 +17138,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1261947845}
   - component: {fileID: 1261947846}
-  - component: {fileID: 1261947847}
   m_Layer: 5
   m_Name: ToggleFrontCam
   m_TagString: Untagged
@@ -17208,7 +17207,7 @@ MonoBehaviour:
   onValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1261947847}
+      - m_Target: {fileID: 1710140040}
         m_MethodName: ToggleFrontCam
         m_Mode: 0
         m_Arguments:
@@ -17222,19 +17221,6 @@ MonoBehaviour:
     m_TypeName: UnityEngine.UI.Toggle+ToggleEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
   m_IsOn: 0
---- !u!114 &1261947847
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1261947844}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 324e14200ae554e008f0a4d03539970c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  frontCamTexture: {fileID: 527118116}
-  frontCamAspFilter: {fileID: 527118115}
 --- !u!1 &1270717321
 GameObject:
   m_ObjectHideFlags: 0
@@ -20075,7 +20061,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.097611204}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -209.5, y: 1.0599823}
+  m_AnchoredPosition: {x: -209.5, y: 1.0599976}
   m_SizeDelta: {x: 402, y: -2.119995}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1488670763
@@ -21481,10 +21467,10 @@ RectTransform:
   m_Father: {fileID: 1168776838}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.000015259, y: -285}
-  m_SizeDelta: {x: 343.3, y: 91.1}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: 0.000015259, y: 245}
+  m_SizeDelta: {x: 343.3, y: 91.100006}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1601275504
 MonoBehaviour:
@@ -22599,6 +22585,7 @@ GameObject:
   - component: {fileID: 1710140038}
   - component: {fileID: 1710140037}
   - component: {fileID: 1710140039}
+  - component: {fileID: 1710140040}
   m_Layer: 0
   m_Name: ConfCtrl
   m_TagString: Untagged
@@ -22662,6 +22649,19 @@ MonoBehaviour:
   - {fileID: 1570038335}
   - {fileID: 1541129889}
   isSlave: 0
+--- !u!114 &1710140040
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1710140036}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 324e14200ae554e008f0a4d03539970c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  frontCamTexture: {fileID: 527118116}
+  frontCamAspFilter: {fileID: 527118115}
 --- !u!1 &1716283227
 GameObject:
   m_ObjectHideFlags: 0
@@ -25679,10 +25679,10 @@ RectTransform:
   m_Father: {fileID: 1670625467}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.000015259, y: -285}
-  m_SizeDelta: {x: 343.3, y: 91.1}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: 0.000015259, y: 170}
+  m_SizeDelta: {x: 343.3, y: 91.100006}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1950336134
 MonoBehaviour:
