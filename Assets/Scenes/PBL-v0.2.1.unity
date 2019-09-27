@@ -1387,7 +1387,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.000018316308, y: -0.000030517578}
+  m_AnchoredPosition: {x: -0.0000014456572, y: -0.000030517578}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &159862573
@@ -3805,7 +3805,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.05
+  near clip plane: 0.2
   far clip plane: 20000
   field of view: 60
   orthographic: 0
@@ -8240,6 +8240,88 @@ CanvasRenderer:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 526037231}
+  m_CullTransparentMesh: 0
+--- !u!1 &527118113
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 527118114}
+  - component: {fileID: 527118117}
+  - component: {fileID: 527118116}
+  - component: {fileID: 527118115}
+  m_Layer: 5
+  m_Name: FrontCamTexture
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &527118114
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 527118113}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1452800944}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 90.39, y: 63.3}
+  m_SizeDelta: {x: 180.98, y: 126.6}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &527118115
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 527118113}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1254083943, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_AspectMode: 0
+  m_AspectRatio: 1.4295418
+--- !u!114 &527118116
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 527118113}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -98529514, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
+      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+  m_Texture: {fileID: 0}
+  m_UVRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+--- !u!222 &527118117
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 527118113}
   m_CullTransparentMesh: 0
 --- !u!1 &528517959
 GameObject:
@@ -14594,7 +14676,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1092246885
 RectTransform:
   m_ObjectHideFlags: 0
@@ -15421,7 +15503,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Enable Social Vis
+  m_Text: Enable Front Cam (Only Available on Specific Devices)
 --- !u!222 &1150807419
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -17056,13 +17138,14 @@ GameObject:
   m_Component:
   - component: {fileID: 1261947845}
   - component: {fileID: 1261947846}
+  - component: {fileID: 1261947847}
   m_Layer: 5
-  m_Name: ToggleSocialVis
+  m_Name: ToggleFrontCam
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1261947845
 RectTransform:
   m_ObjectHideFlags: 0
@@ -17080,7 +17163,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 158.85, y: -133}
+  m_AnchoredPosition: {x: 158.85, y: -146}
   m_SizeDelta: {x: 301.09, y: 44.1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1261947846
@@ -17125,8 +17208,8 @@ MonoBehaviour:
   onValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 747354411}
-        m_MethodName: EnableSocialVis
+      - m_Target: {fileID: 1261947847}
+        m_MethodName: ToggleFrontCam
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -17139,6 +17222,19 @@ MonoBehaviour:
     m_TypeName: UnityEngine.UI.Toggle+ToggleEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
   m_IsOn: 0
+--- !u!114 &1261947847
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1261947844}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 324e14200ae554e008f0a4d03539970c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  frontCamTexture: {fileID: 527118116}
+  frontCamAspFilter: {fileID: 527118115}
 --- !u!1 &1270717321
 GameObject:
   m_ObjectHideFlags: 0
@@ -19358,6 +19454,7 @@ RectTransform:
   - {fileID: 1670625467}
   - {fileID: 1168776838}
   - {fileID: 1096718470}
+  - {fileID: 527118114}
   m_Father: {fileID: 1732101021}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -19503,7 +19600,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 158.85, y: -189}
+  m_AnchoredPosition: {x: 158.85, y: -224}
   m_SizeDelta: {x: 301.09, y: 44.1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1455990643
@@ -26923,10 +27020,10 @@ RectTransform:
   m_Father: {fileID: 1092246885}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.000015259, y: -285}
-  m_SizeDelta: {x: 343.3, y: 91.1}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: 0, y: 234}
+  m_SizeDelta: {x: 343.3, y: 91.099976}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2070974849
 MonoBehaviour:
