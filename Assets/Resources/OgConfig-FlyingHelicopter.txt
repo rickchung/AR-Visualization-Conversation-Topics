@@ -1,5 +1,10 @@
 Flying a Helicopter
-<u>GOAL</u>: Fly your helicopter to collect all the flags. Start the <color=#f5f5f5>ENGINE</color>, <color=#f5f5f5>CONTINUE</color> <color=#f5f5f5>CLIMBING</color> up and <color=#f5f5f5>MOVING</color> forward to the right position. Then <color=#f5f5f5>CLIMB</color> down to capture the flag.
+<u>GOAL</u>: Fly the helicopter over barriers to the destination (blue flag).
+<indent=5%>
++ Start the <color=#f5f5f5>ENGINE</color>,
++ <color=#f5f5f5>CONTINUE</color> <color=#f5f5f5>CLIMBING</color> up
++ <color=#f5f5f5>MOVING</color> forward to the right position, and then
++ <color=#f5f5f5>CLIMB</color> down to capture the flag.
 #
 OgMap-FlyingHelicopter-v1.txt
 OgScript-FlyingHelicopter-M-v1.txt
