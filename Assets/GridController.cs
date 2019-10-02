@@ -2,6 +2,7 @@
 using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public enum GridCellType { BASE, TRAP, REWARD, REWARD_DUAL, WALL, WALL_2, WALL_3, P1_START, P2_START };
 public delegate void GridCellUpdateDelegate(GridCellType cellType, Collider other);
@@ -13,6 +14,7 @@ public class GridController : MonoBehaviour
     public AvatarController avatarController, rivalAvatarController;
     public CodeInterpreter codeInterpreter;
     public ConfManager confManager;
+    public Transform notificationPanel;
 
     private Vector3[,] cellVectorMap;  // The real-world map of the game.
     private Transform[,] cellObjectsMap;  // The map of grid cells
@@ -55,6 +57,8 @@ public class GridController : MonoBehaviour
     void Start()
     {
         dataFolderPath = Application.persistentDataPath;
+
+        notificationPanel.gameObject.SetActive(false);
     }
 
     // ==================== Map Utilities ====================
@@ -255,6 +259,8 @@ public class GridController : MonoBehaviour
                 c.Reset();
 
         NumFlagsCaptured = 0;
+
+        notificationPanel.gameObject.SetActive(false);
     }
 
     public bool IsStageClear()
@@ -280,6 +286,9 @@ public class GridController : MonoBehaviour
                     ac.IsDead = true;
                     if (!ac.IsRival)
                         codeInterpreter.InterruptRunningScript();
+
+                    // Show the notification
+                    notificationPanel.gameObject.SetActive(true);
                 }
                 break;
             case GridCellType.REWARD:

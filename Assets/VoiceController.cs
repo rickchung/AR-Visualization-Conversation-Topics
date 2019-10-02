@@ -17,10 +17,10 @@ public class VoiceController : MonoBehaviour
 
     public bool sendEveryClip, sendCumulativeClip, sendFinalClip;
 
-    public int CLIP_SIZE;
-    public int SAMPLING_RATE;  // Recommended: 16000
+    private int CLIP_SIZE = 5;
+    private int SAMPLING_RATE = 16000;  // Recommended: 16000
 
-    public float micSensitivity;
+    private float micSensitivity = 0.7f;
 
     private AudioSource audioSource;
 
@@ -76,7 +76,7 @@ public class VoiceController : MonoBehaviour
 
     private AudioClip mergedClip;
     private int mergedClipCount;
-    private const int MERGED_CLIP_LIMIT = 10;
+    private const int MERGED_CLIP_LIMIT = 6;
     private List<float> mergedClipData;
     private string mergedClipName;
 
