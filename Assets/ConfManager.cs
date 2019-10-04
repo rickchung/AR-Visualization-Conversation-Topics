@@ -5,6 +5,7 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
 
 public class ConfManager : MonoBehaviour
 {
@@ -14,6 +15,7 @@ public class ConfManager : MonoBehaviour
     // L3: isArrowKeyEnabled, isDeveloperPanelEnabled
 
     public InformationPanel informationPanel;
+    public TextMeshProUGUI timerText;
     public GridController gridController;
     public CodeInterpreter codeInterpreter;
     public PartnerSocket partnerSocket;
@@ -30,8 +32,10 @@ public class ConfManager : MonoBehaviour
     private List<string> stageKeys;
     private int currentStageIndex;
     private Dictionary<string, OgStageConfig> stages;
-
     private ScriptObject scriptSolution;
+
+    private TimeSpan timer;
+    private float timeElapsed;
 
     [HideInInspector] public bool isSlave;
 
@@ -130,6 +134,24 @@ public class ConfManager : MonoBehaviour
         ToggleAlwaysOnRecording(true);
     }
 
+    private void Update()
+    {
+        if (timer != null && timer.TotalSeconds > 0)
+        {
+            timeElapsed += Time.deltaTime;
+            if (timeElapsed >= 1)
+            {
+                timer = timer.Subtract(TimeSpan.FromSeconds(1));
+                timerText.text = string.Format("{0:c}", timer);
+                if (timer.TotalSeconds <= 0.5f)
+                {
+                    timerText.text = "<mark=#ff0000aa>" + timerText.text + "</mark>";
+                }
+                timeElapsed = 0;
+            }
+        }
+    }
+
     // ==========
 
 
@@ -159,6 +181,10 @@ public class ConfManager : MonoBehaviour
     private void _ApplyConfiguration(OgStageConfig conf)
     {
         DataLogger.Log(this.gameObject, LogTag.SYSTEM, "Loading a configuration, " + conf);
+
+        timer = TimeSpan.FromMinutes(25);
+        timerText.text = string.Format("{0:c}", timer);
+        timeElapsed = 0;
 
         nextStageScreen.SetActive(false);
 
