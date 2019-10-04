@@ -25,7 +25,7 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
 
     private ScriptObject loadedScript;
     private ScriptObject solutionScript;
-    private System.Random rand = new System.Random();
+    private System.Random rand = new System.Random(100);
     private ScriptExecMode execMode;
     private bool _cmdSwitchLock, _cmdSwitchRunOnceFlag, _stepSwitchLock, _coroutineLock;
     private float semTimeElapsed;
