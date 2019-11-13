@@ -16,6 +16,14 @@ public class CameraFocusControl : MonoBehaviour
     private Quaternion prevRot;
     private Vector3 prevPos;
 
+    public bool IsAREnabled
+    {
+        get
+        {
+            return arCamera.gameObject.activeSelf;
+        }
+    }
+
     void Start()
     {
         var vuforiaInstance = VuforiaARController.Instance;
@@ -66,6 +74,35 @@ public class CameraFocusControl : MonoBehaviour
         }
 
         if (arCamera.gameObject.activeSelf)
+        {
+            viewContainer.rotation = prevRot;
+            viewContainer.position = prevPos;
+            viewContainer.SetParent(arImageTarget);
+
+            _SwitchArHelper(viewContainer, false);
+        }
+    }
+
+    public void ToggleARCamera(bool enabled)
+    {
+        if (IsAREnabled == enabled)
+            return;
+
+        normalCamera.gameObject.SetActive(!enabled);
+        arCamera.gameObject.SetActive(enabled);
+
+        if (!enabled)
+        {
+            prevRot = viewContainer.rotation;
+            prevPos = viewContainer.position;
+
+            viewContainer.SetParent(nonArTarget);
+            viewContainer.rotation = new Quaternion();
+            viewContainer.position = Vector3.zero;
+
+            _SwitchArHelper(viewContainer, true);
+        }
+        else
         {
             viewContainer.rotation = prevRot;
             viewContainer.position = prevPos;

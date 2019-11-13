@@ -26,6 +26,7 @@ public class ConfManager : MonoBehaviour
     public GameObject startScreen, endScreen, nextStageScreen;
     public Transform stageProgressView;
     public Button stageButtonPrefab;
+    public CameraFocusControl cameraFocusControl;
     public AvatarController[] defaultAvatars, helicopterAvatars;
 
     private List<Button> stageButtons;
@@ -42,7 +43,6 @@ public class ConfManager : MonoBehaviour
     public const string CTRL_APPLY_CONFIG = "CTRL_APPLY_CONFIG";
 
     // ==========
-
 
     private void Start()
     {
@@ -105,31 +105,31 @@ public class ConfManager : MonoBehaviour
         }
 
         // Init configurations of stages
-        stages = new Dictionary<string, OgStageConfig>();
+        // stages = new Dictionary<string, OgStageConfig>();
         // stages.Add("Tutorial", OgStageConfig.ImportConfigFile("OgConfig-Tutorial"));
         // stages.Add("S1-Algorithm", OgStageConfig.ImportConfigFile("OgConfig-Puzzle3"));
-        stages.Add("S-Tutorial", OgStageConfig.ImportConfigFile("OgConfig-FlyingHelicopter-Tutorial"));
-        stages.Add("S-Helicopter", OgStageConfig.ImportConfigFile("OgConfig-FlyingHelicopter"));
+        // stages.Add("S-Tutorial", OgStageConfig.ImportConfigFile("OgConfig-FlyingHelicopter-Tutorial"));
+        // stages.Add("S-Helicopter", OgStageConfig.ImportConfigFile("OgConfig-FlyingHelicopter"));
         // stages.Add("S-Extra", OgStageConfig.ImportConfigFile("OgConfig-FlyingHelicopter-Adv"));
 
         // Init stage buttons
-        stageButtons = new List<Button>();
-        stageKeys = new List<string>();
-        foreach (var kv in stages)
-        {
-            var newButton = Instantiate(stageButtonPrefab, parent: stageProgressView);
-            var newButtonText = newButton.GetComponentInChildren<Text>();
+        // stageButtons = new List<Button>();
+        // stageKeys = new List<string>();
+        // foreach (var kv in stages)
+        // {
+        //     var newButton = Instantiate(stageButtonPrefab, parent: stageProgressView);
+        //     var newButtonText = newButton.GetComponentInChildren<Text>();
 
-            newButton.onClick.AddListener(() => { ApplyConfigurationSync(kv.Key); });
-            newButton.interactable = false;  // To test you can make it true
-            newButtonText.text = kv.Key;
-            newButton.gameObject.SetActive(true);
+        //     newButton.onClick.AddListener(() => { ApplyConfigurationSync(kv.Key); });
+        //     newButton.interactable = false;  // To test you can make it true
+        //     newButtonText.text = kv.Key;
+        //     newButton.gameObject.SetActive(true);
 
-            stageKeys.Add(kv.Key);
-            stageButtons.Add(newButton);
-        }
-        stageButtons[0].interactable = true;
-        stageButtons[stageButtons.Count - 1].GetComponent<Image>().sprite = null;
+        //     stageKeys.Add(kv.Key);
+        //     stageButtons.Add(newButton);
+        // }
+        // stageButtons[0].interactable = true;
+        // stageButtons[stageButtons.Count - 1].GetComponent<Image>().sprite = null;
 
         ToggleAlwaysOnRecording(true);
     }
@@ -154,6 +154,60 @@ public class ConfManager : MonoBehaviour
 
     // ==========
 
+    public void LoadConfigSetAndStartGame(int configSetID = 0)
+    {
+        var configTutorialAR = OgStageConfig.ImportConfigFile("OgConfig-FlyingHelicopter-Tutorial");
+        configTutorialAR.isAREnabled = true;
+        var configTutorialNonAR = OgStageConfig.ImportConfigFile("OgConfig-FlyingHelicopter-Tutorial");
+        configTutorialNonAR.isAREnabled = false;
+        var configHeliAR = OgStageConfig.ImportConfigFile("OgConfig-FlyingHelicopter");
+        configHeliAR.isAREnabled = true;
+        var configHeliNonAR = OgStageConfig.ImportConfigFile("OgConfig-FlyingHelicopter");
+        configHeliNonAR.isAREnabled = false;
+
+        stages = new Dictionary<string, OgStageConfig>();
+
+        switch (configSetID)
+        {
+            case 1:  // Tutorial AR - Heli AR - Heli NonAR
+                stages.Add("Tutorial", configTutorialAR);
+                stages.Add("Task-AR", configHeliAR);
+                stages.Add("Task-NonAR", configHeliNonAR);
+                break;
+            case 2:  // Tutorial NonAR - Heli NonAR - Heli AR
+                stages.Add("Tutorial", configTutorialNonAR);
+                stages.Add("Task-NonAR", configHeliNonAR);
+                stages.Add("Task-AR", configHeliAR);
+                break;
+            default:  // Tutorial AR - Heli AR
+                stages.Add("Tutorial", configTutorialAR);
+                stages.Add("Task-AR", configHeliAR);
+                break;
+        }
+
+        stageButtons = new List<Button>();
+        stageKeys = new List<string>();
+        foreach (var kv in stages)
+        {
+            var newButton = Instantiate(stageButtonPrefab, parent: stageProgressView);
+            var newButtonText = newButton.GetComponentInChildren<Text>();
+
+            newButton.onClick.AddListener(() => { ApplyConfigurationSync(kv.Key); });
+            newButton.interactable = false;  // To test you can make it true
+            newButtonText.text = kv.Key;
+            newButton.gameObject.SetActive(true);
+
+            stageKeys.Add(kv.Key);
+            stageButtons.Add(newButton);
+        }
+        stageButtons[0].interactable = true;
+        stageButtons[stageButtons.Count - 1].GetComponent<Image>().sprite = null;
+
+        StartGame();
+    }
+
+
+    // ==========
 
     public void ApplyConfigurationSync(string confName)
     {
@@ -174,13 +228,18 @@ public class ConfManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Configuration is not found: " + confName);
+            Debug.LogError("Configuration was not found: " + confName);
         }
     }
 
     private void _ApplyConfiguration(OgStageConfig conf)
     {
         DataLogger.Log(this.gameObject, LogTag.SYSTEM, "Loading a configuration, " + conf);
+
+        if (conf.isAREnabled)
+            cameraFocusControl.ToggleARCamera(true);
+        else
+            cameraFocusControl.ToggleARCamera(false);
 
         timer = TimeSpan.FromMinutes(25);
         timerText.text = string.Format("{0:c}", timer);
@@ -349,6 +408,7 @@ public class ConfManager : MonoBehaviour
         public string map;
         public string masterScript, slaveScript;
         public bool isArrowKeyEnabled, isDeveloperPanelEnabled;
+        public bool isAREnabled;
         public string avatarSetName;
         public CodeInterpreter.ScriptExecMode execMode;
 
@@ -365,6 +425,8 @@ public class ConfManager : MonoBehaviour
             this.isDeveloperPanelEnabled = isDeveloperPanelEnabled;
             this.avatarSetName = avatarSetName;
             this.execMode = execMode;
+
+            this.isAREnabled = false;
         }
 
         public static OgStageConfig ImportConfigFile(string filename)
