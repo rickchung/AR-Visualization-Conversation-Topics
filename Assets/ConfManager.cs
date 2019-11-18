@@ -36,6 +36,7 @@ public class ConfManager : MonoBehaviour
     private ScriptObject scriptSolution;
 
     private TimeSpan timer;
+    private int timerTotalMin = 15;
     private float timeElapsed;
 
     [HideInInspector] public bool isSlave;
@@ -103,34 +104,6 @@ public class ConfManager : MonoBehaviour
                 "A predefined map/script is COPIED to " + path
             );
         }
-
-        // Init configurations of stages
-        // stages = new Dictionary<string, OgStageConfig>();
-        // stages.Add("Tutorial", OgStageConfig.ImportConfigFile("OgConfig-Tutorial"));
-        // stages.Add("S1-Algorithm", OgStageConfig.ImportConfigFile("OgConfig-Puzzle3"));
-        // stages.Add("S-Tutorial", OgStageConfig.ImportConfigFile("OgConfig-FlyingHelicopter-Tutorial"));
-        // stages.Add("S-Helicopter", OgStageConfig.ImportConfigFile("OgConfig-FlyingHelicopter"));
-        // stages.Add("S-Extra", OgStageConfig.ImportConfigFile("OgConfig-FlyingHelicopter-Adv"));
-
-        // Init stage buttons
-        // stageButtons = new List<Button>();
-        // stageKeys = new List<string>();
-        // foreach (var kv in stages)
-        // {
-        //     var newButton = Instantiate(stageButtonPrefab, parent: stageProgressView);
-        //     var newButtonText = newButton.GetComponentInChildren<Text>();
-
-        //     newButton.onClick.AddListener(() => { ApplyConfigurationSync(kv.Key); });
-        //     newButton.interactable = false;  // To test you can make it true
-        //     newButtonText.text = kv.Key;
-        //     newButton.gameObject.SetActive(true);
-
-        //     stageKeys.Add(kv.Key);
-        //     stageButtons.Add(newButton);
-        // }
-        // stageButtons[0].interactable = true;
-        // stageButtons[stageButtons.Count - 1].GetComponent<Image>().sprite = null;
-
         ToggleAlwaysOnRecording(true);
     }
 
@@ -241,7 +214,7 @@ public class ConfManager : MonoBehaviour
         else
             cameraFocusControl.ToggleARCamera(false);
 
-        timer = TimeSpan.FromMinutes(25);
+        timer = TimeSpan.FromMinutes(timerTotalMin);
         timerText.text = string.Format("{0:c}", timer);
         timeElapsed = 0;
 
