@@ -28,6 +28,8 @@ public class ConfManager : MonoBehaviour
     public Button stageButtonPrefab;
     public CameraFocusControl cameraFocusControl;
     public AvatarController[] defaultAvatars, helicopterAvatars;
+    public InputField serverIPField;
+    private const string PREFKEY_SERVER_IP = "pref_key_server_ip";
 
     private List<Button> stageButtons;
     private List<string> stageKeys;
@@ -60,51 +62,15 @@ public class ConfManager : MonoBehaviour
         sttCtrlPanel.SetActive(true);
         sttCtrlPanelAlwaysOn.SetActive(false);
 
-        // Load predefined maps/scripts to the data folder
-        var dataFolderPath = Application.persistentDataPath;
-        // This is just a list of files to import during the initialization of game.
-        // They will be copied from the package to the storage on the device.
-        // To add a config into the game, see the variable "stages" below.
-        var filesToCopy = new string[] {
-            "OgConfig-Tutorial",
-                "OgMap-Tutorial1",
-                "OgScript-Tutorial1-M",
-                "OgScript-Tutorial1-S",
-
-            "OgConfig-Puzzle3",
-                "OgMap-Puzzle3",
-                "OgScript-Puzzle3-M",
-                "OgScript-Puzzle3-S",
-
-            "OgConfig-FlyingHelicopter",
-                "OgMap-FlyingHelicopter-v1",
-                "OgScript-FlyingHelicopter-M-v1",
-                "OgScript-FlyingHelicopter-S-v1",
-
-            "OgConfig-FlyingHelicopter-Tutorial",
-                "OgMap-FlyingHelicopter-v0",
-                "OgScript-FlyingHelicopter-M-v0",
-                "OgScript-FlyingHelicopter-S-v0",
-
-            "OgConfig-FlyingHelicopter-Adv",
-                "OgMap-FlyingHelicopter",
-                "OgScript-FlyingHelicopter-M",
-                "OgScript-FlyingHelicopter-S",
-        };
-        foreach (var s in filesToCopy)
-        {
-            var path = Path.Combine(dataFolderPath, s) + ".txt";
-            var txt = (TextAsset)Resources.Load(s, typeof(TextAsset));
-            using (var writer = new StreamWriter(path))
-            {
-                writer.Write(txt.text);
-            }
-            DataLogger.Log(
-                this.gameObject, LogTag.SYSTEM,
-                "A predefined map/script is COPIED to " + path
-            );
-        }
+        // Recording
         ToggleAlwaysOnRecording(true);
+
+        // Networking
+        serverIPField.onValueChanged.AddListener((string value) =>
+        {
+            SetSocketIPAddr();
+        });
+        ShowSocketIPAddr();
     }
 
     private void Update()
@@ -127,8 +93,64 @@ public class ConfManager : MonoBehaviour
 
     // ==========
 
-    public void LoadConfigSetAndStartGame(int configSetID = 0)
+    /// <summary>
+    /// Load configuration files according to a pre-defined rule. This is the only place you need to change when adding new game stages.
+    /// </summary>
+    /// <param name="configSetID"></param>
+    /// <returns></returns>
+    private Dictionary<string, OgStageConfig> LoadConfigSets(int configSetID = 0)
     {
+        // Load predefined maps/scripts to the data folder
+        var dataFolderPath = Application.persistentDataPath;
+
+        // This is just a list of files to import during the initialization of game.
+        // They will be copied from the package to the storage on the device.
+        // To add a config into the game, see the variable "stages" in LoadConfigSetAndStartGame below.
+        var filesToCopy = new string[] {
+
+            // Currently in use
+
+            "OgConfig-FlyingHelicopter-Tutorial",
+                "OgMap-FlyingHelicopter-v0",
+                "OgScript-FlyingHelicopter-M-v0",
+                "OgScript-FlyingHelicopter-S-v0",
+
+            "OgConfig-FlyingHelicopter",
+                "OgMap-FlyingHelicopter-v1",
+                "OgScript-FlyingHelicopter-M-v1",
+                "OgScript-FlyingHelicopter-S-v1",
+
+            // Old Configurations
+            // "OgConfig-Tutorial",
+            //     "OgMap-Tutorial1",
+            //     "OgScript-Tutorial1-M",
+            //     "OgScript-Tutorial1-S",
+            // "OgConfig-Puzzle3",
+            //     "OgMap-Puzzle3",
+            //     "OgScript-Puzzle3-M",
+            //     "OgScript-Puzzle3-S",
+            // "OgConfig-FlyingHelicopter-Adv",
+            //     "OgMap-FlyingHelicopter",
+            //     "OgScript-FlyingHelicopter-M",
+            //     "OgScript-FlyingHelicopter-S",
+
+        };
+        foreach (var s in filesToCopy)
+        {
+            var path = Path.Combine(dataFolderPath, s) + ".txt";
+            var txt = (TextAsset)Resources.Load(s, typeof(TextAsset));
+            using (var writer = new StreamWriter(path))
+            {
+                writer.Write(txt.text);
+            }
+            DataLogger.Log(
+                this.gameObject, LogTag.SYSTEM,
+                "A predefined map/script is COPIED to " + path
+            );
+        }
+
+        // User-defined Rules (You should modeify this section when you want to add new stages)
+
         var configTutorialAR = OgStageConfig.ImportConfigFile("OgConfig-FlyingHelicopter-Tutorial");
         configTutorialAR.isAREnabled = true;
         var configTutorialNonAR = OgStageConfig.ImportConfigFile("OgConfig-FlyingHelicopter-Tutorial");
@@ -138,7 +160,7 @@ public class ConfManager : MonoBehaviour
         var configHeliNonAR = OgStageConfig.ImportConfigFile("OgConfig-FlyingHelicopter");
         configHeliNonAR.isAREnabled = false;
 
-        stages = new Dictionary<string, OgStageConfig>();
+        var stages = new Dictionary<string, OgStageConfig>();
 
         switch (configSetID)
         {
@@ -157,6 +179,17 @@ public class ConfManager : MonoBehaviour
                 stages.Add("Task-AR", configHeliAR);
                 break;
         }
+
+        return stages;
+    }
+
+    /// <summary>
+    /// Used by the start button in the menu screen.
+    /// </summary>
+    /// <param name="configSetID"></param>
+    public void LoadConfigSetAndStartGame(int configSetID = 0)
+    {
+        stages = LoadConfigSets(configSetID);
 
         stageButtons = new List<Button>();
         stageKeys = new List<string>();
@@ -265,9 +298,20 @@ public class ConfManager : MonoBehaviour
 
     // ==========
 
+    private void SetSocketIPAddr()
+    {
+        PlayerPrefs.SetString(PREFKEY_SERVER_IP, serverIPField.text);
+        partnerSocket.SetServerIP(serverIPField.text);
+    }
+    private void ShowSocketIPAddr()
+    {
+        string savedIP = PlayerPrefs.GetString(PREFKEY_SERVER_IP, partnerSocket.GetServerIP());
+        serverIPField.text = savedIP;
+    }
 
     public void StartGame()
     {
+        SetSocketIPAddr();
         if (!partnerSocket.IsConnected())
             partnerSocket.SetupRemoteServer();
 
