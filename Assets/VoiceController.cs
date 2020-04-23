@@ -14,18 +14,18 @@ public class VoiceController : MonoBehaviour
     public SttNetworkManager networkManager;
     public AudioMixerGroup mixerGroupMic, mixerGroupMaster;
     public bool playMicrophoneInRealTime;
-
+    [HideInInspector]
     public bool sendEveryClip, sendCumulativeClip, sendFinalClip;
-
     private int CLIP_SIZE = 5;
     private int SAMPLING_RATE = 16000;  // Recommended: 16000
-
-    private float micSensitivity = 0.7f;
-
     private AudioSource audioSource;
-
     private string micName;
     private string mergedFilePath;
+    private AudioClip mergedClip;
+    private int mergedClipCount;
+    private const int MERGED_CLIP_LIMIT = 2;
+    private List<float> mergedClipData;
+    private string mergedClipName;
 
     void Start()
     {
@@ -73,12 +73,6 @@ public class VoiceController : MonoBehaviour
     {
         StartCoroutine(CheckMic());
     }
-
-    private AudioClip mergedClip;
-    private int mergedClipCount;
-    private const int MERGED_CLIP_LIMIT = 6;
-    private List<float> mergedClipData;
-    private string mergedClipName;
 
     private void RenewMergedClip()
     {
@@ -135,40 +129,34 @@ public class VoiceController : MonoBehaviour
 
     private IEnumerator _ProcessMicClip(float[] clipData)
     {
-        // Check volume
-        var micVolume = Mathf.Max(clipData);
-        // Debug.LogWarning("mic volume = " + micVolume);
-        if (micVolume > micSensitivity)
+        // Append the new clip to the merged clip
+        mergedClipData.AddRange(clipData);
+
+        // Create a new merged clip
+        mergedClip = AudioClip.Create(
+            "merged", mergedClipData.Count, audioSource.clip.channels,
+            audioSource.clip.frequency, false);
+        mergedClip.SetData(mergedClipData.ToArray(), 0);
+
+        // Save the merged file
+        mergedFilePath = SaveMicFile(mergedClipName, mergedClip);
+
+        // Send an STT request for every clip
+        if (sendEveryClip)
         {
-            // Append the new clip to the merged clip
-            mergedClipData.AddRange(clipData);
+            networkManager.RequestSpeechToText(SaveMicFile(audioSource.clip));
+        }
+        // Send an STT request for a cumulative clip
+        if (sendCumulativeClip)
+        {
+            networkManager.RequestSpeechToText(mergedFilePath);
+        }
 
-            // Create a new merged clip
-            mergedClip = AudioClip.Create(
-                "merged", mergedClipData.Count, audioSource.clip.channels,
-                audioSource.clip.frequency, false);
-            mergedClip.SetData(mergedClipData.ToArray(), 0);
-
-            // Save the merged file
-            mergedFilePath = SaveMicFile(mergedClipName, mergedClip);
-
-            // Send an STT request for every clip
-            if (sendEveryClip)
-            {
-                networkManager.RequestSpeechToText(SaveMicFile(audioSource.clip));
-            }
-            // Send an STT request for a cumulative clip
-            if (sendCumulativeClip)
-            {
-                networkManager.RequestSpeechToText(mergedFilePath);
-            }
-
-            // To prevent using too much memory
-            mergedClipCount++;
-            if (mergedClipCount >= MERGED_CLIP_LIMIT)
-            {
-                RenewMergedClip();
-            }
+        // To prevent using too much memory
+        mergedClipCount++;
+        if (mergedClipCount >= MERGED_CLIP_LIMIT)
+        {
+            RenewMergedClip();
         }
         yield return null;
     }
