@@ -7,13 +7,11 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 
+/// <summary>
+/// ConfManager collects all misc methods regarding the configuration of game stage and UI.
+/// </summary>
 public class ConfManager : MonoBehaviour
 {
-    // The format of a configuration file:
-    // L1: Problem (Stage) description
-    // L2: The map to use, local script, remote script
-    // L3: isArrowKeyEnabled, isDeveloperPanelEnabled
-
     public InformationPanel informationPanel;
     public TextMeshProUGUI timerText;
     public GridController gridController;
@@ -45,7 +43,7 @@ public class ConfManager : MonoBehaviour
 
     public const string CTRL_APPLY_CONFIG = "CTRL_APPLY_CONFIG";
 
-    // ==========
+    // ========== System Routines
 
     private void Start()
     {
@@ -91,7 +89,7 @@ public class ConfManager : MonoBehaviour
         }
     }
 
-    // ==========
+    // ========== Custom Maps and Config Rules ==========
 
     /// <summary>
     /// Load configuration files according to a pre-defined rule. This is the only place you need to change when adding new game stages.
@@ -106,6 +104,7 @@ public class ConfManager : MonoBehaviour
         // This is just a list of files to import during the initialization of game.
         // They will be copied from the package to the storage on the device.
         // To add a config into the game, see the variable "stages" in LoadConfigSetAndStartGame below.
+
         var filesToCopy = new string[] {
 
             // Currently in use
@@ -119,6 +118,11 @@ public class ConfManager : MonoBehaviour
                 "OgMap-FlyingHelicopter-v1",
                 "OgScript-FlyingHelicopter-M-v1",
                 "OgScript-FlyingHelicopter-S-v1",
+
+            "JTest1.og.config",
+                "JTest1.og.map",
+                "JTest1.og.master.script",
+                "JTest1.og.slave.script",
 
             // Old Configurations
             // "OgConfig-Tutorial",
@@ -135,6 +139,7 @@ public class ConfManager : MonoBehaviour
             //     "OgScript-FlyingHelicopter-S",
 
         };
+
         foreach (var s in filesToCopy)
         {
             var path = Path.Combine(dataFolderPath, s) + ".txt";
@@ -160,6 +165,11 @@ public class ConfManager : MonoBehaviour
         var configHeliNonAR = OgStageConfig.ImportConfigFile("OgConfig-FlyingHelicopter");
         configHeliNonAR.isAREnabled = false;
 
+        var configTestNonAR = OgStageConfig.ImportConfigFile("JTest1.og.config");
+        configTestNonAR.isAREnabled = false;
+        var configTestAR = OgStageConfig.ImportConfigFile("JTest1.og.config");
+        configTestAR.isAREnabled = true;
+
         var stages = new Dictionary<string, OgStageConfig>();
 
         switch (configSetID)
@@ -173,6 +183,10 @@ public class ConfManager : MonoBehaviour
                 stages.Add("Tutorial", configTutorialNonAR);
                 stages.Add("Task-NonAR", configHeliNonAR);
                 stages.Add("Task-AR", configHeliAR);
+                break;
+            case 99:  // Test
+                stages.Add("Test-NonAR", configTestNonAR);
+                stages.Add("Test-AR", configTestAR);
                 break;
             default:  // Tutorial AR - Heli AR
                 stages.Add("Tutorial", configTutorialAR);
@@ -212,8 +226,7 @@ public class ConfManager : MonoBehaviour
         StartGame();
     }
 
-
-    // ==========
+    // ========== Loading Configs ==========
 
     public void ApplyConfigurationSync(string confName)
     {
@@ -296,7 +309,7 @@ public class ConfManager : MonoBehaviour
         codeInterpreter.ResetAvatars();
     }
 
-    // ==========
+    // ========== Internal Game-control-flow Logistics ==========
 
     private void SetSocketIPAddr()
     {
@@ -384,8 +397,7 @@ public class ConfManager : MonoBehaviour
         nextStageScreen.SetActive(false);
     }
 
-    // ==========
-
+    // ==========  Misc ==========
 
     public void ToggleAlwaysOnRecording(bool value)
     {

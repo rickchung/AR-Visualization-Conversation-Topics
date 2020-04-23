@@ -20,7 +20,7 @@ using UnityEngine.Networking.NetworkSystem;
 public class PartnerSocket : MonoBehaviour
 {
     // For Internet server
-    private const string HOST_SERVER = "10.218.106.151";
+    private string HOST_SERVER = "10.218.106.151";
     private const int HOST_SERVER_PORT = 8082;
     // For local server
     private const int UDP_PORT = 7777;
@@ -89,6 +89,15 @@ public class PartnerSocket : MonoBehaviour
 
         if (useLocalServer)
             SetupLocalServer();
+    }
+
+    public void SetServerIP(string ipAddr)
+    {
+        HOST_SERVER = ipAddr;
+    }
+    public string GetServerIP()
+    {
+        return HOST_SERVER;
     }
 
     public bool IsConnected()

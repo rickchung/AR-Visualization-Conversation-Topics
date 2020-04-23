@@ -4,13 +4,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
-public enum GridCellType { BASE, TRAP, REWARD, REWARD_DUAL, WALL, WALL_2, WALL_3, P1_START, P2_START };
+public enum GridCellType { BASE, TRAP, REWARD, REWARD_DUAL, WALL, WALL_2, WALL_3, P1_START, P2_START, _FLOAT_WALL };
 public delegate void GridCellUpdateDelegate(GridCellType cellType, Collider other);
 
 public class GridController : MonoBehaviour
 {
     public Transform gridStart, gridEnd;
-    public Transform gridCellPrefab, gridCellTargetPrefab, girdCellTrapPrefab, gridCellTargetDuoPrefab, gridCellWallPrefab;
+    public Transform gridCellPrefab, gridCellTargetPrefab, girdCellTrapPrefab, gridCellTargetDuoPrefab, gridCellWallPrefab, gridCellFloatingWallPrefab;
     public AvatarController avatarController, rivalAvatarController;
     public CodeInterpreter codeInterpreter;
     public ConfManager confManager;
@@ -187,6 +187,12 @@ public class GridController : MonoBehaviour
                             GridCellUpdateCallback
                         );
                         break;
+                    case GridCellType._FLOAT_WALL:
+                        newCell = (Transform)Instantiate(gridCellFloatingWallPrefab, transform, false);
+                        newCell.GetComponent<GridCellFloatingWall>().SetUpdateDelegate(
+                            GridCellUpdateCallback
+                        );
+                        break;
                     default:
                         newCell = (Transform)Instantiate(gridCellPrefab, transform, false);
                         break;
@@ -279,6 +285,7 @@ public class GridController : MonoBehaviour
             case GridCellType.WALL:
             case GridCellType.WALL_2:
             case GridCellType.WALL_3:
+            case GridCellType._FLOAT_WALL:
                 DataLogger.Log(this.gameObject, LogTag.MAP, "A trap is triggered.");
                 var ac = other.GetComponent<AvatarController>();
                 if (ac != null)

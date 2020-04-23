@@ -1,0 +1,10 @@
+Flying a Helicopter
+<u>GOAL</u>: Fly the helicopter over barriers to the destination (blue flag).
+#
+JTest1.og.map.txt
+JTest1.og.master.script.txt
+JTest1.og.slave.script.txt
+false
+false
+Avatar-Helicopter
+2

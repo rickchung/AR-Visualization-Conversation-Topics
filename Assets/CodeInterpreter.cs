@@ -257,6 +257,9 @@ public class CodeInterpreter : MonoBehaviour, IEnhancedScrollerDelegate
                     v.ResetArgs();
                 }
             }
+
+            DumpCurrentScript("InitScript");
+
             UpdateCodeViewer();
         }
     }

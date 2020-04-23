@@ -1,0 +1,11 @@
+Engine (start);
+Climb (up);
+Climb (up);
+Climb (up);
+Climb (up);
+...
+Climb (down);
+Continue_Sec (6);
+Climb (up);
+Continue_Sec (3);
+Climb (down);
