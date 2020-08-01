@@ -59,6 +59,9 @@ public class PartnerSocket : MonoBehaviour
         "#2196F388"
     };
 
+    /// <summary>
+    /// A custom set of message types for networking
+    /// </summary>
     private static class MyMsgType
     {
         public static short MSG_TEST = MsgType.Highest + 1;

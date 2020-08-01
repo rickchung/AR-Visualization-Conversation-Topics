@@ -43,7 +43,10 @@ public class ConfManager : MonoBehaviour
 
     public const string CTRL_APPLY_CONFIG = "CTRL_APPLY_CONFIG";
 
-    // ========== System Routines
+
+    // ========================================
+    // System Routines
+    // ========================================
 
     private void Start()
     {
@@ -89,89 +92,25 @@ public class ConfManager : MonoBehaviour
         }
     }
 
-    // ========== Custom Maps and Config Rules ==========
+
+    // ========================================
+    // Custom Maps and Configuration Logistics
+    // ========================================
 
     /// <summary>
-    /// Load configuration files according to a pre-defined rule. This is the only place you need to change when adding new game stages.
+    /// Load configuration files according to a pre-defined rule. This is the only place you need to change when adding new game stages (which should be defined in an external file).
     /// </summary>
     /// <param name="configSetID"></param>
     /// <returns></returns>
     private Dictionary<string, OgStageConfig> LoadConfigSets(int configSetID = 0)
     {
-        // Load predefined maps/scripts to the data folder
-        var dataFolderPath = Application.persistentDataPath;
-
-        // This is just a list of files to import during the initialization of game.
-        // They will be copied from the package to the storage on the device.
-        // To add a config into the game, see the variable "stages" in LoadConfigSetAndStartGame below.
-
-        var filesToCopy = new string[] {
-
-            // Currently in use
-
-            "OgConfig-FlyingHelicopter-Tutorial",
-                "OgMap-FlyingHelicopter-v0",
-                "OgScript-FlyingHelicopter-M-v0",
-                "OgScript-FlyingHelicopter-S-v0",
-
-            "OgConfig-FlyingHelicopter",
-                "OgMap-FlyingHelicopter-v1",
-                "OgScript-FlyingHelicopter-M-v1",
-                "OgScript-FlyingHelicopter-S-v1",
-
-            "JTest1.og.config",
-                "JTest1.og.map",
-                "JTest1.og.master.script",
-                "JTest1.og.slave.script",
-
-            // Old Configurations
-            // "OgConfig-Tutorial",
-            //     "OgMap-Tutorial1",
-            //     "OgScript-Tutorial1-M",
-            //     "OgScript-Tutorial1-S",
-            // "OgConfig-Puzzle3",
-            //     "OgMap-Puzzle3",
-            //     "OgScript-Puzzle3-M",
-            //     "OgScript-Puzzle3-S",
-            // "OgConfig-FlyingHelicopter-Adv",
-            //     "OgMap-FlyingHelicopter",
-            //     "OgScript-FlyingHelicopter-M",
-            //     "OgScript-FlyingHelicopter-S",
-
-        };
-
-        foreach (var s in filesToCopy)
-        {
-            var path = Path.Combine(dataFolderPath, s) + ".txt";
-            var txt = (TextAsset)Resources.Load(s, typeof(TextAsset));
-            using (var writer = new StreamWriter(path))
-            {
-                writer.Write(txt.text);
-            }
-            DataLogger.Log(
-                this.gameObject, LogTag.SYSTEM,
-                "A predefined map/script is COPIED to " + path
-            );
-        }
-
-        // User-defined Rules (You should modeify this section when you want to add new stages)
-
-        var configTutorialAR = OgStageConfig.ImportConfigFile("OgConfig-FlyingHelicopter-Tutorial");
-        configTutorialAR.isAREnabled = true;
-        var configTutorialNonAR = OgStageConfig.ImportConfigFile("OgConfig-FlyingHelicopter-Tutorial");
-        configTutorialNonAR.isAREnabled = false;
-        var configHeliAR = OgStageConfig.ImportConfigFile("OgConfig-FlyingHelicopter");
-        configHeliAR.isAREnabled = true;
-        var configHeliNonAR = OgStageConfig.ImportConfigFile("OgConfig-FlyingHelicopter");
-        configHeliNonAR.isAREnabled = false;
-
-        var configTestNonAR = OgStageConfig.ImportConfigFile("JTest1.og.config");
-        configTestNonAR.isAREnabled = false;
-        var configTestAR = OgStageConfig.ImportConfigFile("JTest1.og.config");
-        configTestAR.isAREnabled = true;
+        // Import the copied configurations
+        var configTutorialAR = OgStageConfig.ImportConfigFile("OgConfig-FlyingHelicopter-Tutorial", true);
+        var configTutorialNonAR = OgStageConfig.ImportConfigFile("OgConfig-FlyingHelicopter-Tutorial", false);
+        var configHeliAR = OgStageConfig.ImportConfigFile("OgConfig-FlyingHelicopter", true);
+        var configHeliNonAR = OgStageConfig.ImportConfigFile("OgConfig-FlyingHelicopter", false);
 
         var stages = new Dictionary<string, OgStageConfig>();
-
         switch (configSetID)
         {
             case 1:  // Tutorial AR - Heli AR - Heli NonAR
@@ -184,10 +123,6 @@ public class ConfManager : MonoBehaviour
                 stages.Add("Task-NonAR", configHeliNonAR);
                 stages.Add("Task-AR", configHeliAR);
                 break;
-            case 99:  // Test
-                stages.Add("Test-NonAR", configTestNonAR);
-                stages.Add("Test-AR", configTestAR);
-                break;
             default:  // Tutorial AR - Heli AR
                 stages.Add("Tutorial", configTutorialAR);
                 stages.Add("Task-AR", configHeliAR);
@@ -198,11 +133,12 @@ public class ConfManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Used by the start button in the menu screen.
+    /// Used by the start button in the menu screen. This method serves as a preprocessing stage before the game-starting routine.
     /// </summary>
     /// <param name="configSetID"></param>
     public void LoadConfigSetAndStartGame(int configSetID = 0)
     {
+        // Load a configuration set
         stages = LoadConfigSets(configSetID);
 
         stageButtons = new List<Button>();
@@ -226,7 +162,10 @@ public class ConfManager : MonoBehaviour
         StartGame();
     }
 
-    // ========== Loading Configs ==========
+
+    // ========================================
+    // Loading Configs
+    // ========================================
 
     public void ApplyConfigurationSync(string confName)
     {
@@ -309,7 +248,10 @@ public class ConfManager : MonoBehaviour
         codeInterpreter.ResetAvatars();
     }
 
-    // ========== Internal Game-control-flow Logistics ==========
+
+    // ========================================
+    // Internal Game-control-flow Logistics 
+    // ========================================
 
     private void SetSocketIPAddr()
     {
@@ -322,14 +264,22 @@ public class ConfManager : MonoBehaviour
         serverIPField.text = savedIP;
     }
 
+    /// <summary>
+    /// The major game-starting routine. This method does the following things:
+    /// - Set up the internet connection to the IP entered by the user
+    /// - Apply the game configuration (currently associated to individual start buttons)
+    /// </summary>
     public void StartGame()
     {
+        // TODO: Add a feature that allows the user to choose whehter to enable networking or not.
         SetSocketIPAddr();
         if (!partnerSocket.IsConnected())
             partnerSocket.SetupRemoteServer();
 
+        // Apply the first game configuration
         currentStageIndex = 0;
         _ApplyConfiguration(stages[stageKeys[currentStageIndex]]);
+        // Disable the start screen and reset the avatar
         startScreen.SetActive(false);
         codeInterpreter.ResetAvatars();
         // informationPanel.ShowInstructionScreen(true);
@@ -397,7 +347,10 @@ public class ConfManager : MonoBehaviour
         nextStageScreen.SetActive(false);
     }
 
-    // ==========  Misc ==========
+
+    // ========================================
+    // Misc
+    // ========================================
 
     public void ToggleAlwaysOnRecording(bool value)
     {
@@ -430,6 +383,9 @@ public class ConfManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// An abstract data type of game configuration
+    /// </summary>
     public class OgStageConfig
     {
         public string name;
@@ -458,13 +414,34 @@ public class ConfManager : MonoBehaviour
             this.isAREnabled = false;
         }
 
-        public static OgStageConfig ImportConfigFile(string filename)
+        /// <summary>
+        /// Load a configuration file from the Unity Resources to the data storage on the device.
+        /// </summary>
+        /// <param name="filename">the file to load</param>
+        /// <returns></returns>
+        private static string CopyResourceToDevice(string filename)
         {
-            var dataDirPath = Application.persistentDataPath;
-            var filePath = Path.Combine(dataDirPath, filename) + ".txt";
-            OgStageConfig rt = null;
+            Debug.Log("Loading from resources:" + filename);
+            // Load the asset from the resources (the filename should not have any extension)
+            var _resFilename = Path.GetFileNameWithoutExtension(filename);
+            var resData = (TextAsset)Resources.Load(_resFilename, typeof(TextAsset));
+            // Define the path to output
+            var dataFolderPath = Application.persistentDataPath;
+            var outPath = Path.Combine(dataFolderPath, _resFilename) + ".txt";
+            // Dump the asset
+            using (var writer = new StreamWriter(outPath))
+            {
+                writer.Write(resData.text);
+            }
+            return outPath;
+        }
 
-            using (var reader = new StreamReader(filePath))
+        public static OgStageConfig ImportConfigFile(string filename, bool enableAR)
+        {
+            var configFilePath = CopyResourceToDevice(filename);
+            
+            OgStageConfig rt = null;
+            using (var reader = new StreamReader(configFilePath))
             {
                 // L1: name
                 var name = reader.ReadLine();
@@ -479,10 +456,14 @@ public class ConfManager : MonoBehaviour
 
                 // L3: map filename (must be placed in Resources)
                 var map = reader.ReadLine();
+                CopyResourceToDevice(map);
                 // L4: master's script filename (must be placed in Resources)
                 var masterScript = reader.ReadLine();
+                CopyResourceToDevice(masterScript);
                 // L5: slave's script filename (must be placed in Resources)
                 var slaveScript = reader.ReadLine();
+                CopyResourceToDevice(slaveScript);
+
                 // L6: Will the arrow keys be enabled?
                 var isArrowKeyEnabled = Boolean.Parse(reader.ReadLine());
                 // L7: Will the developer panel be enabled?
@@ -503,6 +484,8 @@ public class ConfManager : MonoBehaviour
                     avatarSetName, syncMode
                 );
             }
+
+            rt.isAREnabled = enableAR;
 
             return rt;
         }
