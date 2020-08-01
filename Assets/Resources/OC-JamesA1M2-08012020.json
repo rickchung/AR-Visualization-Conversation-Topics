@@ -1,0 +1,14 @@
+{
+    "name": "Tutorial",
+    "problem": "<u>GOAL</u>: Fly the helicopter over the terrain and barriers to the destination (blue flag).",
+
+    "map": "OM-JamesA1M2-08012020.txt",
+    "masterScript": "OS-M-JamesA1-08012020.txt",
+    "slaveScript": "OS-S-JamesA1-08012020.txt",
+
+    "isArrowKeyEnabled": "false",
+    "isDeveloperPanelEnabled": "false",
+    
+    "avatarSetName": "Avatar-Helicopter",
+    "execMode": 2
+}
