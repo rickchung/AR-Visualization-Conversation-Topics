@@ -53,7 +53,7 @@ public class DataLogger : MonoBehaviour
     {
         if (dataLogger != null)
         {
-            var timestamp = System.DateTime.Now.ToString("MM/dd/HH:mm:ss");
+            var timestamp = System.DateTime.Now.ToString("MM/dd/HH:mm:ss:fffffff");
             var logOutput = string.Format(
                 "{3}, {0}, {1}, {2}", self.name, tag.ToString(), msg, timestamp.ToString()
             );
@@ -74,7 +74,7 @@ public class DataLogger : MonoBehaviour
     {
         if (dataLogger != null)
         {
-            var timestamp = System.DateTime.Now.ToString("MM/dd/HH:mm:ss");
+            var timestamp = System.DateTime.Now.ToString("MM/dd/HH:mm:ss:fffffff");
             var logOutput = string.Format(
                 "{3}, {0}, {1}, {2}", "Static", tag.ToString(), msg, timestamp.ToString()
             );
