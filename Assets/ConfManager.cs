@@ -27,8 +27,10 @@ public class ConfManager : MonoBehaviour
     public Button stageButtonPrefab;
     public CameraFocusControl cameraFocusControl;
     public AvatarController[] defaultAvatars, helicopterAvatars;
+
     public InputField serverIPField;
     private const string PREFKEY_SERVER_IP = "pref_key_server_ip";
+    private Boolean offlineMode;
 
     public ConfigScrollerController configScrollerController;
 
@@ -112,9 +114,12 @@ public class ConfManager : MonoBehaviour
     public void LoadConfigSetAndStartGame(int configSetID = 0)
     {
         // Load a configuration set
-        if (configSetID < configSets.Count) {
+        if (configSetID < configSets.Count)
+        {
             stages = configSets[configSetID];
-        } else {
+        }
+        else
+        {
             Debug.LogError("Invalid config set ID: " + configSetID);
             return;
         }
@@ -126,12 +131,12 @@ public class ConfManager : MonoBehaviour
             var newButton = Instantiate(stageButtonPrefab, parent: stageProgressView);
             var newButtonText = newButton.GetComponentInChildren<Text>();
 
-            newButton.onClick.AddListener(() => { ApplyConfigurationSync((string) kv.Key); });
+            newButton.onClick.AddListener(() => { ApplyConfigurationSync((string)kv.Key); });
             newButton.interactable = false;  // To test you can make it true
-            newButtonText.text = (string) kv.Key;
+            newButtonText.text = (string)kv.Key;
             newButton.gameObject.SetActive(true);
 
-            stageKeys.Add((string) kv.Key);
+            stageKeys.Add((string)kv.Key);
             stageButtons.Add(newButton);
         }
         stageButtons[0].interactable = true;
@@ -146,7 +151,8 @@ public class ConfManager : MonoBehaviour
     /// <param name="configSetID"></param>
     /// <returns></returns>
 
-    private List<OrderedDictionary> InitConfigSets() {
+    private List<OrderedDictionary> InitConfigSets()
+    {
         // Import the copied configurations
         var configTutorialAR = OgStageConfig.ImportConfigJSON("OgConfig-FlyingHelicopterTutorial-ASUFall19", true);
         var configTutorialNonAR = OgStageConfig.ImportConfigJSON("OgConfig-FlyingHelicopterTutorial-ASUFall19", false);
@@ -275,10 +281,13 @@ public class ConfManager : MonoBehaviour
     public void StartGame()
     {
         // TODO: Add a feature that allows the user to choose whehter to enable networking or not.
-        SetSocketIPAddr();
-        if (!partnerSocket.IsConnected())
-            partnerSocket.SetupRemoteServer();
-
+        if (!offlineMode)
+        {
+            SetSocketIPAddr();
+            if (!partnerSocket.IsConnected())
+                partnerSocket.SetupRemoteServer();
+        }
+        
         // Apply the first game configuration
         currentStageIndex = 0;
         _ApplyConfiguration((OgStageConfig)stages[stageKeys[currentStageIndex]]);
@@ -354,6 +363,11 @@ public class ConfManager : MonoBehaviour
     // ========================================
     // Misc
     // ========================================
+
+    public void ToggleOfflineMode(bool value)
+    {
+        offlineMode = value;
+    }
 
     public void ToggleAlwaysOnRecording(bool value)
     {
