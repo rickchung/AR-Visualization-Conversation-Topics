@@ -42,7 +42,6 @@ public class ConfManager : MonoBehaviour
     private ScriptObject scriptSolution;
 
     private TimeSpan timer;
-    private int timerTotalMin = 15;
     private float timeElapsed;
 
     [HideInInspector] public bool isSlave;
@@ -208,7 +207,7 @@ public class ConfManager : MonoBehaviour
         else
             cameraFocusControl.ToggleARCamera(false);
 
-        timer = TimeSpan.FromMinutes(timerTotalMin);
+        timer = TimeSpan.FromMinutes(conf.timerTotalMin);
         timerText.text = string.Format("{0:c}", timer);
         timeElapsed = 0;
 
@@ -280,14 +279,14 @@ public class ConfManager : MonoBehaviour
     /// </summary>
     public void StartGame()
     {
-        // TODO: Add a feature that allows the user to choose whehter to enable networking or not.
+        // The user can choose whether to start with the offline mode or not
         if (!offlineMode)
         {
             SetSocketIPAddr();
             if (!partnerSocket.IsConnected())
                 partnerSocket.SetupRemoteServer();
         }
-        
+
         // Apply the first game configuration
         currentStageIndex = 0;
         _ApplyConfiguration((OgStageConfig)stages[stageKeys[currentStageIndex]]);
@@ -413,6 +412,7 @@ public class ConfManager : MonoBehaviour
         public bool isAREnabled;
         public string avatarSetName;
         public CodeInterpreter.ScriptExecMode execMode;
+        public int timerTotalMin;
 
         public OgStageConfig(
             string name, string problem, string map, string masterScript, string slaveScript,
@@ -456,64 +456,6 @@ public class ConfManager : MonoBehaviour
         /// <summary>
         /// Parse and import a configuration file into an object.
         /// </summary>
-        [Obsolete("This method is for the first version of configuration files")]
-        public static OgStageConfig ImportConfigFile(string filename, bool enableAR)
-        {
-            var configFilePath = CopyResourceToDevice(filename);
-
-            OgStageConfig rt = null;
-            using (var reader = new StreamReader(configFilePath))
-            {
-                // L1: name
-                var name = reader.ReadLine();
-                // L2: problem desc
-                string problem = "";
-                string nextProblemLine = reader.ReadLine();
-                while (nextProblemLine != null && (!nextProblemLine.Trim().Equals("#")))
-                {
-                    problem += nextProblemLine + "\n";
-                    nextProblemLine = reader.ReadLine();
-                }
-
-                // L3: map filename (must be placed in Resources)
-                var map = reader.ReadLine();
-                CopyResourceToDevice(map);
-                // L4: master's script filename (must be placed in Resources)
-                var masterScript = reader.ReadLine();
-                CopyResourceToDevice(masterScript);
-                // L5: slave's script filename (must be placed in Resources)
-                var slaveScript = reader.ReadLine();
-                CopyResourceToDevice(slaveScript);
-
-                // L6: Will the arrow keys be enabled?
-                var isArrowKeyEnabled = Boolean.Parse(reader.ReadLine());
-                // L7: Will the developer panel be enabled?
-                var isDeveloperPanelEnabled = Boolean.Parse(reader.ReadLine());
-                // L8: The set name of avaters to use
-                var avatarSetName = reader.ReadLine();
-                if (avatarSetName == null) avatarSetName = "Avatar-Default";
-                // L9: Sync mode
-                var syncModeStr = reader.ReadLine();
-                CodeInterpreter.ScriptExecMode syncMode = CodeInterpreter.ScriptExecMode.SYNC_STEP_SWITCHING;
-                if (syncModeStr != null)
-                    syncMode = (CodeInterpreter.ScriptExecMode)int.Parse(syncModeStr);
-
-                rt = new OgStageConfig(
-                    name, problem, map,
-                    masterScript, slaveScript,
-                    isArrowKeyEnabled, isDeveloperPanelEnabled,
-                    avatarSetName, syncMode
-                );
-            }
-
-            rt.isAREnabled = enableAR;
-
-            return rt;
-        }
-
-        /// <summary>
-        /// Parse and import a configuration file into an object.
-        /// </summary>
         /// <param name="filename">A text file in the JSON format</param>
         /// <param name="enableAR">Whether to enable AR</param>
         /// <returns>A config object</returns>
@@ -531,8 +473,6 @@ public class ConfManager : MonoBehaviour
 
             // Convert the config in json into the format accepted by the system
 
-            OgStageConfig rt = null;
-
             var name = jsonObj.name;
             var problem = jsonObj.problem;
 
@@ -549,6 +489,9 @@ public class ConfManager : MonoBehaviour
             var avatarSetName = (jsonObj.avatarSetName == null) ? "Avatar-Default" : jsonObj.avatarSetName;
             var syncMode = (CodeInterpreter.ScriptExecMode)jsonObj.execMode;
 
+            var timerTotalMin = (jsonObj.timerTotalMin > 0) ? jsonObj.timerTotalMin : 15;
+
+            OgStageConfig rt = null;
             rt = new OgStageConfig(
                 name, problem, map,
                 masterScript, slaveScript,
@@ -556,6 +499,7 @@ public class ConfManager : MonoBehaviour
                 avatarSetName, syncMode
             );
             rt.isAREnabled = enableAR;
+            rt.timerTotalMin = timerTotalMin;
 
             return rt;
         }
@@ -574,5 +518,6 @@ public class ConfManager : MonoBehaviour
     {
         public string name, problem, map, masterScript, slaveScript, isArrowKeyEnabled, isDeveloperPanelEnabled, avatarSetName;
         public int execMode;
+        public int timerTotalMin;
     }
 }
