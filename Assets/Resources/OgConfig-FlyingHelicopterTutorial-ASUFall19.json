@@ -1,0 +1,14 @@
+{
+    "name": "Tutorial",
+    "problem": "<u>GOAL</u>: Fly the helicopter over the terrain and barriers to the destination (blue flag).",
+
+    "map": "OgMap-FlyingHelicopterTutorial-ASUFall19.txt",
+    "masterScript": "OgScript-M-FlyingHelicopterTutorial-ASUFall19.txt",
+    "slaveScript": "OgScript-S-FlyingHelicopterTutorial-ASUFall19.txt",
+
+    "isArrowKeyEnabled": "false",
+    "isDeveloperPanelEnabled": "false",
+    
+    "avatarSetName": "Avatar-Helicopter",
+    "execMode": 2
+}

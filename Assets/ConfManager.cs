@@ -105,10 +105,10 @@ public class ConfManager : MonoBehaviour
     private Dictionary<string, OgStageConfig> LoadConfigSets(int configSetID = 0)
     {
         // Import the copied configurations
-        var configTutorialAR = OgStageConfig.ImportConfigFile("OgConfig-FlyingHelicopter-Tutorial", true);
-        var configTutorialNonAR = OgStageConfig.ImportConfigFile("OgConfig-FlyingHelicopter-Tutorial", false);
-        var configHeliAR = OgStageConfig.ImportConfigFile("OgConfig-FlyingHelicopter", true);
-        var configHeliNonAR = OgStageConfig.ImportConfigFile("OgConfig-FlyingHelicopter", false);
+        var configTutorialAR = OgStageConfig.ImportConfigJSON("OgConfig-FlyingHelicopterTutorial-ASUFall19", true);
+        var configTutorialNonAR = OgStageConfig.ImportConfigJSON("OgConfig-FlyingHelicopterTutorial-ASUFall19", false);
+        var configHeliAR = OgStageConfig.ImportConfigJSON("OgConfig-FlyingHelicopter-ASUFall19", true);
+        var configHeliNonAR = OgStageConfig.ImportConfigJSON("OgConfig-FlyingHelicopter-ASUFall19", false);
 
         var stages = new Dictionary<string, OgStageConfig>();
         switch (configSetID)
@@ -386,7 +386,7 @@ public class ConfManager : MonoBehaviour
     /// <summary>
     /// An abstract data type of game configuration
     /// </summary>
-    public class OgStageConfig
+    private class OgStageConfig
     {
         public string name;
         public string problem;
@@ -436,10 +436,14 @@ public class ConfManager : MonoBehaviour
             return outPath;
         }
 
+        /// <summary>
+        /// Parse and import a configuration file into an object.
+        /// </summary>
+        [Obsolete("This method is for the first version of configuration files")]
         public static OgStageConfig ImportConfigFile(string filename, bool enableAR)
         {
             var configFilePath = CopyResourceToDevice(filename);
-            
+
             OgStageConfig rt = null;
             using (var reader = new StreamReader(configFilePath))
             {
@@ -490,9 +494,68 @@ public class ConfManager : MonoBehaviour
             return rt;
         }
 
+        /// <summary>
+        /// Parse and import a configuration file into an object.
+        /// </summary>
+        /// <param name="filename">A text file in the JSON format</param>
+        /// <param name="enableAR">Whether to enable AR</param>
+        /// <returns>A config object</returns>
+        public static OgStageConfig ImportConfigJSON(string filename, bool enableAR)
+        {
+            // Load the file into a string
+            var configFilePath = CopyResourceToDevice(filename);
+            var json = "";
+            using (var reader = new StreamReader(configFilePath))
+            {
+                json = reader.ReadToEnd();
+            }
+            // If a field is missing, it will be set by the default value of its type
+            var jsonObj = JsonUtility.FromJson<OgStageConfigJSON>(json);
+
+            // Convert the config in json into the format accepted by the system
+
+            OgStageConfig rt = null;
+
+            var name = jsonObj.name;
+            var problem = jsonObj.problem;
+
+            var map = jsonObj.map;
+            CopyResourceToDevice(map);
+            var masterScript = jsonObj.masterScript;
+            CopyResourceToDevice(masterScript);
+            var slaveScript = jsonObj.slaveScript;
+            CopyResourceToDevice(slaveScript);
+
+            var isArrowKeyEnabled = Boolean.Parse(jsonObj.isArrowKeyEnabled);
+            var isDeveloperPanelEnabled = Boolean.Parse(jsonObj.isDeveloperPanelEnabled);
+
+            var avatarSetName = (jsonObj.avatarSetName == null) ? "Avatar-Default" : jsonObj.avatarSetName;
+            var syncMode = (CodeInterpreter.ScriptExecMode)jsonObj.execMode;
+
+            rt = new OgStageConfig(
+                name, problem, map,
+                masterScript, slaveScript,
+                isArrowKeyEnabled, isDeveloperPanelEnabled,
+                avatarSetName, syncMode
+            );
+            rt.isAREnabled = enableAR; 
+
+            return rt;
+        }
+
         override public string ToString()
         {
             return name;
         }
+    }
+
+
+    /// <summary>
+    /// This class is specifically used as a wrapper to read/write a configuration in the JSON format. 
+    /// </summary>
+    private class OgStageConfigJSON
+    {
+        public string name, problem, map, masterScript, slaveScript, isArrowKeyEnabled, isDeveloperPanelEnabled, avatarSetName;
+        public int execMode;
     }
 }

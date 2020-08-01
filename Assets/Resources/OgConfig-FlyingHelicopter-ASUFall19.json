@@ -1,0 +1,14 @@
+{
+    "name": "Flying a Helicopter",
+    "problem": "<u>GOAL</u>: Fly the helicopter over barriers to th\ndestination (blue flag).\n<indent=5%>\n+ Start the <color=#f5f5f5>ENGINE</color>,\n+ <color=#f5f5f5>CONTINUE</color> <color=#f5f5f5>CLIMBING</color> up\n+ <color=#f5f5f5>MOVING</color> forward to the right position an\n<color=#f5f5f5>HOVER</color>\n+ <color=#f5f5f5>CLIMB</color> down to capture the flag.",
+
+    "map": "OgMap-FlyingHelicopter-ASUFall19.txt",
+    "masterScript": "OgScript-M-FlyingHelicopter-ASUFall19.txt",
+    "slaveScript": "OgScript-S-FlyingHelicopter-ASUFall19.txt",
+    
+    "isArrowKeyEnabled": "false",
+    "isDeveloperPanelEnabled": "false",
+
+    "avatarSetName": "Avatar-Helicopter",
+    "execMode": 2
+}
