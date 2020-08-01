@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Specialized;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -29,10 +30,13 @@ public class ConfManager : MonoBehaviour
     public InputField serverIPField;
     private const string PREFKEY_SERVER_IP = "pref_key_server_ip";
 
+    public ConfigScrollerController configScrollerController;
+
     private List<Button> stageButtons;
     private List<string> stageKeys;
     private int currentStageIndex;
-    private Dictionary<string, OgStageConfig> stages;
+    private OrderedDictionary stages;
+    private List<OrderedDictionary> configSets;
     private ScriptObject scriptSolution;
 
     private TimeSpan timer;
@@ -72,6 +76,10 @@ public class ConfManager : MonoBehaviour
             SetSocketIPAddr();
         });
         ShowSocketIPAddr();
+
+        // Retrieve the predefined configuration set
+        configSets = InitConfigSets();
+        configScrollerController.SetData(configSets);
     }
 
     private void Update()
@@ -98,68 +106,59 @@ public class ConfManager : MonoBehaviour
     // ========================================
 
     /// <summary>
-    /// Load configuration files according to a pre-defined rule. This is the only place you need to change when adding new game stages (which should be defined in an external file).
-    /// </summary>
-    /// <param name="configSetID"></param>
-    /// <returns></returns>
-    private Dictionary<string, OgStageConfig> LoadConfigSets(int configSetID = 0)
-    {
-        // Import the copied configurations
-        var configTutorialAR = OgStageConfig.ImportConfigJSON("OgConfig-FlyingHelicopterTutorial-ASUFall19", true);
-        var configTutorialNonAR = OgStageConfig.ImportConfigJSON("OgConfig-FlyingHelicopterTutorial-ASUFall19", false);
-        var configHeliAR = OgStageConfig.ImportConfigJSON("OgConfig-FlyingHelicopter-ASUFall19", true);
-        var configHeliNonAR = OgStageConfig.ImportConfigJSON("OgConfig-FlyingHelicopter-ASUFall19", false);
-
-        var stages = new Dictionary<string, OgStageConfig>();
-        switch (configSetID)
-        {
-            case 1:  // Tutorial AR - Heli AR - Heli NonAR
-                stages.Add("Tutorial", configTutorialAR);
-                stages.Add("Task-AR", configHeliAR);
-                stages.Add("Task-NonAR", configHeliNonAR);
-                break;
-            case 2:  // Tutorial NonAR - Heli NonAR - Heli AR
-                stages.Add("Tutorial", configTutorialNonAR);
-                stages.Add("Task-NonAR", configHeliNonAR);
-                stages.Add("Task-AR", configHeliAR);
-                break;
-            default:  // Tutorial AR - Heli AR
-                stages.Add("Tutorial", configTutorialAR);
-                stages.Add("Task-AR", configHeliAR);
-                break;
-        }
-
-        return stages;
-    }
-
-    /// <summary>
     /// Used by the start button in the menu screen. This method serves as a preprocessing stage before the game-starting routine.
     /// </summary>
     /// <param name="configSetID"></param>
     public void LoadConfigSetAndStartGame(int configSetID = 0)
     {
         // Load a configuration set
-        stages = LoadConfigSets(configSetID);
+        if (configSetID < configSets.Count) {
+            stages = configSets[configSetID];
+        } else {
+            Debug.LogError("Invalid config set ID: " + configSetID);
+            return;
+        }
 
         stageButtons = new List<Button>();
         stageKeys = new List<string>();
-        foreach (var kv in stages)
+        foreach (DictionaryEntry kv in stages)
         {
             var newButton = Instantiate(stageButtonPrefab, parent: stageProgressView);
             var newButtonText = newButton.GetComponentInChildren<Text>();
 
-            newButton.onClick.AddListener(() => { ApplyConfigurationSync(kv.Key); });
+            newButton.onClick.AddListener(() => { ApplyConfigurationSync((string) kv.Key); });
             newButton.interactable = false;  // To test you can make it true
-            newButtonText.text = kv.Key;
+            newButtonText.text = (string) kv.Key;
             newButton.gameObject.SetActive(true);
 
-            stageKeys.Add(kv.Key);
+            stageKeys.Add((string) kv.Key);
             stageButtons.Add(newButton);
         }
         stageButtons[0].interactable = true;
         stageButtons[stageButtons.Count - 1].GetComponent<Image>().sprite = null;
 
         StartGame();
+    }
+
+    /// <summary>
+    /// Load configuration files according to a pre-defined rule. This is the only place you need to change when adding new game stages (which should be defined in an external file).
+    /// </summary>
+    /// <param name="configSetID"></param>
+    /// <returns></returns>
+
+    private List<OrderedDictionary> InitConfigSets() {
+        // Import the copied configurations
+        var configTutorialAR = OgStageConfig.ImportConfigJSON("OgConfig-FlyingHelicopterTutorial-ASUFall19", true);
+        var configTutorialNonAR = OgStageConfig.ImportConfigJSON("OgConfig-FlyingHelicopterTutorial-ASUFall19", false);
+        var configHeliAR = OgStageConfig.ImportConfigJSON("OgConfig-FlyingHelicopter-ASUFall19", true);
+        var configHeliNonAR = OgStageConfig.ImportConfigJSON("OgConfig-FlyingHelicopter-ASUFall19", false);
+
+        var stageList = new List<OrderedDictionary>() {
+            new OrderedDictionary() {{"Tutorial", configTutorialAR}, {"Task-AR", configHeliAR}, {"Task-NonAR", configHeliNonAR}},
+            new OrderedDictionary() {{"Tutorial", configTutorialNonAR}, {"Task-NonAR", configHeliNonAR}, {"Task-AR", configHeliAR}},
+        };
+
+        return stageList;
     }
 
 
@@ -176,7 +175,7 @@ public class ConfManager : MonoBehaviour
             if (currentStageIndex != newStageIndex)
             {
                 currentStageIndex = newStageIndex;
-                _ApplyConfiguration(stages[confName]);
+                _ApplyConfiguration((OgStageConfig)stages[confName]);
 
                 // Also tell the partner to load the configuration
                 partnerSocket.BroadcastAvatarCtrl(
@@ -278,7 +277,7 @@ public class ConfManager : MonoBehaviour
 
         // Apply the first game configuration
         currentStageIndex = 0;
-        _ApplyConfiguration(stages[stageKeys[currentStageIndex]]);
+        _ApplyConfiguration((OgStageConfig)stages[stageKeys[currentStageIndex]]);
         // Disable the start screen and reset the avatar
         startScreen.SetActive(false);
         codeInterpreter.ResetAvatars();
@@ -538,7 +537,7 @@ public class ConfManager : MonoBehaviour
                 isArrowKeyEnabled, isDeveloperPanelEnabled,
                 avatarSetName, syncMode
             );
-            rt.isAREnabled = enableAR; 
+            rt.isAREnabled = enableAR;
 
             return rt;
         }
