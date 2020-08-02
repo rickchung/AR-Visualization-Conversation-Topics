@@ -83,10 +83,12 @@ public class HelicopterController : AvatarController
                     switch (args[0])
                     {
                         case "left":
-                            HoveringTurnLeft();
+                            // HoveringTurnLeft();
+                            TurnInstantLeft();
                             break;
                         case "right":
-                            HoveringTurnRight();
+                            // HoveringTurnRight();
+                            TurnInstantRight();
                             break;
                     }
                     break;
@@ -261,16 +263,32 @@ public class HelicopterController : AvatarController
     public void StartEngine()
     {
         isEngineOn = true;
-        rbTopRotor.AddTorque(10f * helicopter.up, ForceMode.Impulse);
-        rbTailRotor.AddTorque(10f * -helicopter.right, ForceMode.Impulse);
+        RotateRotors();
     }
     public void StopEngine()
     {
         isEngineOn = false;
-        rbTopRotor.angularVelocity = Vector3.zero;
-        rbTailRotor.angularVelocity = Vector3.zero;
+        StopRotors();
         upAcc = forwardAcc = 0;
         rbHelicopter.velocity = 10 * SCALE_UPACC * -Vector3.up;
+    }
+
+    /// <summary>
+    /// Stop the rotating rotors to make the stop effect
+    /// </summary>
+    private void StopRotors()
+    {
+        rbTopRotor.angularVelocity = Vector3.zero;
+        rbTailRotor.angularVelocity = Vector3.zero;
+    }
+
+    /// <summary>
+    /// Rotate the rotors to make the fly effect
+    /// </summary>
+    private void RotateRotors()
+    {
+        rbTopRotor.AddTorque(10f * rbTopRotor.transform.up, ForceMode.Impulse);
+        rbTailRotor.AddTorque(10f * -rbTailRotor.transform.right, ForceMode.Impulse);
     }
 
     public void ClimbUp()
@@ -293,6 +311,25 @@ public class HelicopterController : AvatarController
     public void HoveringTurnLeft()
     {
         SpeedUpTailRotor(scaleHoverTurn);
+    }
+
+    public void TurnInstantLeft()
+    {
+        MakeInstantTurn(-90);
+    }
+
+    public void TurnInstantRight()
+    {
+        MakeInstantTurn(90);
+    }
+
+    private void MakeInstantTurn(float eularAngle)
+    {
+        StopRotors();
+        helicopter.Rotate(Vector3.up * eularAngle, Space.World);
+        // rbTopRotor.transform.Rotate(rbTopRotor.transform.up * eularAngle, Space.Self);
+        // rbTailRotor.transform.Rotate(rbTailRotor.transform.up * eularAngle, Space.Self);
+        RotateRotors();
     }
 
     public void MoveForward()

@@ -1,7 +1,9 @@
 
+Engine (start);
+Climb (up);
 Move (forward);
 Continue_Sec (8);
-Hover ();
+Turn (left);
 
 Move (forward);
 Continue_Sec (7);
