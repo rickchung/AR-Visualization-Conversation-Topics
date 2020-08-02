@@ -270,7 +270,7 @@ public class HelicopterController : AvatarController
         isEngineOn = false;
         StopRotors();
         upAcc = forwardAcc = 0;
-        rbHelicopter.velocity = 10 * SCALE_UPACC * -Vector3.up;
+        rbHelicopter.velocity = 30 * SCALE_UPACC * -Vector3.up;
     }
 
     /// <summary>
@@ -327,8 +327,6 @@ public class HelicopterController : AvatarController
     {
         StopRotors();
         helicopter.Rotate(Vector3.up * eularAngle, Space.World);
-        // rbTopRotor.transform.Rotate(rbTopRotor.transform.up * eularAngle, Space.Self);
-        // rbTailRotor.transform.Rotate(rbTailRotor.transform.up * eularAngle, Space.Self);
         RotateRotors();
     }
 

@@ -1,10 +1,12 @@
-
+...
 Engine (start);
 Climb (up);
 Move (forward);
-Continue_Sec (8);
+Continue_Sec (3);
 Turn (left);
-
-Move (forward);
-Continue_Sec (7);
+...
+Continue_Sec (3);
+Turn (right);
+Continue_Sec (6);
 Hover ();
+Climb (down);
