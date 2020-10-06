@@ -258,7 +258,7 @@ public class HelicopterController : AvatarController
     private const float SCALE_TORQUE = 20f;
     private float SCALE_UPACC = 25f;
     private float SCALE_DOWNACC = 10f;
-    private const float SCALE_FORWARD_ACC = 30f;
+    private const float SCALE_FORWARD_ACC = 90f; // 30f;
 
     public void StartEngine()
     {

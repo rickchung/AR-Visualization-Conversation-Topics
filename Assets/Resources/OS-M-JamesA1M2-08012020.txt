@@ -10,3 +10,15 @@ Climb (down);
 Climb (up);
 Continue_Sec (3);
 Continue_Sec (3);
+Engine (start);
+Climb (up);
+...
+Climb (down);
+Continue_Sec (6);
+Climb (up);
+Continue_Sec (3);
+...
+Climb (down);
+Climb (up);
+Continue_Sec (3);
+Continue_Sec (3);

@@ -12,3 +12,17 @@ Hover ();
 Continue_Sec (6);
 Hover ();
 Climb (down);
+...
+Engine (start);
+Climb (up);
+Move (forward);
+Continue_Sec (3);
+Turn (left);
+...
+Continue_Sec (3);
+Turn (right);
+Continue_Sec (6);
+Hover ();
+Continue_Sec (6);
+Hover ();
+Climb (down);

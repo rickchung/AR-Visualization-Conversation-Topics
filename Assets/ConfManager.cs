@@ -159,10 +159,11 @@ public class ConfManager : MonoBehaviour
         var configHeliNonAR = OgStageConfig.ImportConfigJSON("OgConfig-FlyingHelicopter-ASUFall19", false);
 
         var configJamesA1M1 = OgStageConfig.ImportConfigJSON("OC-JamesA1M1-08012020.json", false);
-        var configJamesA1M2 = OgStageConfig.ImportConfigJSON("OC-JamesA1M2-08012020.json", false);
+        var configJamesA1M2 = OgStageConfig.ImportConfigJSON("OC-JamesA1M2-08012020.json", true);
+        var configJamesA1M3 = OgStageConfig.ImportConfigJSON("OC-JamesA1M3-10062020.json", true);
 
         var stageList = new List<OrderedDictionary>() {
-            new OrderedDictionary() {{"2020-JA1-Map1", configJamesA1M1}, {"2020-JA1-Map2", configJamesA1M2}},
+            new OrderedDictionary() {{"2020-JA1-Map1", configJamesA1M1}, {"2020-JA1-Map2", configJamesA1M2}, {"2020-JA1-Map3", configJamesA1M3}},
             new OrderedDictionary() {{"ASUF19-Tutorial", configTutorialAR}, {"Task-AR", configHeliAR}, {"Task-NonAR", configHeliNonAR}},
             new OrderedDictionary() {{"ASUF19-Tutorial", configTutorialNonAR}, {"Task-NonAR", configHeliNonAR}, {"Task-AR", configHeliAR}},
         };
