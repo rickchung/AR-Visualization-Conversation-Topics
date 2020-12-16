@@ -243,7 +243,8 @@ public class GridController : MonoBehaviour
     /// </summary>
     public void ResetMap()
     {
-        if (cellMetaObjectsMap == null) {
+        if (cellMetaObjectsMap == null)
+        {
             RemoveGridMap();
             GenerateDefaultMap();
             return;
@@ -265,10 +266,9 @@ public class GridController : MonoBehaviour
                         // When rewards are used as origins of avatars, we do not reset rewards that have been eaten once before
                         if (confManager.UseRewardAsOrigin)
                         {
-                            if (!((GridCellTarget)c).WasEatenBefore)
-                            {
-                                c.Reset();
-                            }
+                            if (c is GridCellTarget)
+                                if (!((GridCellTarget)c).WasEatenBefore)
+                                    c.Reset();
                         }
                         else
                         {
@@ -305,6 +305,7 @@ public class GridController : MonoBehaviour
     private void GridCellUpdateCallback(IGridCell cell, Collider other)
     {
         var cellType = cell.GetCellType();
+        var ac = other.GetComponent<AvatarController>();
 
         switch (cellType)
         {
@@ -314,7 +315,6 @@ public class GridController : MonoBehaviour
             case GridCellType.WALL_3:
             case GridCellType._FLOAT_WALL:
                 DataLogger.Log(this.gameObject, LogTag.MAP, "A trap is triggered.");
-                var ac = other.GetComponent<AvatarController>();
                 if (ac != null)
                 {
                     ac.IsDead = true;
@@ -326,22 +326,24 @@ public class GridController : MonoBehaviour
                 }
                 break;
             case GridCellType.REWARD:
-                DataLogger.Log(this.gameObject, LogTag.MAP, string.Format("A reward is collected"));
-
-                // Set the avatar's origin the position of this reward if the setting is enabled
-                if (confManager.UseRewardAsOrigin)
+                if (ac != null)
                 {
-                    // It is a little tricky here because there are two avatars (one is a ghost).
-                    // We only reset the origin of the avatar who touches this reward.
-                    // Therefore, it's the Collider other who's AvatarController should update the origin
-                    if (other.GetComponent<AvatarController>() != null)
+                    DataLogger.Log(this.gameObject, LogTag.MAP, string.Format("A reward is collected"));
+                    if (cell is GridCellTarget)
+                        ((GridCellTarget)cell).WasEatenBefore = true;
+
+                    // Set the avatar's origin the position of this reward if the setting is enabled
+                    if (confManager.UseRewardAsOrigin)
                     {
-                        other.GetComponent<AvatarController>().UpdateStartingCells(cell.GetCell(), cell.GetCellPosition());
+                        // It is a little tricky here because there are two avatars (one is a ghost).
+                        // We only reset the origin of the avatar who touches this reward.
+                        // Therefore, it's the Collider other who's AvatarController should update the origin
+                        ac.UpdateStartingCells(cell.GetCell(), cell.GetCellPosition());
+
+                        NumFlagsCaptured++;
+                        DataLogger.Log(this.gameObject, LogTag.MAP, string.Format("Scoreboard: cur={0}, target={1}", NumFlagsCaptured, TargetNumOfFlags));
                     }
                 }
-
-                NumFlagsCaptured++;
-                DataLogger.Log(this.gameObject, LogTag.MAP, string.Format("Scoreboard: cur={0}, target={1}", NumFlagsCaptured, TargetNumOfFlags));
                 break;
             case GridCellType.REWARD_DUAL:
                 DataLogger.Log(this.gameObject, LogTag.MAP, "A dual reward is collected.");

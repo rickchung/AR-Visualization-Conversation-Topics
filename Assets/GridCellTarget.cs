@@ -32,7 +32,6 @@ public class GridCellTarget : MonoBehaviour, IGridCell
             flagPole.gameObject.SetActive(false);
             if (updateDelegate != null)
             {
-                WasEatenBefore = true;
                 updateDelegate(this, other);
             }
         }

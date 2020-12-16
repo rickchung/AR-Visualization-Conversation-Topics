@@ -82,6 +82,8 @@ public class ConfManager : MonoBehaviour
         // Retrieve the predefined configuration set
         configSets = InitConfigSets();
         configScrollerController.SetData(configSets);
+
+        UseRewardAsOrigin = true;
     }
 
     private void Update()
