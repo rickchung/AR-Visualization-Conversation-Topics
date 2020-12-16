@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GridCellTargetDual : MonoBehaviour
+public class GridCellTargetDual : MonoBehaviour, IGridCell
 {
     private GridCellType cellType = GridCellType.REWARD_DUAL;
     private Transform flagPoleLocal, flagPoleRemote;
@@ -37,7 +37,7 @@ public class GridCellTargetDual : MonoBehaviour
                 flagToTrigger.gameObject.SetActive(false);
                 if (updateDelegate != null)
                 {
-                    updateDelegate(this.cellType, other);
+                    updateDelegate(this, other);
                 }
             }
         }
@@ -50,4 +50,20 @@ public class GridCellTargetDual : MonoBehaviour
         if (flagPoleRemote != null)
             flagPoleRemote.gameObject.SetActive(true);
     }
+
+    public GridCellType GetCellType()
+    {
+        return this.cellType;
+    }
+
+    public Vector3 GetCellPosition()
+    {
+        return this.transform.localPosition;
+    }
+
+    public Transform GetCell()
+    {
+        return this.transform;
+    }
+
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GridCellTrap : MonoBehaviour
+public class GridCellTrap : MonoBehaviour, IGridCell
 {
     private GridCellType cellType = GridCellType.TRAP;
     private static float trapPower = 800f;
@@ -25,7 +25,7 @@ public class GridCellTrap : MonoBehaviour
 
         if (updateDelegate != null)
         {
-            updateDelegate(this.cellType, other);
+            updateDelegate(this, other);
         }
     }
 
@@ -36,4 +36,24 @@ public class GridCellTrap : MonoBehaviour
         rigidbody.AddForce(Vector3.up * trapPower, ForceMode.Impulse);
         rigidbody.AddTorque(new Vector3(0f, 1f, 1f) * trapTorque, ForceMode.Impulse);
     }
+
+    public GridCellType GetCellType()
+    {
+        return this.cellType;
+    }
+
+    public Vector3 GetCellPosition()
+    {
+        return this.transform.localPosition;
+    }
+
+    public Transform GetCell()
+    {
+        return this.transform;
+    }
+
+    public void Reset() {
+        // Do nothing
+    }
+
 }

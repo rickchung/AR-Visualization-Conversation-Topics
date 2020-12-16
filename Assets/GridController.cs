@@ -5,7 +5,20 @@ using UnityEngine;
 using TMPro;
 
 public enum GridCellType { BASE, TRAP, REWARD, REWARD_DUAL, WALL, WALL_2, WALL_3, P1_START, P2_START, _FLOAT_WALL };
-public delegate void GridCellUpdateDelegate(GridCellType cellType, Collider other);
+
+// public delegate void GridCellUpdateDelegate(GridCellType cellType, Collider other);
+public delegate void GridCellUpdateDelegate(IGridCell cell, Collider other);
+
+/// <summary>
+/// A dirty and lazy fix to keep behaviors of all types of grid cells consistent
+/// </summary>
+public interface IGridCell
+{
+    GridCellType GetCellType();
+    Vector3 GetCellPosition();
+    Transform GetCell();
+    void Reset();
+}
 
 public class GridController : MonoBehaviour
 {
@@ -17,40 +30,16 @@ public class GridController : MonoBehaviour
     public Transform notificationPanel;
 
     private Vector3[,] cellVectorMap;  // The real-world map of the game.
-    private Transform[,] cellObjectsMap;  // The map of grid cells
+    private IGridCell[,] cellMetaObjectsMap;  // The map of grid cells
+    private Transform[,] cellObjectsMap;
     private GridCellType[,] cellTypeMap;  // The map of grid cells with types
     private List<GridCellTarget> flagCells;  // A list of flag cells
     private List<GridCellTargetDual> dualFlagCells;  // A list of flag cells
-    private int numFlagsCaptured;
-    private int targetNumOfFlags;
     private int numInX, numInZ;
     private static string dataFolderPath;
 
-    public int NumFlagsCaptured
-    {
-        get
-        {
-            return numFlagsCaptured;
-        }
-
-        set
-        {
-            numFlagsCaptured = value;
-        }
-    }
-
-    public int TargetNumOfFlags
-    {
-        get
-        {
-            return targetNumOfFlags;
-        }
-
-        set
-        {
-            targetNumOfFlags = value;
-        }
-    }
+    public int NumFlagsCaptured { get; set; }
+    public int TargetNumOfFlags { get; set; }
 
     // ==================== Unity Lifecycle ====================
 
@@ -91,6 +80,7 @@ public class GridController : MonoBehaviour
         );
 
         cellVectorMap = new Vector3[numInX, numInZ];
+        cellMetaObjectsMap = null;
         cellObjectsMap = new Transform[numInX, numInZ];
         cellTypeMap = new GridCellType[numInX, numInZ];
 
@@ -131,8 +121,6 @@ public class GridController : MonoBehaviour
         // Map geo info
         var startingPoint = gridStart.localPosition;
         var endPoint = gridEnd.localPosition;
-        // var distX = Mathf.Abs(startingPoint.x - endPoint.x);
-        // var distZ = Mathf.Abs(startingPoint.z - endPoint.z);
         var stepSize = gridStart.localScale.x;
         var padding = stepSize * 0.10f;
         numInX = cells.GetLength(0);
@@ -140,12 +128,15 @@ public class GridController : MonoBehaviour
 
         // Init map objects
         cellVectorMap = new Vector3[numInX, numInZ];
+        cellMetaObjectsMap = new IGridCell[numInX, numInZ];
         cellObjectsMap = new Transform[numInX, numInZ];
+        cellTypeMap = cells;
+
+        // Reward-related
         flagCells = new List<GridCellTarget>();
         dualFlagCells = new List<GridCellTargetDual>();
         NumFlagsCaptured = 0;
         TargetNumOfFlags = 0;
-        cellTypeMap = cells;
 
         // Generate grid cells
         for (var x = 0; x < numInX; x++)
@@ -154,47 +145,42 @@ public class GridController : MonoBehaviour
             {
                 var cellType = cellTypeMap[x, z];
                 Transform newCell;
+                IGridCell cellObjMeta;
                 switch (cellType)
                 {
                     case GridCellType.REWARD:
                         newCell = (Transform)Instantiate(gridCellTargetPrefab, transform, false);
-                        newCell.GetComponent<GridCellTarget>().SetUpdateDelegate(
-                            GridCellUpdateCallback
-                        );
-                        flagCells.Add(newCell.GetComponent<GridCellTarget>());
+                        cellObjMeta = newCell.GetComponent<GridCellTarget>();
+                        newCell.GetComponent<GridCellTarget>().SetUpdateDelegate(GridCellUpdateCallback);
                         TargetNumOfFlags += 1;
                         break;
                     case GridCellType.REWARD_DUAL:
                         newCell = (Transform)Instantiate(gridCellTargetDuoPrefab, transform, false);
-                        newCell.GetComponent<GridCellTargetDual>().SetUpdateDelegate(
-                            GridCellUpdateCallback
-                        );
-                        dualFlagCells.Add(newCell.GetComponent<GridCellTargetDual>());
+                        cellObjMeta = newCell.GetComponent<GridCellTargetDual>();
+                        newCell.GetComponent<GridCellTargetDual>().SetUpdateDelegate(GridCellUpdateCallback);
                         TargetNumOfFlags += 2;
                         break;
                     case GridCellType.TRAP:
                         newCell = (Transform)Instantiate(girdCellTrapPrefab, transform, false);
-                        newCell.GetComponent<GridCellTrap>().SetUpdateDelegate(
-                            GridCellUpdateCallback
-                        );
+                        cellObjMeta = newCell.GetComponent<GridCellTrap>();
+                        newCell.GetComponent<GridCellTrap>().SetUpdateDelegate(GridCellUpdateCallback);
                         break;
                     case GridCellType.WALL:
                     case GridCellType.WALL_2:
                     case GridCellType.WALL_3:
                         newCell = (Transform)Instantiate(gridCellWallPrefab, transform, false);
+                        cellObjMeta = newCell.GetComponent<GridCellWall>();
                         newCell.GetComponent<GridCellWall>().SetHeight((int)cellType - 3);
-                        newCell.GetComponent<GridCellWall>().SetUpdateDelegate(
-                            GridCellUpdateCallback
-                        );
+                        newCell.GetComponent<GridCellWall>().SetUpdateDelegate(GridCellUpdateCallback);
                         break;
                     case GridCellType._FLOAT_WALL:
                         newCell = (Transform)Instantiate(gridCellFloatingWallPrefab, transform, false);
-                        newCell.GetComponent<GridCellFloatingWall>().SetUpdateDelegate(
-                            GridCellUpdateCallback
-                        );
+                        cellObjMeta = newCell.GetComponent<GridCellFloatingWall>();
+                        newCell.GetComponent<GridCellFloatingWall>().SetUpdateDelegate(GridCellUpdateCallback);
                         break;
                     default:
                         newCell = (Transform)Instantiate(gridCellPrefab, transform, false);
+                        cellObjMeta = null;
                         break;
                 }
 
@@ -207,6 +193,7 @@ public class GridController : MonoBehaviour
                 newCell.gameObject.SetActive(true);
                 // Save for future references
                 cellVectorMap[x, z] = newPos;
+                cellMetaObjectsMap[x, z] = cellObjMeta;
                 cellObjectsMap[x, z] = newCell;
                 cellTypeMap[x, z] = cellType;
             }
@@ -251,21 +238,58 @@ public class GridController : MonoBehaviour
                 Destroy(o.gameObject);
     }
 
+    /// <summary>
+    /// Reset the current map by removing the current one and generating a new one, or resetting the existing one.
+    /// </summary>
     public void ResetMap()
     {
-        RemoveGridMap();
-        GenerateMapFromCells(cellTypeMap);
+        if (cellMetaObjectsMap == null) {
+            RemoveGridMap();
+            GenerateDefaultMap();
+            return;
+        }
 
-        if (flagCells != null)
-            foreach (var c in flagCells)
-                c.Reset();
+        for (int x = 0; x < numInX; x++)
+        {
+            for (int z = 0; z < numInZ; z++)
+            {
+                IGridCell c = cellMetaObjectsMap[x, z];
 
-        if (dualFlagCells != null)
-            foreach (var c in dualFlagCells)
-                c.Reset();
+                // If the cell is a default cell that does not have metadata, skip
+                if (c == null)
+                    continue;
 
-        NumFlagsCaptured = 0;
+                switch (c.GetCellType())
+                {
+                    case GridCellType.REWARD:
+                        // When rewards are used as origins of avatars, we do not reset rewards that have been eaten once before
+                        if (confManager.UseRewardAsOrigin)
+                        {
+                            if (!((GridCellTarget)c).WasEatenBefore)
+                            {
+                                c.Reset();
+                            }
+                        }
+                        else
+                        {
+                            c.Reset();
+                            NumFlagsCaptured--;
+                        }
+                        break;
+                    default:
+                        c.Reset();
+                        break;
+                }
+            }
+        }
 
+        if (NumFlagsCaptured < 0)
+        {
+            NumFlagsCaptured = 0;
+        }
+
+        avatarController.ResetPosition();
+        rivalAvatarController.ResetPosition();
         notificationPanel.gameObject.SetActive(false);
     }
 
@@ -273,12 +297,15 @@ public class GridController : MonoBehaviour
     {
         // TODO: This method should consider whether the avatar is dead or not.
         // TODO: This method should be synchronized between local and remote devices.
-        return (numFlagsCaptured == targetNumOfFlags);
+        return (NumFlagsCaptured == TargetNumOfFlags);
     }
 
     private bool isThisStageClear;
-    private void GridCellUpdateCallback(GridCellType cellType, Collider other)
+
+    private void GridCellUpdateCallback(IGridCell cell, Collider other)
     {
+        var cellType = cell.GetCellType();
+
         switch (cellType)
         {
             case GridCellType.TRAP:
@@ -299,12 +326,26 @@ public class GridController : MonoBehaviour
                 }
                 break;
             case GridCellType.REWARD:
-                DataLogger.Log(this.gameObject, LogTag.MAP, "A reward is collected.");
-                NumFlagsCaptured += 1;
+                DataLogger.Log(this.gameObject, LogTag.MAP, string.Format("A reward is collected"));
+
+                // Set the avatar's origin the position of this reward if the setting is enabled
+                if (confManager.UseRewardAsOrigin)
+                {
+                    // It is a little tricky here because there are two avatars (one is a ghost).
+                    // We only reset the origin of the avatar who touches this reward.
+                    // Therefore, it's the Collider other who's AvatarController should update the origin
+                    if (other.GetComponent<AvatarController>() != null)
+                    {
+                        other.GetComponent<AvatarController>().UpdateStartingCells(cell.GetCell(), cell.GetCellPosition());
+                    }
+                }
+
+                NumFlagsCaptured++;
+                DataLogger.Log(this.gameObject, LogTag.MAP, string.Format("Scoreboard: cur={0}, target={1}", NumFlagsCaptured, TargetNumOfFlags));
                 break;
             case GridCellType.REWARD_DUAL:
                 DataLogger.Log(this.gameObject, LogTag.MAP, "A dual reward is collected.");
-                NumFlagsCaptured += 1;
+                NumFlagsCaptured++;
                 break;
             case GridCellType.BASE:
                 break;

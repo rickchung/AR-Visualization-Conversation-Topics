@@ -30,7 +30,8 @@ public class ConfManager : MonoBehaviour
 
     public InputField serverIPField;
     private const string PREFKEY_SERVER_IP = "pref_key_server_ip";
-    private Boolean offlineMode;
+    public Boolean UseOfflineMode { get; set; }  // set single-user mode
+    public Boolean UseRewardAsOrigin { get; set; }  // set the avatar's position the last reward
 
     public ConfigScrollerController configScrollerController;
 
@@ -281,7 +282,7 @@ public class ConfManager : MonoBehaviour
     public void StartGame()
     {
         // The user can choose whether to start with the offline mode or not
-        if (!offlineMode)
+        if (!UseOfflineMode)
         {
             SetSocketIPAddr();
             if (!partnerSocket.IsConnected())
@@ -363,11 +364,6 @@ public class ConfManager : MonoBehaviour
     // ========================================
     // Misc
     // ========================================
-
-    public void ToggleOfflineMode(bool value)
-    {
-        offlineMode = value;
-    }
 
     public void ToggleAlwaysOnRecording(bool value)
     {

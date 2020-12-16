@@ -2,15 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GridCellTarget : MonoBehaviour
+public class GridCellTarget : MonoBehaviour, IGridCell
 {
     private GridCellType cellType = GridCellType.REWARD;
     private Transform flagPole;
     private GridCellUpdateDelegate updateDelegate;
 
+    public bool WasEatenBefore { get; set; }
+
     void Start()
     {
         flagPole = transform.Find("FlagPole");
+        WasEatenBefore = false;
     }
 
     public void SetUpdateDelegate(GridCellUpdateDelegate d)
@@ -29,7 +32,8 @@ public class GridCellTarget : MonoBehaviour
             flagPole.gameObject.SetActive(false);
             if (updateDelegate != null)
             {
-                updateDelegate(this.cellType, other);
+                WasEatenBefore = true;
+                updateDelegate(this, other);
             }
         }
     }
@@ -38,5 +42,20 @@ public class GridCellTarget : MonoBehaviour
     {
         if (flagPole != null)
             flagPole.gameObject.SetActive(true);
+    }
+
+    public GridCellType GetCellType()
+    {
+        return this.cellType;
+    }
+
+    public Vector3 GetCellPosition()
+    {
+        return this.transform.localPosition;
+    }
+
+    public Transform GetCell()
+    {
+        return this.transform;
     }
 }
