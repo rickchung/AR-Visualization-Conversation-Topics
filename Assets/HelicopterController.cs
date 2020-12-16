@@ -198,21 +198,25 @@ public class HelicopterController : AvatarController
 
     override public void ResetPosition()
     {
+        // Invoke the fundamental reset routine
         base.ResetPosition();
 
+        // The helicopter has some other physics need to reset as follows
+
+        // Reset the local rotation of the helicopter
         helicopter.localRotation = Quaternion.Euler(0, 180, 0);
+        // Use a different position along the y axis
         var pos = helicopter.localPosition;
         pos.y = 0.015f;
         helicopter.localPosition = pos;
-
+        
+        // Reset the rotor and its related physics
         topRotor.localRotation = topOrgRot;
         tailRotor.localRotation = tailOrgRot;
         topRotor.localPosition = topOrgPos;
         tailRotor.localPosition = tailOrgPos;
-
         poutTopRotor = poutTailRotor = boutTopRotor = boutTailRotor = 1;
-
-        // Reset the physics
+        // Reset other physics
         StopEngine();
         forwardAcc = upAcc = torqueAcc = curAltitudeLv = 0;
         rbHelicopter.velocity = Vector3.zero;

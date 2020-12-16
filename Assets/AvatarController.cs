@@ -143,7 +143,8 @@ public class AvatarController : MonoBehaviour
             UpdateStartingCells();
         }
 
-        // Reset the position
+        // Reset the position the starting cell
+        // TODO: Here we can add a condition when to reset the avatar a different position
         Vector3 avatarPos = startingCellInGrid.localPosition;
         avatarPos.y = AVATAR_Y_POS;
         avatar.localPosition = avatarPos;
@@ -160,6 +161,10 @@ public class AvatarController : MonoBehaviour
         ;
     }
 
+
+    /// <summary>
+    /// Set the avartar's origin the starting cell of the grid map. The position of the rival avatar is opposite to the non-rival one.
+    /// </summary>
     public void UpdateStartingCells()
     {
         Transform sc = null;
@@ -198,8 +203,12 @@ public class AvatarController : MonoBehaviour
             }
         }
 
-        startingCellInGrid = sc;
-        startingCellInVec = vc;
+        UpdateStartingCells(sc, vc);
+    }
+
+    public void UpdateStartingCells(Transform sc, Vector3? vc) {
+        this.startingCellInGrid = sc;
+        this.startingCellInVec = vc;
     }
 
     public virtual List<string> GetModifiableCmds()
