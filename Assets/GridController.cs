@@ -202,17 +202,15 @@ public class GridController : MonoBehaviour
         // Deactivate the starting and end cells
         gridStart.gameObject.SetActive(false);
         gridEnd.gameObject.SetActive(false);
-        // When the grid is ready, reset the positions of avatars
-        avatarController.UpdateStartingCells();
-        avatarController.ResetPosition();
-        rivalAvatarController.UpdateStartingCells();
-        rivalAvatarController.ResetPosition();
     }
 
     public void LoadGridMap(string mapName)
     {
         isThisStageClear = false;
         RemoveGridMap();
+
+        avatarController.gameObject.SetActive(false);
+        rivalAvatarController.gameObject.SetActive(false);
 
         if (mapName.Equals("Default"))
         {
@@ -223,6 +221,14 @@ public class GridController : MonoBehaviour
             var map = ImportGridAndProblem(mapName);
             GenerateMapFromCells(map);
         }
+
+        // When the grid is ready, reset the positions of avatars
+        avatarController.UpdateStartingCells();
+        avatarController.ResetPosition();
+        avatarController.gameObject.SetActive(true);
+        rivalAvatarController.UpdateStartingCells();
+        rivalAvatarController.ResetPosition();
+        rivalAvatarController.gameObject.SetActive(true);
 
         // TODO: When a grid map is loaded, should it reset the positions of two avatars?
         //
@@ -241,55 +247,59 @@ public class GridController : MonoBehaviour
     /// <summary>
     /// Reset the current map by removing the current one and generating a new one, or resetting the existing one.
     /// </summary>
-    public void ResetMap()
+    public void ResetMap(bool purge = false)
     {
-        if (cellMetaObjectsMap == null)
+        if (purge)
         {
             RemoveGridMap();
-            GenerateDefaultMap();
-            return;
-        }
-
-        for (int x = 0; x < numInX; x++)
-        {
-            for (int z = 0; z < numInZ; z++)
-            {
-                IGridCell c = cellMetaObjectsMap[x, z];
-
-                // If the cell is a default cell that does not have metadata, skip
-                if (c == null)
-                    continue;
-
-                switch (c.GetCellType())
-                {
-                    case GridCellType.REWARD:
-                        // When rewards are used as origins of avatars, we do not reset rewards that have been eaten once before
-                        if (confManager.UseRewardAsOrigin)
-                        {
-                            if (c is GridCellTarget)
-                                if (!((GridCellTarget)c).WasEatenBefore)
-                                    c.Reset();
-                        }
-                        else
-                        {
-                            c.Reset();
-                            NumFlagsCaptured--;
-                        }
-                        break;
-                    default:
-                        c.Reset();
-                        break;
-                }
-            }
-        }
-
-        if (NumFlagsCaptured < 0)
-        {
+            GenerateMapFromCells(cellTypeMap);
             NumFlagsCaptured = 0;
         }
+        else
+        {
 
-        avatarController.ResetPosition();
-        rivalAvatarController.ResetPosition();
+            for (int x = 0; x < numInX; x++)
+            {
+                for (int z = 0; z < numInZ; z++)
+                {
+                    IGridCell c = cellMetaObjectsMap[x, z];
+
+                    // If the cell is a default cell that does not have metadata, skip
+                    if (c == null)
+                        continue;
+
+                    switch (c.GetCellType())
+                    {
+                        case GridCellType.REWARD:
+                            // When rewards are used as origins of avatars, we do not reset rewards that have been eaten once before
+                            if (confManager.UseRewardAsOrigin)
+                            {
+                                if (c is GridCellTarget)
+                                    if (!((GridCellTarget)c).WasEatenBefore)
+                                        c.Reset();
+                            }
+                            else
+                            {
+                                c.Reset();
+                                NumFlagsCaptured--;
+                            }
+                            break;
+                        default:
+                            c.Reset();
+                            break;
+                    }
+                }
+            }
+
+            if (NumFlagsCaptured < 0)
+            {
+                NumFlagsCaptured = 0;
+            }
+
+            avatarController.ResetPosition();
+            rivalAvatarController.ResetPosition();
+        }
+
         notificationPanel.gameObject.SetActive(false);
     }
 
@@ -355,6 +365,7 @@ public class GridController : MonoBehaviour
 
         if (IsStageClear())
         {
+            ResetMap(true);
             if (!isThisStageClear)
             {
                 DataLogger.Log(this.gameObject, LogTag.SYSTEM, "Stage Clear!");

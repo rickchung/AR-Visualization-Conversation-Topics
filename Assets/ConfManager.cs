@@ -218,7 +218,9 @@ public class ConfManager : MonoBehaviour
         nextStageScreen.SetActive(false);
 
         informationPanel.ReplaceContent(conf.problem);
+        
         gridController.LoadGridMap(conf.map);
+
         arrowKeyPanel.SetActive(conf.isArrowKeyEnabled);
         sttCtrlPanel.SetActive(!conf.isArrowKeyEnabled);
         developerPanel.SetActive(conf.isDeveloperPanelEnabled);

@@ -6,7 +6,6 @@ public class GridCellFloatingWall : MonoBehaviour, IGridCell
 {
     private GridCellType cellType = GridCellType.WALL;
     private GridCellUpdateDelegate updateDelegate;
-    private List<Vector3> childrenTransforms;
     private Vector3[] origin;
 
     public void SetUpdateDelegate(GridCellUpdateDelegate d)
@@ -51,19 +50,6 @@ public class GridCellFloatingWall : MonoBehaviour, IGridCell
 
     public void Reset()
     {
-        // Restore the transforms, including position and rotation, of all children
-        var i = 0;
-        foreach (Transform c in this.transform)
-        {
-            if (c.gameObject.activeSelf)
-            {
-                c.localPosition = childrenTransforms[i];
-                c.localRotation = Quaternion.identity;
-                c.Rotate(childrenTransforms[i + 1], Space.Self);
-                i += 2;
-            }
-        }
-
         // Reset this object itself
         if (origin == null)
         {

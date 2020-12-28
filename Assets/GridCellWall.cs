@@ -6,7 +6,6 @@ public class GridCellWall : MonoBehaviour, IGridCell
 {
     private GridCellType cellType = GridCellType.WALL;
     private GridCellUpdateDelegate updateDelegate;
-    private List<Vector3> childrenTransforms;
     private Vector3[] origin;
     public GameObject cubeLevel;
 
@@ -43,7 +42,6 @@ public class GridCellWall : MonoBehaviour, IGridCell
 
     public void SetHeight(int numCube)
     {
-        childrenTransforms = new List<Vector3>();
         for (int i = 0; i < numCube; i++)
         {
             var cloneCube = Instantiate(
@@ -56,9 +54,6 @@ public class GridCellWall : MonoBehaviour, IGridCell
             cloneCubePos.y += 15f * i;
             cloneCube.transform.localPosition = cloneCubePos;
             cloneCube.SetActive(true);
-
-            childrenTransforms.Add(cloneCube.transform.localPosition);
-            childrenTransforms.Add(cloneCube.transform.localRotation.eulerAngles);
         }
     }
 
@@ -79,18 +74,6 @@ public class GridCellWall : MonoBehaviour, IGridCell
 
     public void Reset()
     {
-        // Restore the transforms, including position and rotation, of all children
-        var i = 0;
-        foreach (Transform c in this.transform)
-        {
-            if (c.gameObject.activeSelf)
-            {
-                c.localPosition = childrenTransforms[i];
-                c.localRotation = Quaternion.identity;
-                c.Rotate(childrenTransforms[i + 1], Space.Self);
-                i += 2;
-            }
-        }
         // Reset this object itself
         if (origin == null)
         {
